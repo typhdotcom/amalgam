@@ -26,19 +26,26 @@ This module combines M3.2 (`Amalgam/System/ZigzagTarget.lean`) with M3.3
   datum. The targets of candidates with datum `(A, A')` are exactly `Target.ofDatum A A' T` for
   `T ⊆ join A A'`; in fields, exactly the targets with full content on the five fixed entries,
   `LM`-entry `A`, `MR`-entry `A'`, and `LMR`-entry contained in `join A A'`.
-* `datum_determines_target_iff`: the datum `(A, A')` determines a unique target exactly when
-  `join A A' = ∅`. The datum records which coarse binary families lift, not whether the fine
-  middle states used by an `LM`-lift and an `MR`-lift of one coarse full family coincide. When
-  the join is nonempty, `Target.ofDatum A A' ∅` and `Target.ofDatum A A' (join A A')` are two
-  distinct targets of candidates with this datum.
+* `datum_determines_target_iff`, `target_eq_of_join_eq_empty`: the datum `(A, A')` determines
+  a unique target exactly when `join A A' = ∅`. The datum records which coarse binary families
+  lift, not whether the fine middle states used by an `LM`-lift and an `MR`-lift of one coarse
+  full family coincide. When the join is nonempty, `Target.ofDatum A A' ∅` and
+  `Target.ofDatum A A' (join A A')` are two distinct targets of candidates with this datum.
 * `realizable_target_iff`: an abstract target arises from some candidate exactly when its five
   fixed entries are full and its `LMR`-entry lies in the join of its `LM`- and `MR`-entries.
-  This is the unconditional converse of M3.3 read at the level of targets: it settles which
-  target collections on this shape and datum are realizable at all, with no further hypothesis.
-  The M4 review decides what closure obligations remain.
+  This is the unconditional converse of M3.3 read at the level of targets, recorded as the
+  realizability consequence (PROPOSAL Section 14) for this shape and datum.
+
+## Universe convention
+
+The coarse system lives in `RestrictionSystem.{0, w}`. Statements with a candidate as hypothesis
+(`Candidate.image_LMR_subset_join`, `subset_join_of_candidate`, `Candidate.target_eq_ofDatum`,
+`Candidate.target_realizable`, `target_eq_of_join_eq_empty`) hold for a fine system in any
+universe `v`. The realization `realize A A' T` has fine states in the coarse universe `w`, so the
+existential statements and the iff's quantify over `Candidate.{w, w}`.
 -/
 
-universe v w
+universe v v₁ v₂ w
 
 namespace Zigzag
 
@@ -171,6 +178,19 @@ theorem datum_determines_target_iff (A : Set (S'.CompatibleFamily LM))
         (congrArg Prod.fst h₁) (congrArg Prod.snd h₁) (congrArg Prod.fst h₂)
         (congrArg Prod.snd h₂)⟩
 
+/-- Candidates with fine systems in any universes and the same datum `(A, A')` have the same
+target when `join A A' = ∅`: the forward half of `datum_determines_target_iff` at arbitrary fine
+universes. -/
+theorem target_eq_of_join_eq_empty {A : Set (S'.CompatibleFamily LM)}
+    {A' : Set (S'.CompatibleFamily MR)} {c₁ : Candidate.{v₁, w} S'} {c₂ : Candidate.{v₂, w} S'}
+    (h : join A A' = ∅) (h₁ : c₁.datum = (A, A')) (h₂ : c₂.datum = (A, A')) :
+    c₁.target = c₂.target :=
+  (Candidate.target_eq_iff c₁ c₂).2 ⟨h₁.trans h₂.symm, by
+    have e₁ := subset_join_of_candidate h₁ rfl
+    have e₂ := subset_join_of_candidate h₂ rfl
+    rw [h, Set.subset_empty_iff] at e₁ e₂
+    exact e₁.trans e₂.symm⟩
+
 /-! ### Realizability of abstract targets -/
 
 /-- Every candidate's target, in any fine universe, has full content on the five fixed entries
@@ -183,9 +203,8 @@ theorem Candidate.target_realizable (c : Candidate.{v, w} S') :
 
 /-- Which abstract target collections arise from a candidate at all: exactly those with full
 content on the empty family, on each singleton, and on `LR`, and with `LMR`-entry contained in
-the join of the `LM`- and `MR`-entries. This settles realizability of the target collection for
-this shape and datum without further conditions; the M4 review decides what closure obligations
-remain. -/
+the join of the `LM`- and `MR`-entries. This is the realizability consequence of the
+classification for this shape and datum, with no further condition. -/
 theorem realizable_target_iff (t : Target S') :
     (∃ c : Candidate.{w, w} S', c.target = t) ↔
       t.empty = Set.univ ∧ t.l = Set.univ ∧ t.m = Set.univ ∧ t.r = Set.univ ∧

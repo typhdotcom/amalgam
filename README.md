@@ -593,7 +593,9 @@ lifts exist while no lift of the full family does (`compatible_LMR_split_iff`,
 The two candidates therefore supply the same binary images (`image_LM_eq`,
 `image_MR_eq`) and have different full images (`image_LMR_ne`), separated by the
 named coarse family `y₀`, which `glue` attains (`y₀_mem_image_glue`) and `split`
-does not (`y₀_notMem_image_split`). Both observations are surjective at every
+does not (`y₀_notMem_image_split`). Packaged as candidates of `coarse`
+(`splitCandidate`, `glueCandidate`), they have equal supplied datum
+(`datum_eq`) and different targets (`target_ne`). Both observations are surjective at every
 context (`surjective_φsplit`, `surjective_φglue`), and all four adjacent binary
 comparisons are surjective onto the coarse binary families
 (`surjective_observedMapFamily_LM_split`, `surjective_observedMapFamily_MR_split`,
@@ -615,6 +617,72 @@ empty carrier are excluded, since no map out of an empty set is onto a singleton
 coarse state. The sweep covers only bounded carrier sizes and singleton coarse
 objects, so no coarse family type in it has two elements; it can refute the
 conjecture or guide the proof, and it cannot prove the universal law.
+
+### Classification at fixed datum
+
+`Amalgam/System/ZigzagClassification.lean` reads the classification of full
+images at the level of the whole target, by combining the fixed entries of
+`Amalgam/System/ZigzagTarget.lean` with the realization of
+`Amalgam/System/ZigzagRealization.lean`. No refinement of the supplied datum is
+introduced: it remains the ordered pair `(I_LM, I_MR)`, and the target
+equivalence remains equality of all eight subsets.
+
+Necessity transfers to candidates unchanged. `Candidate.image_LMR_subset_join`
+says `I_LMR ⊆ join I_LM I_MR` for a candidate in any fine universe, and
+`subset_join_of_candidate` is the same statement for a candidate with named
+datum `(A, A')` and named full image `T`.
+
+Sufficiency is the realization packaged as a candidate. `realizeCandidate A A' T`
+is the fine system `realize A A' T` with its objectwise surjective observation;
+`realizeCandidate_datum` gives it datum `(A, A')` under the hypothesis
+`T ⊆ join A A'`, and `realizeCandidate_image_LMR` gives it full image `T` for
+every `A`, `A'` and `T`. Hence `exists_candidate_iff`: a candidate with datum
+`(A, A')` and full image `T` exists exactly when `T ⊆ join A A'`.
+
+Every target that occurs has one shape. `Target.ofDatum A A' T` is the target
+with full coarse content on the empty family, on each singleton and on `LR`,
+with `LM`-entry `A`, `MR`-entry `A'` and `LMR`-entry `T`. `Target.eq_ofDatum_iff`
+says a target is that one exactly when its five fixed entries are full and its
+`LM`-, `MR`- and `LMR`-entries are `A`, `A'` and `T`, and
+`Candidate.target_eq_ofDatum` says every candidate's target is `Target.ofDatum`
+at its own datum and full image.
+
+The classification at fixed datum is `exists_candidate_target_iff`: the targets
+of candidates with datum `(A, A')` are exactly `Target.ofDatum A A' T` for
+`T ⊆ join A A'`. `exists_candidate_target_iff'` is the same statement in the
+eight fields: a target is the target of a candidate with datum `(A, A')` exactly
+when its entries on the empty family, on each singleton and on `LR` are full,
+its `LM`-entry is `A`, its `MR`-entry is `A'`, and its `LMR`-entry lies in
+`join A A'`.
+
+Uniqueness at the level of the target is `datum_determines_target_iff`: the
+datum `(A, A')` determines the target exactly when `join A A' = ∅`; the
+forward direction, `target_eq_of_join_eq_empty`, holds for two candidates in
+any fine universes. When the
+join is nonempty, `Target.ofDatum A A' ∅` and `Target.ofDatum A A' (join A A')`
+are two distinct targets of candidates with this datum. The missing information
+is the same one the previous subsection names: the datum records which coarse
+binary families lift, not whether the fine middle states used by an `LM`-lift
+and an `MR`-lift of a single coarse full family coincide.
+
+Realizability of an abstract target needs no datum. `Candidate.target_realizable`
+says every candidate's target, in any fine universe, has full content on the
+five fixed entries and `LMR`-entry contained in the join of its `LM`- and
+`MR`-entries, and `realizable_target_iff` says those conditions are exactly the
+ones a target satisfies to arise from some candidate. That settles which target
+collections arise from any candidate on this shape, with no further hypothesis;
+it records rather than closes M4's obligation, which decides what closure
+requirements remain.
+
+The universe convention is the one the earlier subsections use. Forward
+directions hold for candidates at any fine universe, since they consume
+naturality alone: `Candidate.image_LMR_subset_join`, `subset_join_of_candidate`,
+`Candidate.target_eq_ofDatum` and `Candidate.target_realizable` are stated at an
+independent fine universe. The existential directions produce the tagged
+realization, whose fine states are built from the coarse ones, so
+`exists_candidate_iff`, `exists_candidate_target_iff`,
+`exists_candidate_target_iff'`, `datum_determines_target_iff` and
+`realizable_target_iff` quantify over candidates at the coarse universe.
 
 ## Four comparison behaviors
 

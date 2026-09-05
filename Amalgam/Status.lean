@@ -11,6 +11,7 @@ import Amalgam.System.Comparison
 import Amalgam.System.Presentation
 import Amalgam.System.Restriction
 import Amalgam.System.Zigzag
+import Amalgam.System.ZigzagClassification
 import Amalgam.System.ZigzagRealization
 import Amalgam.System.ZigzagTarget
 
@@ -1849,6 +1850,16 @@ example : φsplit.image Zigzag.MR = φglue.image Zigzag.MR := image_MR_eq
 
 example : φsplit.image Zigzag.LMR ≠ φglue.image Zigzag.LMR := image_LMR_ne
 
+/-- Packaged as candidate realizations of `coarse`, the two systems have equal supplied datum and
+different targets. -/
+example : Zigzag.Candidate coarse := splitCandidate
+
+example : Zigzag.Candidate coarse := glueCandidate
+
+example : splitCandidate.datum = glueCandidate.datum := datum_eq
+
+example : splitCandidate.target ≠ glueCandidate.target := target_ne
+
 /-- The named coarse family separating the two candidates. -/
 example : coarse.CompatibleFamily Zigzag.LMR := y₀
 
@@ -1870,6 +1881,118 @@ example : Function.Surjective (φglue.observedMapFamily Zigzag.MR) :=
   surjective_observedMapFamily_MR_glue
 
 end MiddleSplitWitness
+
+/-! ### Classification at fixed datum -/
+
+section ClassificationSection
+
+variable {S' : RestrictionSystem.{0, uW} Context} (A : Set (S'.CompatibleFamily Zigzag.LM))
+  (A' : Set (S'.CompatibleFamily Zigzag.MR)) (T : Set (S'.CompatibleFamily Zigzag.LMR))
+
+/-- The full image of a candidate in any fine universe lies in the join of its datum. -/
+example (c : Zigzag.Candidate.{uV, uW} S') :
+    c.φ.image Zigzag.LMR ⊆ Zigzag.join c.datum.1 c.datum.2 :=
+  c.image_LMR_subset_join
+
+/-- The same statement for a named datum and full image. -/
+example {c : Zigzag.Candidate.{uV, uW} S'} (h₁ : c.datum = (A, A'))
+    (h₂ : c.φ.image Zigzag.LMR = T) : T ⊆ Zigzag.join A A' :=
+  Zigzag.subset_join_of_candidate h₁ h₂
+
+/-- The realization of `(A, A', T)` packaged as a candidate, at the coarse universe. -/
+example : Zigzag.Candidate.{uW, uW} S' := Zigzag.realizeCandidate A A' T
+
+/-- Its datum is `(A, A')`, under `T ⊆ join A A'`. -/
+example (hT : T ⊆ Zigzag.join A A') : (Zigzag.realizeCandidate A A' T).datum = (A, A') :=
+  Zigzag.realizeCandidate_datum hT
+
+/-- Its full image is `T`, for every `A`, `A'` and `T`. -/
+example : (Zigzag.realizeCandidate A A' T).φ.image Zigzag.LMR = T :=
+  Zigzag.realizeCandidate_image_LMR A A' T
+
+/-- A candidate with datum `(A, A')` and full image `T` exists exactly when `T ⊆ join A A'`. -/
+example :
+    (∃ c : Zigzag.Candidate.{uW, uW} S', c.datum = (A, A') ∧ c.φ.image Zigzag.LMR = T) ↔
+      T ⊆ Zigzag.join A A' :=
+  Zigzag.exists_candidate_iff A A' T
+
+/-- The shape of a target at a fixed datum and full image. -/
+example : Zigzag.Target S' := Zigzag.Target.ofDatum A A' T
+
+/-- A target has that shape exactly when its five fixed entries are full and its `LM`-, `MR`- and
+`LMR`-entries are `A`, `A'` and `T`. -/
+example (t : Zigzag.Target S') :
+    t = Zigzag.Target.ofDatum A A' T ↔
+      t.empty = (Set.univ : Set (S'.CompatibleFamily Zigzag.empty)) ∧
+        t.l = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.L))) ∧
+          t.m = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.M))) ∧
+            t.r = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.R))) ∧
+              t.lr = (Set.univ : Set (S'.CompatibleFamily Zigzag.LR)) ∧
+                t.lm = A ∧ t.mr = A' ∧ t.lmr = T :=
+  t.eq_ofDatum_iff
+
+/-- Every candidate's target, in any fine universe, has that shape at its own datum and full
+image. -/
+example (c : Zigzag.Candidate.{uV, uW} S') :
+    c.target = Zigzag.Target.ofDatum c.datum.1 c.datum.2 (c.φ.image Zigzag.LMR) :=
+  c.target_eq_ofDatum
+
+/-- The classification at fixed datum: the targets of candidates with datum `(A, A')` are exactly
+`Target.ofDatum A A' U` for `U ⊆ join A A'`. -/
+example (t : Zigzag.Target S') :
+    (∃ c : Zigzag.Candidate.{uW, uW} S', c.datum = (A, A') ∧ c.target = t) ↔
+      ∃ U, U ⊆ Zigzag.join A A' ∧ t = Zigzag.Target.ofDatum A A' U :=
+  Zigzag.exists_candidate_target_iff A A' t
+
+/-- The same classification in fields. -/
+example (t : Zigzag.Target S') :
+    (∃ c : Zigzag.Candidate.{uW, uW} S', c.datum = (A, A') ∧ c.target = t) ↔
+      t.empty = (Set.univ : Set (S'.CompatibleFamily Zigzag.empty)) ∧
+        t.l = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.L))) ∧
+          t.m = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.M))) ∧
+            t.r = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.R))) ∧
+              t.lr = (Set.univ : Set (S'.CompatibleFamily Zigzag.LR)) ∧
+                t.lm = A ∧ t.mr = A' ∧ t.lmr ⊆ Zigzag.join A A' :=
+  Zigzag.exists_candidate_target_iff' A A' t
+
+/-- The exact uniqueness condition: the datum `(A, A')` determines the whole target exactly when
+the join is empty. -/
+example :
+    (∀ c₁ c₂ : Zigzag.Candidate.{uW, uW} S',
+        c₁.datum = (A, A') → c₂.datum = (A, A') → c₁.target = c₂.target) ↔
+      Zigzag.join A A' = ∅ :=
+  Zigzag.datum_determines_target_iff A A'
+
+/-- When the join is empty, any two candidates with that datum, in any fine universes, have the
+same target. -/
+example {c₁ : Zigzag.Candidate.{uV₁, uW} S'} {c₂ : Zigzag.Candidate.{uV₂, uW} S'}
+    (h : Zigzag.join A A' = ∅) (h₁ : c₁.datum = (A, A')) (h₂ : c₂.datum = (A, A')) :
+    c₁.target = c₂.target :=
+  Zigzag.target_eq_of_join_eq_empty h h₁ h₂
+
+/-- Every candidate's target, in any fine universe, is full on the five fixed entries and has
+`LMR`-entry inside the join of its `LM`- and `MR`-entries. -/
+example (c : Zigzag.Candidate.{uV, uW} S') :
+    c.target.empty = (Set.univ : Set (S'.CompatibleFamily Zigzag.empty)) ∧
+      c.target.l = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.L))) ∧
+        c.target.m = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.M))) ∧
+          c.target.r = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.R))) ∧
+            c.target.lr = (Set.univ : Set (S'.CompatibleFamily Zigzag.LR)) ∧
+              c.target.lmr ⊆ Zigzag.join c.target.lm c.target.mr :=
+  c.target_realizable
+
+/-- Which abstract targets arise from a candidate at all, with no further hypothesis. -/
+example (t : Zigzag.Target S') :
+    (∃ c : Zigzag.Candidate.{uW, uW} S', c.target = t) ↔
+      t.empty = (Set.univ : Set (S'.CompatibleFamily Zigzag.empty)) ∧
+        t.l = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.L))) ∧
+          t.m = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.M))) ∧
+            t.r = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.R))) ∧
+              t.lr = (Set.univ : Set (S'.CompatibleFamily Zigzag.LR)) ∧
+                t.lmr ⊆ Zigzag.join t.lm t.mr :=
+  Zigzag.realizable_target_iff t
+
+end ClassificationSection
 
 end InformationBoundary
 

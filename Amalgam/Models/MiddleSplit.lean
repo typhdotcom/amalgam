@@ -1,6 +1,7 @@
 import Amalgam.System.Binary
 import Amalgam.System.Comparison
 import Amalgam.System.Zigzag
+import Amalgam.System.ZigzagTarget
 
 /-!
 # M3.1: a strict information-loss witness for the adjacent binary datum
@@ -35,7 +36,9 @@ glue     univ    univ    univ
 Both observations `φsplit`, `φglue` are surjective at every context, and all four adjacent binary
 comparisons are surjective onto the coarse binary families. The strict pair is
 `image_LM_eq`, `image_MR_eq`, `image_LMR_ne`, with the coarse family `y₀` attained by `glue`
-(`y₀_mem_image_glue`) and not by `split` (`y₀_notMem_image_split`).
+(`y₀_mem_image_glue`) and not by `split` (`y₀_notMem_image_split`). Packaged as candidate
+realizations (`splitCandidate`, `glueCandidate`), the pair has equal supplied datum (`datum_eq`)
+and different targets (`target_ne`).
 
 The supplied datum records that each adjacent view lifts; it records no fine middle state and no
 identification of the two independently chosen lifts. `split` exploits exactly that gap: the `LM`
@@ -279,5 +282,20 @@ theorem surjective_observedMapFamily_LM_glue :
 theorem surjective_observedMapFamily_MR_glue :
     Function.Surjective (φglue.observedMapFamily MR) :=
   Set.range_eq_univ.1 ((φglue.range_observedMapFamily (F := MR)).trans image_MR_glue)
+
+/-! ### The strict pair as candidate realizations -/
+
+/-- `split` with its observation as a candidate realization of `coarse`. -/
+def splitCandidate : Candidate coarse := ⟨split, φsplit, surjective_φsplit⟩
+
+/-- `glue` with its observation as a candidate realization of `coarse`. -/
+def glueCandidate : Candidate coarse := ⟨glue, φglue, surjective_φglue⟩
+
+/-- The two candidates have the same supplied datum `(I_LM, I_MR)`. -/
+theorem datum_eq : splitCandidate.datum = glueCandidate.datum := Prod.ext image_LM_eq image_MR_eq
+
+/-- The two candidates have different targets: equal supplied data conceal different full images. -/
+theorem target_ne : splitCandidate.target ≠ glueCandidate.target := fun h =>
+  image_LMR_ne (congrArg Target.lmr h)
 
 end Amalgam.Models.MiddleSplit

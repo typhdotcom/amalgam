@@ -32,6 +32,10 @@ images are `φ.image LM = A`, `φ.image MR = A'`, `φ.image LMR = T`.
   image exactly when `join A A' = ∅`; otherwise `∅` and `join A A'` are two distinct realizable
   full images. The datum records which coarse binary families lift, not whether the fine middle
   states used by an `LM`-lift and an `MR`-lift of one coarse full family coincide.
+
+The coarse system lives in `RestrictionSystem.{0, w}`. The necessary inclusion holds for a fine
+system in any universe `v`; the realization has fine states in the coarse universe `w`, so the
+existential statements quantify over fine systems in `RestrictionSystem.{0, w}`.
 -/
 
 universe v w
