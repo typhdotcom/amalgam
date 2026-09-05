@@ -17,6 +17,12 @@ enter the foundation automatically.
 
 The project name is **Amalgam**.
 
+Mathematical notation uses readable Unicode and plain-text names in CommonMark
+inline code and fenced `text` blocks. Subscripts use underscores, and a joint
+index is parenthesized, as in `ext_(f,g)`. These are schematic formulas, not
+Lean source. This convention needs no math-rendering extension and is preserved
+by the configured Markdown formatter.
+
 Its scope is not fixed by the name. In standard mathematical language, an
 amalgamation is a global object realizing compatible local data. The project
 studies existence, uniqueness, multiplicity, observational loss, and
@@ -39,19 +45,10 @@ content is another. They need not distinguish the same realizations.
 
 The forward construction is
 
-\[
-\\text{global states}
-\\longrightarrow
-\\text{partial observations}
-\\longrightarrow
-\\text{compatible local families}
-\\longrightarrow
-\\text{extension fibers}
-\\longrightarrow
-\\text{observables}
-\\longrightarrow
-\\text{reconstruction}.
-\]
+```text
+global states → partial observations → compatible local families
+              → extension fibers → observables → reconstruction
+```
 
 An observation forgets distinctions.
 
@@ -63,14 +60,12 @@ several global states.
 
 Those are different mathematical phenomena:
 
-\[
-\\begin{array}{rcl}
-\\text{nonexistence} &:& \\text{compatible local data has no global extension},\\
-\\text{uniqueness} &:& \\text{compatible local data has at most one extension},\\
-\\text{incidence} &:& \\text{extensions are distributed over local data},\\
-\\text{coarse obstruction} &:& \\text{a summary records only part of that distribution}.
-\\end{array}
-\]
+```text
+nonexistence:       compatible local data has no global extension
+uniqueness:         compatible local data has at most one extension
+incidence:          extensions are distributed over local data
+coarse obstruction: a summary records only part of that distribution
+```
 
 The project studies these levels separately. It must never identify a scalar
 summary with the extension structure that produced it.
@@ -101,15 +96,15 @@ have different incidence behavior.
 
 Third, for a finite map
 
-\[
-f : A \\to B,
-\]
+```text
+f : A → B
+```
 
 the fiber-cardinality function
 
-\[
-\\operatorname{ext}\_f(b)=|f^{-1}(b)|
-\]
+```text
+ext_f(b) = |f⁻¹(b)|
+```
 
 recovers the map over the fixed codomain exactly up to relabeling inside its
 fibers. The scalar comparison term is only a coarse statistic of this profile.
@@ -122,9 +117,9 @@ results already known, a scalar field would not be chosen as primitive.
 
 Amalgam therefore begins one level lower:
 
-\[
-\\boxed{\\text{restriction, compatibility, comparison, and extension}.}
-\]
+```text
+restriction, compatibility, comparison, and extension
+```
 
 The old scalar calculus may reappear as a derived observation when it answers
 a question raised by the reconstruction problem. It must not determine the
@@ -140,50 +135,48 @@ Begin with ordinary types and maps.
 
 A single observation is a function
 
-\[
-f : X \\to Y.
-\]
+```text
+f : X → Y
+```
 
-For an observed value (y:Y), its extension fiber is
+For an observed value `y : Y`, its extension fiber is
 
-\[
-\\operatorname{Ext}\_f(y)={x:X\\mid f(x)=y}.
-\]
+```text
+Ext_f(y) = {x : X | f(x) = y}
+```
 
 This is already an inverse object. It records every global state consistent
-with the observation (y).
+with the observation `y`.
 
-The first genuinely local-to-global datum consists of local state spaces (L)
-and (R), an overlap space (B), and restriction maps (L \\to B \\leftarrow R).
+The first genuinely local-to-global datum consists of local state spaces `L`
+and `R`, an overlap space `B`, and restriction maps `L → B ← R`.
 It can be supplied without a global state space. A candidate realization adds
-global states (G) and maps forming a commuting square:
+global states `G` and maps forming a commuting square:
 
-\[
-\\begin{array}{ccc}
-G & \\longrightarrow & L\\
-\\downarrow && \\downarrow\\
-R & \\longrightarrow & B.
-\\end{array}
-\]
+```text
+G ───→ L
+│      │
+↓      ↓
+R ───→ B
+```
 
 The compatible local pairs form the pullback-like type
 
-\[
-\\operatorname{Compat}(L,R;B)
-={(l,r):L\\times R\\mid l|\_B=r|\_B}.
-\]
+```text
+Compat(L, R; B) = {(l, r) : L × R | l|_B = r|_B}
+```
 
 Commutativity induces the comparison map
 
-\[
-\\operatorname{compare}:G\\to\\operatorname{Compat}(L,R;B).
-\]
+```text
+compare : G → Compat(L, R; B)
+```
 
-For a compatible pair (p), the fiber
+For a compatible pair `p`, the fiber
 
-\[
-\\operatorname{Ext}\_{\\operatorname{compare}}(p)
-\]
+```text
+Ext_compare(p)
+```
 
 is the type of its global amalgamations. This notation is schematic; the Lean
 API should use an existing standard fiber construction unless a new wrapper
@@ -213,9 +206,9 @@ ______________________________________________________________________
 
 The comparison map separates the principal failure modes exactly.
 
-For compatible local data (p):
+For compatible local data `p`:
 
-- (\\operatorname{Ext}\_{\\operatorname{compare}}(p)) is empty exactly when
+- `Ext_compare(p)` is empty exactly when
   globalization fails;
 - it is nonempty exactly when at least one globalization exists;
 - it is a subsingleton exactly when globalization is unique when it exists;
@@ -250,31 +243,29 @@ An observation is not an interpretive metaphor in the core.
 It is a map that identifies elements in the same fiber and may omit elements
 of its codomain.
 
-For (f:X\\to Y), two global states are observationally indistinguishable
+For `f : X → Y`, two global states are observationally indistinguishable
 when
 
-\[
-f(x)=f(x').
-\]
+```text
+f(x) = f(x')
+```
 
-This relation is represented by the kernel pair (X\\times_Y X). Reserve the
+This relation is represented by the kernel pair `X ×_Y X`. Reserve the
 algebraic word `kernel` for contexts where a pointed or homomorphic kernel is
 actually present; for a general observable, state the induced equality
 relation explicitly.
 
 For an observable on structures
 
-\[
-\\mathcal O : \\mathcal S\\to\\mathcal D,
-\]
+```text
+O : Systems → Data
+```
 
 the induced observational equivalence is
 
-\[
-S\\sim\_{\\mathcal O}T
-\\quad\\Longleftrightarrow\\quad
-\\mathcal O(S)=\\mathcal O(T).
-\]
+```text
+S ∼_O T  ↔  O(S) = O(T)
+```
 
 Every observable introduced by the project must answer four questions:
 
@@ -303,41 +294,35 @@ ______________________________________________________________________
 
 # 6. Refinement serves a declared reconstruction target
 
-Suppose (\\mathcal O_0) and (\\mathcal O_1) observe the same class of
+Suppose `O_0` and `O_1` observe the same class of
 systems.
 
 The second is at least as informative as the first only when
 
-\[
-\\mathcal O_1(S)=\\mathcal O_1(T)
-\\Longrightarrow
-\\mathcal O_0(S)=\\mathcal O_0(T).
-\]
+```text
+O_1(S) = O_1(T)  ⇒  O_0(S) = O_0(T)
+```
 
 Prefer an explicit factorization
 
-\[
-\\mathcal O_0=q\\circ\\mathcal O_1
-\]
+```text
+O_0 = q ∘ O_1
+```
 
 when one exists. It identifies the forgetting map, not merely the resulting
 implication.
 
 A refinement is strictly stronger only after an explicit witness satisfies
 
-\[
-\\mathcal O_0(S)=\\mathcal O_0(T),
-\\qquad
-\\mathcal O_1(S)\\ne\\mathcal O_1(T).
-\]
+```text
+O_0(S) = O_0(T),    O_1(S) ≠ O_1(T)
+```
 
-A datum is complete relative to a target equivalence (\\simeq) when
+A datum is complete relative to a target equivalence `≃` when
 
-\[
-\\mathcal O(S)=\\mathcal O(T)
-\\quad\\Longleftrightarrow\\quad
-S\\simeq T.
-\]
+```text
+O(S) = O(T)  ↔  S ≃ T
+```
 
 The target equivalence must be named. “Determines the system” is not an
 acceptable theorem summary.
@@ -361,14 +346,12 @@ ______________________________________________________________________
 
 # 7. Fixed-base reconstruction is not system reconstruction
 
-For maps (f:X\\to B) and (g:Y\\to B) into the same fixed codomain, the
-appropriate residual symmetry is an equivalence over (B):
+For maps `f : X → B` and `g : Y → B` into the same fixed codomain, the
+appropriate residual symmetry is an equivalence over `B`:
 
-\[
-f\\simeq_B g
-\\quad\\Longleftrightarrow\\quad
-\\exists e:X\\simeq Y,\\quad g(e(x))=f(x)\\text{ for all }x.
-\]
+```text
+f ≃_B g  ↔  ∃ e : X ≃ Y, ∀ x : X, g(e(x)) = f(x)
+```
 
 This reconstructs a map while treating labels inside each fiber as
 unobservable.
@@ -396,35 +379,51 @@ ______________________________________________________________________
 
 # 8. Finite profiles are derived observables
 
-When (X) and (Y) are finite, the extension profile of (f:X\\to Y) is
+When `X` and `Y` are finite, the extension profile of `f : X → Y` is
 
-\[
-\\operatorname{ext}\_f(y)=|\\operatorname{Ext}\_f(y)|.
-\]
+```text
+ext_f(y) = |Ext_f(y)|
+```
 
 Its foundational theorem package should include:
 
 - total mass:
-  (\\sum_y\\operatorname{ext}\_f(y)=|X|);
+  `∑_y ext_f(y) = |X|`;
 - reachedness:
-  (y) is reached exactly when (\\operatorname{ext}\_f(y)>0);
+  `y` is reached exactly when `ext_f(y) > 0`;
 - missedness:
-  (y) is missed exactly when (\\operatorname{ext}\_f(y)=0);
+  `y` is missed exactly when `ext_f(y) = 0`;
 - injectivity exactly when every count is at most one;
 - surjectivity exactly when every count is positive;
 - bijectivity exactly when every count is one;
 - redundancy as total fiber excess;
 - reconstruction over a fixed codomain:
-  (\\operatorname{ext}\_f=\\operatorname{ext}\_g) exactly when
-  (f\\simeq_Y g).
+  `ext_f = ext_g` exactly when
+  `f ≃_Y g`.
 
 This package is a known proof donor. It should be ported only after the new
 repository independently arrives at the definitions above, with the minimum
 dependencies and in the new vocabulary.
 
-The theorem is special to finite sets. For structured, infinite, measured, or
-homotopical fibers, cardinality will generally forget more. The project must
-not promote the finite profile into a universal notion of extension data.
+The natural-number profile and finite-sum package use finite carriers. The
+classification mechanism itself extends to arbitrary unstructured types:
+equality of cardinal-valued fiber profiles gives an equivalence of each pair
+of corresponding fibers, and classical choice assembles these into an
+equivalence over the fixed base. Conversely, an equivalence over the base gives
+equal fiber cardinals. Compare cardinals in a common universe, using lifts
+when necessary. The underlying cardinal equality criterion is mathlib's
+[`Cardinal.eq`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/SetTheory/Cardinal/Defs.html#Cardinal.eq).
+
+This is an existence classification; cardinal equality alone supplies no
+computable inverse. Cardinality also forgets additional structure on fibers,
+such as topology, measure, or group operations, so equal underlying cardinals
+need not give structure-preserving equivalences. A coarser statistic than the
+full cardinal-valued profile may lose even unstructured multiplicity. Infinitude
+alone is not the source of that loss.
+
+This boundary corrects the scope of the supporting theorem. It adds no
+infinite-cardinal formalization milestone; port the finite package where
+natural-number counting is consumed.
 
 ______________________________________________________________________
 
@@ -432,34 +431,28 @@ ______________________________________________________________________
 
 Consider two observations of the same finite source:
 
-\[
-X\\xrightarrow{f}Y,
-\\qquad
-X\\xrightarrow{g}Z.
-\]
+```text
+f : X → Y,    g : X → Z
+```
 
 Their joint observation is
 
-\[
-(f,g):X\\to Y\\times Z,
-\]
+```text
+(f, g) : X → Y × Z
+```
 
 with joint extension profile
 
-\[
-\\operatorname{ext}\_{f,g}(y,z)
-=|{x:X\\mid f(x)=y,\\quad g(x)=z}|.
-\]
+```text
+ext_(f,g)(y, z) = |{x : X | f(x) = y and g(x) = z}|
+```
 
 The individual profiles are its marginals:
 
-\[
-\\operatorname{ext}_f(y)
-=\\sum_z\\operatorname{ext}_{f,g}(y,z),
-\\qquad
-\\operatorname{ext}_g(z)
-=\\sum_y\\operatorname{ext}_{f,g}(y,z).
-\]
+```text
+ext_f(y) = ∑_z ext_(f,g)(y, z)
+ext_g(z) = ∑_y ext_(f,g)(y, z)
+```
 
 Separate profiles therefore forget how the two observations co-occur on the
 common source.
@@ -469,20 +462,15 @@ separate profiles but different joint profiles and no isomorphism of forks
 over the fixed codomains.
 
 The corresponding inverse theorem should prove that the joint profile
-reconstructs the fork over fixed (Y) and (Z) exactly up to a relabeling of
-(X) commuting with both observations.
+reconstructs the fork over fixed `Y` and `Z` exactly up to a relabeling of
+`X` commuting with both observations.
 
 This is an elementary instance of the project's pattern:
 
-\[
-\\text{coarse invariant}
-\\longrightarrow
-\\text{identified structures}
-\\longrightarrow
-\\text{fiberwise refinement}
-\\longrightarrow
-\\text{recovered incidence}.
-\]
+```text
+coarse invariant → identified structures
+                 → fiberwise refinement → recovered incidence
+```
 
 Do not infer an indefinite tower of named pairwise, triple, and higher joint
 profiles. Once adjacent arities reveal a recurrence or a family-level object,
@@ -493,35 +481,32 @@ ______________________________________________________________________
 
 # 10. Compatibility is more than a product
 
-Independent observations land in (Y\\times Z). Overlapping observations land
+Independent observations land in `Y × Z`. Overlapping observations land
 in a compatibility object.
 
 Given
 
-\[
-Y\\xrightarrow{p}B,
-\\qquad
-Z\\xrightarrow{q}B,
-\]
+```text
+p : Y → B,    q : Z → B
+```
 
 the compatible pairs are
 
-\[
-Y\\times_B Z
-={(y,z):Y\\times Z\\mid p(y)=q(z)}.
-\]
+```text
+Y ×_B Z = {(y, z) : Y × Z | p(y) = q(z)}
+```
 
-A global state space (X), maps (f:X\\to Y) and (g:X\\to Z), and the law
+A global state space `X`, maps `f : X → Y` and `g : X → Z`, and the law
 
-\[
-p\\circ f=q\\circ g
-\]
+```text
+p ∘ f = q ∘ g
+```
 
 induce
 
-\[
-\\operatorname{compare}:X\\to Y\\times_B Z.
-\]
+```text
+compare : X → Y ×_B Z
+```
 
 The project should identify exactly which results about independent joint
 observation are instances of this compatibility shape, and which require the
@@ -533,21 +518,26 @@ that never changes a statement or proof does not belong in the interface.
 ## Reduction across an overlap
 
 The first substantive target compares compatibility before and after local
-observation. Fix a finite span (L \\xrightarrow{p} B \\xleftarrow{q} R), a
-coarse span (L' \\xrightarrow{p'} B' \\xleftarrow{q'} R'), and surjective
-observation maps (a:L \\to L'), (b:B \\to B'), and (c:R \\to R') satisfying
-(p' \\circ a=b \\circ p) and (q' \\circ c=b \\circ q). Surjectivity makes
-the coarse objects actual reductions; arbitrary observations can first be
-restricted to their images.
+observation. Fix spans of arbitrary types `L ─p→ B ←q─ R` and
+`L' ─p'→ B' ←q'─ R'`, with maps `a : L → L'`, `b : B → B'`, and
+`c : R → R'` satisfying `p' ∘ a = b ∘ p` and `q' ∘ c = b ∘ q`.
+Commutation is the only hypothesis for the following constructions, fiber
+descriptions, and image criterion. No finite carriers or surjectivity are
+required.
 
-Write (P=L \\times_B R) and (P'=L' \\times\_{B'} R'). Commutation gives
-(k:P \\to P'), with (k(l,r)=(a(l),c(r))). On (P), identify pairs exactly
-when their two observed components agree, and write (Q) for the quotient.
-The induced comparison (\\bar{k}:Q \\to P') is canonical and injective.
+Objectwise surjective maps specialize this setup to actual reductions onto
+the coarse objects. Arbitrary observations can instead be restricted to their
+images; the commutation laws restrict the coarse span to those images too.
+State this specialization after the general theorem.
+
+Write `P = L ×_B R` and `P' = L' ×_(B') R'`. Commutation gives
+`k : P → P'`, with `k(l, r) = (a(l), c(r))`. On `P`, identify pairs exactly
+when their two observed components agree, and write `Q` for the quotient.
+The induced comparison `k_bar : Q → P'` is canonical and injective.
 This construction and injectivity are calibration lemmas to formalize, not
 additional hypotheses. Its image is the jointly attainable coarse content.
 
-The exact lifting criterion to prove is: a coarse compatible pair (u,v)
+The exact lifting criterion to prove is: a coarse compatible pair `(u, v)`
 lies in that image if and only if
 
 ```text
@@ -556,23 +546,23 @@ lies in that image if and only if
 
 Thus reduction and assembly agree precisely when this intersection is
 nonempty for every coarse compatible pair. Coarse compatibility asserts only
-equality after (b); the criterion asks for an actual common fine overlap value.
-The theorem must identify each fiber of (k) with its fine compatible lifts,
+equality after `b`; the criterion asks for an actual common fine overlap value.
+The theorem must identify each fiber of `k` with its fine compatible lifts,
 separating existence and uniqueness of representatives from the automatic
-uniqueness of an observed class in (Q). A two-sided inverse to (\\bar{k}) on all of
-(P') exists exactly under the lifting criterion and is then unique, with both
+uniqueness of an observed class in `Q`. A two-sided inverse to `k_bar` on all of
+`P'` exists exactly under the lifting criterion and is then unique, with both
 round-trip laws. No preferred fine representative follows from that inverse.
 
-A strict finite witness is prescribed: let (L) and (R) be singletons, let
-(B={0,1}), and restrict their elements to (0) and (1), respectively. Reduce
+A strict finite witness is prescribed: let `L` and `R` be singletons, let
+`B = {0, 1}`, and restrict their elements to `0` and `1`, respectively. Reduce
 all three objects to singletons. The reduction maps commute and are
-surjective, but (P) is empty while (P') is a singleton. Formalize this witness;
+surjective, but `P` is empty while `P'` is a singleton. Formalize this witness;
 do not claim it is minimal without a separate exclusion proof.
 
 This is a statement about compatible local descriptions. For a supplied
-global realization (G \\to P), its observed image in (P') may be smaller
-still. Keep failure of coarse pairs to lift to (P) separate from failure of
-fine compatible pairs to extend to (G).
+global realization `G → P`, its observed image in `P'` may be smaller
+still. Keep failure of coarse pairs to lift to `P` separate from failure of
+fine compatible pairs to extend to `G`.
 
 The binary theorem calibrates the definitions. The central research question
 is which supplied local lifting or incidence data suffices for the same
@@ -622,33 +612,70 @@ ______________________________________________________________________
 The central inverse problem concerns a fixed finite restriction shape with
 shared overlaps and declared admissible comparisons. Supply the coarse local
 datum first and define its candidate fine realizations and commuting
-observation maps. The finite-family analogue of Section 10 compares the
-observed classes of fine compatible families with coarse compatible families.
+observation maps. For each declared admissible family `F`, let `P_F` and
+`P'_F` be the fine and coarse compatible-family types. The raw comparison
+`k_F : P_F → P'_F` records fine lifts. Quotienting its source by equality of
+observed components gives `Q_F` and an injection `k_bar_F : Q_F → P'_F`.
+Define the attainable image `I_F = image(k_F) = image(k_bar_F)`.
 
-The project must classify what local data determines the image of this
-comparison and what coherence information remains missing. Binary lifting
+The initial reconstruction target is the collection of `I_F` for **every**
+declared admissible family, with the maps induced by the declared coarse
+restrictions between families. Over the fixed coarse datum, observable-content
+equivalence means equality of these images as subsets of their respective
+`P'_F`; their restriction maps then agree as restrictions of the fixed maps.
+When bases vary, specify the coherent transport convention first.
+
+For each declared restriction from `F` to `E`, naturality supplies
+
+```text
+restrict_(F,E)(I_F) ⊆ I_E.
+```
+
+It does not supply equality: a fine compatible family on `E` need not extend
+to one on `F`. The full-family image is the distinguished joint question,
+but it does not in general determine the proper-family images. M3 must record
+which of these the supplied local datum already fixes and which still need
+reconstruction. A theorem about the full image alone closes the target only
+with a theorem that it, together with the supplied datum, determines all
+remaining admissible images. Do not impose extension of all local families
+as an implicit assumption.
+
+A prospective finite witness uses `L → B ← M → D ← R`. Each of `L`, `M`, and
+`R` is a singleton, each of `B` and `D` is `{0, 1}`, and all coarse objects are
+singletons. All reduction maps are the unique surjections, so their squares
+commute. Declare `LM`, `MR`, and `LMR` admissible, together with their local
+views and restriction maps. List the fine restriction values in the order
+`L→B`, `M→B`, `M→D`, `R→D`:
+
+```text
+System  Restriction values   I_LM       I_MR       I_LMR
+A       (0, 0, 0, 1)         singleton  empty      empty
+B       (0, 1, 0, 0)         empty      singleton  empty
+```
+
+This witness is to be certified with the finite-family theory. It separates
+equality of full-family content from equality of all admissible content; it
+makes no claim about completeness of the local input datum still to be chosen
+in M3. No smallest-shape claim is made.
+
+The project must classify what local data determines this collection of
+images and what coherence information remains missing. Binary lifting
 conditions may provide representatives separately without a single consistent
-choice across the family. Fix one shape before stating the classification;
-do not claim a smallest shape without certified exclusions.
+choice across the family. Fix one shape before stating the classification.
 
-Two target equivalences must be explicit. Observable-content equivalence
-compares the outcomes of all declared admissible observations, including their
-joint constraints. Presentation equivalence consists of component equivalences
-commuting with every restriction and respecting the supplied observation maps.
-The theorem must say which target it serves and classify the equivalence
-induced by its chosen datum.
-
-Independently reconstructed comparison maps need not give presentation
-equivalence: their equivalences may disagree on shared spaces. Investigate
-this gap when it obstructs the declared target. If observable content is
-already reconstructed, recovering further hidden presentation structure is
-not an automatic obligation.
+Presentation equivalence is a separate target: component equivalences commute
+with every restriction and respect the supplied observation maps. Independently
+reconstructed comparison maps need not yield such an equivalence, since their
+equivalences may disagree on shared spaces. Investigate that gap when it
+obstructs the declared target. Recovering further hidden presentation structure
+is not an automatic obligation once observable content is reconstructed.
 
 Closure requires an exact sufficiency theorem or a sharp obstruction for the
 chosen local datum, with an explicit strict finite witness for every claimed
 information loss. If a refinement is required, name the missing compatibility
-datum and prove what it resolves. A classification of unavoidable ambiguity
-can settle this problem without recovering a unique presentation.
+datum and prove what it resolves for the entire target collection. A
+classification of unavoidable ambiguity can settle this problem without
+recovering a unique presentation.
 
 ______________________________________________________________________
 
@@ -668,18 +695,12 @@ maps, fibers, profiles, counts, and scalar summaries.
 
 The project should repeatedly reverse each map:
 
-\[
-\\begin{aligned}
-\\text{scalar summary}
-&\\Longrightarrow \\text{which profile quotient?}\\
-\\text{extension profile}
-&\\Longrightarrow \\text{which comparison map?}\\
-\\text{comparison maps}
-&\\Longrightarrow \\text{which restriction system?}\\
-\\text{local equivalences}
-&\\Longrightarrow \\text{which coherent equivalence?}
-\\end{aligned}
-\]
+```text
+scalar summary     ⇒ which profile quotient?
+extension profile  ⇒ which comparison map?
+comparison maps    ⇒ which restriction system?
+local equivalences ⇒ which coherent equivalence?
+```
 
 Each arrow requires a theorem or an impossibility result.
 
@@ -752,15 +773,9 @@ useful. They are outputs.
 
 The project should seek explicit factorizations such as
 
-\[
-\\text{extension fibers}
-\\longrightarrow
-\\text{fiber profile}
-\\longrightarrow
-\\text{incidence summary}
-\\longrightarrow
-\\text{scalar obstruction}.
-\]
+```text
+extension fibers → fiber profile → incidence summary → scalar obstruction
+```
 
 At each arrow:
 
@@ -802,11 +817,9 @@ data and reprove its blindness as an instance of a general forgetting theorem.
 
 The desired relationship is
 
-\[
-\\boxed{
-\\text{Descent defect data is a cardinal statistic of amalgamation data}.
-}
-\]
+```text
+Descent defect data is a cardinal statistic of amalgamation data.
+```
 
 That sentence is a research target until a theorem states the maps and exact
 equivalence relations involved. It must not appear as a factual README claim
@@ -1011,8 +1024,9 @@ The code should read like a small downstream mathlib library.
 - Theorem names describe formal content, not project history or motivation.
 - Avoid abbreviations unless they are standard and genuinely improve use.
 
-Use `Amalgam` as the package and root library namespace. Definitions intended
-for eventual upstreaming should nevertheless use the mathematical namespace
+Use `amalgam` as the Lake package name and `Amalgam` as the root library and
+namespace. Definitions intended for eventual upstreaming should nevertheless
+use the mathematical namespace
 their subject requires inside the project, rather than accumulating under one
 flat branded namespace.
 
@@ -1253,32 +1267,48 @@ comparison behaviors. No counts or context hierarchy are required.
 
 ## M1 — When local reduction preserves compatibility
 
-Fix the finite binary setup and surjective commuting observation maps of
-Section 10. The target is equality of attainable coarse compatible pairs;
-it does not require recovery of fine multiplicities.
+Use the binary setup of Section 10 with arbitrary types and commuting maps.
+Prove the core statements without surjectivity, then specialize to objectwise
+surjective reductions. Only the explicit witnesses require finite carriers.
+The target is equality of attainable coarse compatible pairs; it does not
+require recovery of fine multiplicities.
 
-Construct (k:P \\to P') and the induced injection (\\bar{k}:Q \\to P').
-Characterize its image by the intersection of fine overlap values available
-above each coarse pair. Prove that it is an equivalence exactly when every
+Construct `k : P → P'` and the induced injection `k_bar : Q → P'`.
+Characterize the image of `k_bar` by the intersection of fine overlap values
+available above each coarse pair. Prove that `k_bar` is an equivalence exactly when every
 coarse compatible pair lifts, and give the inverse and both round trips under
-that condition. Characterize the fibers of (k) separately.
+that condition. Characterize the fibers of `k` separately.
 
 Certify the singleton/two-point-overlap failure witness in Section 10.
 The milestone closes with the necessary-and-sufficient lifting criterion,
 not merely a sufficient condition such as injectivity of the overlap reduction.
-Keep global extension through a supplied (G) separate from this local lifting.
+Keep global extension through a supplied `G` separate from this local lifting.
 
 ## M2 — The comparison for finite families
 
-Introduce the weakest finite restriction interface consumed by the binary
-result and its extension to shared overlaps. Declare which families are
-admissible and which restrictions between families are supplied.
+Introduce the weakest restriction interface consumed by the binary result and
+its extension to finite families with shared overlaps. Finiteness here concerns
+the indexing families; state carriers remain arbitrary. Declare which families
+are admissible and which restrictions between families are supplied.
 
-The central theorem constructs the comparison from observed classes of fine
-compatible families to coarse compatible families, identifies its image and
-fibers, and proves its compatibility with the declared restrictions between
-families. Include binary reduction, presentation invariance, and degeneration
-under redundant views as consequences of this construction.
+For every admissible `F`, construct both maps from Section 12:
+
+- `k_F : P_F → P'_F`, whose fiber over a coarse family is the type of its
+  fine compatible lifts;
+- `k_bar_F : Q_F → P'_F`, the injection from observed quotient classes, whose
+  image is the attainable content `I_F` and whose fibers are subsingletons.
+
+Prove naturality of both maps under the declared family restrictions, and
+identify `Q_F` with `I_F`. Include binary reduction, presentation invariance,
+and degeneration under redundant views as consequences. Prove the induced
+restriction maps on images and the inclusion in Section 12; equality requires
+an additional theorem.
+
+Retain a calibration case with two fine compatible families mapping constantly
+to one coarse family: the fiber of `k_F` has two elements, while the fiber of
+`k_bar_F` has one observed class. The image-only target does not require
+recovery of the first multiplicity. Also certify the Section 12 finite witness
+separating full-family content from all admissible content.
 
 Do not assert that binary surjectivity implies family surjectivity. That is
 part of the next inverse problem. Do not build an arity-by-arity tower.
@@ -1288,16 +1318,24 @@ part of the next inverse problem. Do not build an arity-by-arity tower.
 Use finite reconnaissance to select one explicit finite context shape with
 shared overlaps. Then fix its admissible families, candidate realizations,
 supplied local lifting or incidence datum, and target equivalence before the
-classification work. Start with attainable joint content as the target;
-any stronger presentation target needs a named question that requires it.
+classification work. The initial target is the entire collection of attainable
+images `I_F`, with its restriction maps, as defined in Section 12. Any stronger
+presentation target needs a named question that requires it. Explicitly list
+which proper-family images the input datum already fixes and which remain to
+be reconstructed.
 
 The closing theorem classifies the equivalence on realizations induced by
-the supplied datum and determines exactly whether it fixes the image of the
-full-family comparison from M2. If local data is insufficient, provide a strict
-finite pair with identical supplied data and different attainable joint
-content, and characterize the missing compatibility information. Prove an
-exact criterion or a complete description of the remaining possibilities;
-an isolated counterexample alone does not close the classification.
+the supplied datum and determines exactly whether it fixes that entire target
+collection. Keep the full-family image as the distinguished joint question.
+A full-image-only reconstruction theorem suffices only if a further theorem
+shows that the full image together with the supplied datum determines every
+remaining admissible image and its restriction maps.
+
+If local data is insufficient, provide a strict finite pair with identical
+supplied data and different target collections, and characterize the missing
+compatibility information. Name the admissible family where the images differ.
+Prove an exact criterion or a complete description of the remaining target
+collections; an isolated counterexample alone does not close the classification.
 
 Any proposed sufficient refinement must have a reconstruction theorem for the
 declared target and an explicit witness for its claimed necessity. Preserve
@@ -1313,13 +1351,17 @@ tracks or prerequisites for M1.
 ## M4 — Realizability and closure on the chosen shape
 
 For exactly the shape, datum, and target fixed in M3, characterize which
-abstract data arises from a coherent realization. Separate pointwise
+abstract data arises from a coherent realization. Retain all admissible images
+`I_F` with their restriction maps as the target; no substitution of just the
+full-family image is allowed without the determination theorem required in M3.
+Separate pointwise
 realizability, overlap consistency, simultaneous realizability, and freedom
 up to the target equivalence. Do not assume existence of a simultaneous global
 assignment unless it belongs to the declared realization class.
 
 The closing theorem gives necessary and sufficient realizability conditions
-and the remaining ambiguity for realizable data. Every proper condition needs
+and the remaining possible target collections for realizable data. Every proper
+condition needs
 a strict incompatible datum; an unconditional realizability theorem discharges
 that witness obligation. A constructor for positive examples alone is not a
 classification.
@@ -1412,8 +1454,8 @@ The principal evidence is:
 - an exact comparison between reducing assembled descriptions and assembling
   reduced descriptions;
 - a necessary-and-sufficient lifting criterion with a strict finite failure;
-- a classification of the gap between local information and coherent joint
-  realization on the chosen shape;
+- a classification of the gap between local information and attainable images
+  for all admissible families, with their restriction maps, on the chosen shape;
 - a realizability boundary for the classified data;
 - explicit witnesses justifying every claimed necessary refinement;
 - a reconstruction theorem or sharp impossibility result naming its target
@@ -1499,8 +1541,11 @@ It reaches a legitimate stopping point when:
 1. the observation datum, admissible comparisons, realization class, and target
    equivalence are fixed and recorded;
 2. the equivalence on realizations induced by that datum is classified exactly;
-3. the gap between local information and coherent reconstruction is settled
-   for the chosen shape by a positive theorem or sharp obstruction;
+3. the gap between local information and the entire target collection of
+   admissible images `I_F`, with its restriction maps, is settled for the chosen
+   shape by a positive theorem or sharp obstruction; a full-image-only result
+   includes a theorem that the supplied datum and full image determine the
+   remaining admissible images;
 4. the chosen realizability problem has a necessary-and-sufficient boundary,
    with the residual freedom characterized;
 5. every claimed necessary refinement has an explicit strict witness, and
