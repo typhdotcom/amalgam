@@ -1286,7 +1286,7 @@ end SpanCalibration
 
 section ZigzagCalibration
 
-open Amalgam.Models.Zigzag
+open Zigzag Zigzag.Context Amalgam.Models.Zigzag
 
 /-- The four generating inequalities of the shared-overlap shape. -/
 example : Context.B ≤ Context.L := Context.B_le_L
