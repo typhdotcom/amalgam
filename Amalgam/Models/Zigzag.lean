@@ -6,8 +6,9 @@ import Amalgam.System.Zigzag
 # Calibration case 2: the Section 12 witness on `L → B ← M → D ← R`
 
 The finite witness of PROPOSAL Section 12, certified with the finite-family theory. The five-point
-preorder `Zigzag.Context` (in `Amalgam/System/Zigzag.lean`) has `B ≤ L`, `B ≤ M`, `D ≤ M`, `D ≤ R`; `B` is the greatest common coarser
-context of `L` and `M`; `D` is that of `M` and `R`; and `L`, `R` have no common coarser context.
+preorder `Zigzag.Context` (in `Amalgam/System/Zigzag.lean`) has `B ≤ L`, `B ≤ M`, `D ≤ M`,
+`D ≤ R`; `B` is the greatest common coarser context of `L` and `M`; `D` is that of `M` and `R`;
+and `L`, `R` have no common coarser context.
 Every fine system has singleton states at `L`, `M`, `R` and two-point states at `B`, `D`, and is
 determined by its four restriction values listed in the arrow order
 

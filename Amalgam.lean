@@ -2,6 +2,7 @@ import Amalgam.Core.Comparison
 import Amalgam.Core.Fiber
 import Amalgam.Core.Reduction
 import Amalgam.Models.Lifting
+import Amalgam.Models.MiddleSplit
 import Amalgam.Models.Overlap
 import Amalgam.Models.Span
 import Amalgam.Models.Zigzag
@@ -11,3 +12,5 @@ import Amalgam.System.Comparison
 import Amalgam.System.Presentation
 import Amalgam.System.Restriction
 import Amalgam.System.Zigzag
+import Amalgam.System.ZigzagRealization
+import Amalgam.System.ZigzagTarget
