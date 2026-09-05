@@ -328,6 +328,13 @@ variable {L : Type uLf} {R : Type uRf} {B : Type uBf} {p : L → B} {q : R → B
 example : p.Pullback q → p'.Pullback q' :=
   Function.Pullback.map ha hc
 
+/-- The comparison is the lift of the observed projections, by definition. -/
+example :
+    Function.Pullback.map ha hc =
+      Function.Pullback.lift (a ∘ Function.Pullback.fst) (c ∘ Function.Pullback.snd)
+        fun s => (ha s.fst).trans ((congrArg b s.comm).trans (hc s.snd).symm) :=
+  rfl
+
 /-- The left observed component of a mapped pair. -/
 example (s : p.Pullback q) : (Function.Pullback.map ha hc s).fst = a s.fst :=
   Function.Pullback.fst_map ha hc s
@@ -457,6 +464,13 @@ example (t : p'.Pullback q') :
       {s : p.Pullback q // a s.fst = t.fst ∧ c s.snd = t.snd} :=
   Function.Pullback.fiberMapEquiv ha hc t
 
+/-- That fiber is the pairs of fine views that are compatible and observed as the two coarse
+components. -/
+example (t : p'.Pullback q') :
+    {s // Function.Pullback.map ha hc s = t} ≃
+      {x : L × R // p x.1 = q x.2 ∧ a x.1 = t.fst ∧ c x.2 = t.snd} :=
+  Function.Pullback.fiberMapEquivProd ha hc t
+
 /-- That fiber is the compatible pairs of fine lifts of the two coarse components. -/
 example (t : p'.Pullback q') :
     {s // Function.Pullback.map ha hc s = t} ≃
@@ -502,6 +516,12 @@ example :
     Function.Surjective (Function.Pullback.observedMap ha hc) ↔
       Function.Surjective (Function.Pullback.map ha hc) :=
   Function.Pullback.surjective_observedMap_iff_surjective_map ha hc
+
+/-- The induced comparison is bijective exactly when the raw comparison is surjective. -/
+example :
+    Function.Bijective (Function.Pullback.observedMap ha hc) ↔
+      Function.Surjective (Function.Pullback.map ha hc) :=
+  Function.Pullback.bijective_observedMap_iff_surjective_map ha hc
 
 /-- The observed quotient is all coarse compatible pairs exactly under the criterion
 everywhere. -/
@@ -638,7 +658,8 @@ example : p' t₀.fst = q' t₀.snd := Function.Pullback.comm t₀
 
 /-- The lifting criterion fails there: the fine overlap values reached from the two sides are
 disjoint. -/
-example : ¬(p '' (a ⁻¹' {t₀.fst}) ∩ q '' (c ⁻¹' {t₀.snd})).Nonempty := not_lifts_t₀
+example : ¬(p '' (a ⁻¹' {t₀.fst}) ∩ q '' (c ⁻¹' {t₀.snd})).Nonempty :=
+  not_nonempty_inter_t₀
 
 /-- The unique coarse pair is attained by neither comparison. -/
 example : t₀ ∉ Set.range (Function.Pullback.map ha hc) := t₀_notMem_range_map

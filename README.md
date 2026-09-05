@@ -76,7 +76,8 @@ exactly when the joint map `x ↦ (f x, g x)` is.
 observation. The datum is two spans `L ─p→ B ←q─ R` and `L' ─p'→ B' ←q'─ R'`
 together with observation maps `a : L → L'`, `b : B → B'` and `c : R → R'`, and
 pointwise commutation proofs `p' (a l) = b (p l)` and `q' (c r) = b (q r)`.
-Commutation is the only hypothesis of everything below.
+Commutation is the only hypothesis below, except where the sufficient special
+case names its own.
 
 Commutation induces the raw comparison `Function.Pullback.map`, which sends a
 fine compatible pair `(l, r)` to `(a l, c r)`. It is the lift of `a ∘ fst` and
@@ -110,8 +111,10 @@ view observed as `v`. `mem_range_observedMap_iff` is the same criterion for the
 induced comparison.
 
 The fiber of the raw comparison over a coarse pair is the type of fine
-compatible pairs observed as it (`fiberMapEquiv`), equivalently the compatible
-pairs of fine lifts of its two components (`fiberMapEquivPullback`). These are
+compatible pairs observed as it (`fiberMapEquiv`), equivalently the pairs of
+fine views satisfying the three conditions of compatibility and the two
+observations (`fiberMapEquivProd`), equivalently the compatible pairs of fine
+lifts of its two components (`fiberMapEquivPullback`). These are
 the fine lifts, and existence and uniqueness stay separate: the fiber is
 nonempty exactly under the criterion, empty exactly when the criterion fails, a
 subsingleton exactly when any two fine pairs observed as that coarse pair

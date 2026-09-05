@@ -98,22 +98,22 @@ instance uniqueCoarsePullback : Unique (p'.Pullback q') where
 
 /-- The lifting criterion fails at `t₀`: the fine overlap values reached from the left are
 `{false}` and those reached from the right are `{true}`. -/
-theorem not_lifts_t₀ :
+theorem not_nonempty_inter_t₀ :
     ¬(p '' (a ⁻¹' {t₀.fst}) ∩ q '' (c ⁻¹' {t₀.snd})).Nonempty := by
   rintro ⟨_, ⟨_, -, rfl⟩, _, -, hr⟩
   exact Bool.false_ne_true hr.symm
 
 /-- `t₀` is not attained by the observed comparison. -/
 theorem t₀_notMem_range_map : t₀ ∉ Set.range (Function.Pullback.map ha hc) := fun h =>
-  not_lifts_t₀ ((Function.Pullback.mem_range_map_iff ha hc t₀).1 h)
+  not_nonempty_inter_t₀ ((Function.Pullback.mem_range_map_iff ha hc t₀).1 h)
 
 /-- `t₀` is not attained by the induced comparison on the observed quotient. -/
 theorem t₀_notMem_range_observedMap : t₀ ∉ Set.range (Function.Pullback.observedMap ha hc) :=
-  fun h => not_lifts_t₀ ((Function.Pullback.mem_range_observedMap_iff ha hc t₀).1 h)
+  fun h => not_nonempty_inter_t₀ ((Function.Pullback.mem_range_observedMap_iff ha hc t₀).1 h)
 
 /-- `t₀` has no fine lift. -/
 theorem isEmpty_fiber_t₀ : IsEmpty {s // Function.Pullback.map ha hc s = t₀} :=
-  (Function.Pullback.isEmpty_fiber_map_iff ha hc t₀).2 not_lifts_t₀
+  (Function.Pullback.isEmpty_fiber_map_iff ha hc t₀).2 not_nonempty_inter_t₀
 
 /-- The observed quotient is empty, being a quotient of the empty fine pullback. -/
 theorem isEmpty_observed : IsEmpty (Function.Pullback.Observed ha hc) :=
@@ -121,11 +121,11 @@ theorem isEmpty_observed : IsEmpty (Function.Pullback.Observed ha hc) :=
 
 /-- Existence fails: the observed comparison misses the only coarse compatible pair. -/
 theorem not_surjective_map : ¬Function.Surjective (Function.Pullback.map ha hc) := fun hs =>
-  not_lifts_t₀ ((Function.Pullback.surjective_map_iff ha hc).1 hs t₀)
+  not_nonempty_inter_t₀ ((Function.Pullback.surjective_map_iff ha hc).1 hs t₀)
 
 /-- Surjective observations do not suffice: the induced comparison is not bijective. -/
 theorem not_bijective_observedMap :
     ¬Function.Bijective (Function.Pullback.observedMap ha hc) := fun hb =>
-  not_lifts_t₀ ((Function.Pullback.bijective_observedMap_iff ha hc).1 hb t₀)
+  not_nonempty_inter_t₀ ((Function.Pullback.bijective_observedMap_iff ha hc).1 hb t₀)
 
 end Amalgam.Models.Lifting

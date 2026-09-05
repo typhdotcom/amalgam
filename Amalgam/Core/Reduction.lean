@@ -22,9 +22,9 @@ Fix spans `L ─p→ B ←q─ R` and `L' ─p'→ B' ←q'─ R'` of arbitrary 
   common image. Fibers of `observedMap` are subsingletons, `subsingleton_fiber_observedMap`.
 * `mem_range_map_iff`: a coarse compatible pair `t` is attained exactly when
   `p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})` is nonempty, i.e. some fine overlap value is
-  reached from both sides above `t`. `fiberMapEquiv`, `fiberMapEquivPullback`,
-  `nonempty_fiber_map_iff`, `subsingleton_fiber_map_iff` describe the fine lifts of `t` and
-  separate their existence from their uniqueness.
+  reached from both sides above `t`. `fiberMapEquiv`, `fiberMapEquivProd`,
+  `fiberMapEquivPullback`, `nonempty_fiber_map_iff`, `subsingleton_fiber_map_iff` describe the
+  fine lifts of `t` and separate their existence from their uniqueness.
 * `bijective_observedMap_iff`: `observedMap` is bijective exactly when the criterion holds at
   every coarse compatible pair. Under the criterion `observedEquiv` is the inverse, with both
   round trips and uniqueness `eq_observedEquiv_symm_of_rightInverse`,
@@ -136,7 +136,7 @@ theorem observed_rel_iff (s s' : p.Pullback q) :
 /-- Observed equality is equality under `map`. -/
 theorem observed_rel_iff_map_eq (s s' : p.Pullback q) :
     Setoid.ker (map ha hc) s s' ↔ map ha hc s = map ha hc s' :=
-  Iff.rfl
+  Setoid.ker_def
 
 /-- The quotient of fine compatible pairs by observed equality. -/
 abbrev Observed : Type _ :=
@@ -263,6 +263,27 @@ def fiberMapEquiv :
 @[simp] theorem fiberMapEquiv_symm_apply_coe
     (s : {s : p.Pullback q // a s.fst = t.fst ∧ c s.snd = t.snd}) :
     ((fiberMapEquiv ha hc t).symm s : p.Pullback q) = s :=
+  rfl
+
+/-- The fiber of `map` over `t` is the type of pairs of fine views satisfying the three
+conditions: fine compatibility, left view observed as `t.fst`, right view observed as `t.snd`. -/
+def fiberMapEquivProd :
+    {s // map ha hc s = t} ≃ {x : L × R // p x.1 = q x.2 ∧ a x.1 = t.fst ∧ c x.2 = t.snd} where
+  toFun s := ⟨(s.1.fst, s.1.snd), s.1.comm, ((map_eq_iff ha hc).1 s.2).1,
+    ((map_eq_iff ha hc).1 s.2).2⟩
+  invFun x := ⟨mk x.1.1 x.1.2 x.2.1, (map_eq_iff ha hc).2 ⟨x.2.2.1, x.2.2.2⟩⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+/-- `fiberMapEquivProd` forgets the compatibility proof. -/
+@[simp] theorem fiberMapEquivProd_apply_coe (s : {s // map ha hc s = t}) :
+    (fiberMapEquivProd ha hc t s : L × R) = (s.1.fst, s.1.snd) :=
+  rfl
+
+/-- `fiberMapEquivProd.symm` reassembles the compatible pair. -/
+@[simp] theorem fiberMapEquivProd_symm_apply_coe
+    (x : {x : L × R // p x.1 = q x.2 ∧ a x.1 = t.fst ∧ c x.2 = t.snd}) :
+    ((fiberMapEquivProd ha hc t).symm x : p.Pullback q) = mk x.1.1 x.1.2 x.2.1 :=
   rfl
 
 /-- The fiber of `map` over `t` is the pullback of `p` and `q` restricted to the fine views
