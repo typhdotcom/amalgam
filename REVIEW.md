@@ -1,149 +1,161 @@
-State: READY FOR WORK
-Turn: worker
-Candidate: —; accepted M0 candidate 6a33636f, submission 89c090ae
+State: READY FOR REVIEW
+Turn: reviewer
+Candidate: 17913b28; accepted M0 candidate 6a33636f; accepted proposal baseline 7159fd31
 
-# Verdict and active objective
+# Submission
 
-M0 is accepted without remaining corrections. R1–R2 are closed. Its durable
-built status and closing theorem names are recorded in
-[the proposal's M0 section](PROPOSAL.md#26-initial-milestones).
-
-The active objective is **M1 — When local reduction preserves compatibility**.
-Determine exactly which compatible coarse pairs come from compatible fine
-pairs. The closing result must identify the attainable image by an actual
-common fine overlap value and characterize when the quotient of fine pairs
-by observed equality is equivalent to all coarse compatible pairs.
-
-This is a local lifting question. It does not assert extension to a separately
-supplied global realization or recover hidden fine multiplicities from
-observed classes.
+M1 — When local reduction preserves compatibility — is implemented at
+`17913b28`. The exact binary lifting criterion, the observed quotient with
+its injection and inverse laws, the surjective specialization with restriction
+to images, and the prescribed finite failure witness are all compiled. No
+`sorry`, no project axiom; classical choice appears only in the inverse
+constructions named below. M0's API, Status coverage, and four witnesses are
+unchanged. No M2 work was started.
 
 # Accepted foundation
 
 [PROPOSAL.md](PROPOSAL.md), especially Sections 10 and 26, owns this contract.
 
-- Keep ordinary maps on arbitrary carriers, allowing empty types. Commutation
-  alone supports the core constructions and image criterion. Objectwise
-  surjectivity specializes them to reductions; finiteness supplies witnesses.
-- Reuse the accepted generic fiber API and mathlib's `Function.Pullback`.
-  Inspect `Function.mapPullback` and standard quotient/image constructions
-  before introducing alternatives. Any wrapper must improve the statements.
-- Preserve the distinction between the raw comparison's fine-lift fibers and
-  the quotient injection's subsingleton fibers.
+- Ordinary maps on arbitrary carriers with independent universes; empty types
+  allowed. Commutation alone supports the constructions and the criterion.
+  Objectwise surjectivity is a specialization; finiteness supplies witnesses.
+- The generic fiber API and mathlib's `Function.Pullback` are reused; the raw
+  comparison is an M0 `lift`, the quotient is `Setoid.ker`, and the quotient
+  equivalence is `Setoid.quotientKerEquivRange`. No wrapper was introduced.
+- Raw fibers of `k` (fine lifts) and subsingleton fibers of `k_bar` (observed
+  classes) are kept distinct in the API and the README.
 - The later target remains all admissible attainable images with their
-  restriction maps. Finite-family indexing, M3's shape selection, profiles,
-  and the Descent bridge remain outside this round.
-- Keep the pinned toolchain, license, root exports, Status discipline, and
-  development tasks. The Apache appendix placeholders are resolved and stay
-  unchanged. `nu tasks.nu cache` is implemented and verified.
+  restriction maps. Finite-family indexing, M3's shape, profiles, and the
+  Descent bridge are untouched.
+- Toolchain, license, root exports, Status discipline, and tasks unchanged.
 
-# Datum and target
+# Datum
 
-Fix spans `L ─p→ B ←q─ R` and `L' ─p'→ B' ←q'─ R'`, with maps
-`a : L → L'`, `b : B → B'`, and `c : R → R'` satisfying
-`p' ∘ a = b ∘ p` and `q' ∘ c = b ∘ q`.
+Spans `p : L → B`, `q : R → B`, `p' : L' → B'`, `q' : R' → B'`, maps
+`a : L → L'`, `b : B → B'`, `c : R → R'`, pointwise commutation
+`ha : ∀ l, p' (a l) = b (p l)`, `hc : ∀ r, q' (c r) = b (q r)`. All carriers
+are `Type*` with independent universes. `P = Function.Pullback p q`,
+`P' = Function.Pullback p' q'`. Everything lives in `Amalgam/Core/Reduction.lean`
+under `Function.Pullback`, except the witness.
 
-Write `P = Function.Pullback p q` and `P' = Function.Pullback p' q'`.
-The raw map `k : P → P'` sends a fine compatible pair to its two observed
-components. On `P`, declare two pairs equivalent exactly when both observed
-components agree. Let `Q` be the quotient and `k_bar : Q → P'` its induced
-map. The base `P'` and its labels are fixed. The target is equality of the
-attainable coarse content with all of `P'`, not recovery of fine pairs.
-
-# Current work and closing evidence
+# Closing evidence
 
 ## M1.1 — Canonical comparison and observed quotient
 
-Construct `k`, the observed-equality quotient, and `k_bar`. Prove the
-projection and factorization laws, injectivity of `k_bar`, and equality of
-the two maps' images. Identify `Q` with their common image using a named
-equivalence with its round-trip laws. Do not assume injectivity or define
-the quotient using any finer relation than agreement of observed components.
-
-**Evidence:** declarations at arbitrary independent universes, with no
-finiteness, decidability, or surjectivity hypotheses in these statements.
-The quotient relation is proved equivalent to equality under `k`.
-The API uses the accepted pullback/fiber constructions and standard quotient
-machinery rather than duplicating them.
+- `map ha hc : P → P'` := `lift (a ∘ fst) (c ∘ snd) _`; `map_eq_mapPullback`
+  shows it is mathlib's `Function.mapPullback` on the funext'd laws.
+  Projection laws `fst_map`, `snd_map`, `map_mk`; `map_eq_iff`,
+  `map_eq_map_iff`; functoriality `map_id`, `map_map`, `map_lift`.
+- Relation: `Setoid.ker (map ha hc)`. `observed_rel_iff` states it as
+  agreement of both observed components; `observed_rel_iff_map_eq` as
+  equality under `map`. `Observed ha hc := Quotient (Setoid.ker (map ha hc))`;
+  `observed_mk_eq_iff`.
+- `observedMap ha hc : Observed → P'` := `Setoid.kerLift`. Factorization
+  `observedMap_mk` (simp), `observedMap_comp_mk`, `fst/snd_observedMap_mk`.
+  `observedMap_injective` (`Setoid.kerLift_injective`), `range_observedMap`
+  (`Setoid.range_kerLift_eq_range`).
+- `observedEquivRange : Observed ≃ Set.range map`
+  (`Setoid.quotientKerEquivRange`) with `coe_observedEquivRange_mk`,
+  `coe_observedEquivRange`, and round trips
+  `observedEquivRange_symm_apply_apply`, `observedEquivRange_apply_symm_apply`.
+- `subsingleton_fiber_observedMap : ∀ t, Subsingleton {x // observedMap x = t}`
+  via the generic `injective_iff_subsingleton_fiber`.
 
 ## M1.2 — Exact lifting criterion and inverse
 
-For each coarse compatible pair `t = (u,v)`, prove equivalence between its
-membership in the attainable image and:
+- `mem_range_map_iff (t) : t ∈ Set.range map ↔ (p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty` — the displayed
+  criterion verbatim, no hypotheses beyond commutation. Also
+  `mem_range_map_iff_exists`, `mem_range_map_iff_exists_overlap` (explicit
+  common overlap value `β`), and `mem_range_observedMap_iff`.
+- Raw fiber identification: `fiberMapEquiv t : {s // map s = t} ≃ {s : P // a s.fst = t.fst ∧ c s.snd = t.snd}` (via `fiberLiftEquiv`) and
+  `fiberMapEquivProd t : {s // map s = t} ≃ {x : L × R // p x.1 = q x.2 ∧ a x.1 = t.fst ∧ c x.2 = t.snd}` (the three conditions literally), and `fiberMapEquivPullback t : {s // map s = t} ≃ Function.Pullback (p restricted to {l // a l = t.fst}) (q restricted to {r // c r = t.snd})`,
+  both with apply/symm computation lemmas.
+- Existence and uniqueness of fine lifts, separately, via the fiber API:
+  `nonempty_fiber_map_iff` (↔ criterion), `isEmpty_fiber_map_iff`,
+  `subsingleton_fiber_map_iff`, `nonempty_unique_fiber_map_iff`.
+- Closing theorem `bijective_observedMap_iff : Bijective observedMap ↔ ∀ t, (p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty`, with
+  `surjective_map_iff`, `surjective_observedMap_iff_surjective_map`,
+  `surjective_observedMap_iff`, `bijective_observedMap_iff_surjective`,
+  `bijective_observedMap_iff_surjective_map`.
+- Under `h : ∀ t, criterion`: `observedEquiv ha hc h : Observed ≃ P'`
+  (`Equiv.ofBijective`, noncomputable; docstring says it selects an observed
+  class, not a fine representative), `observedEquiv_apply` (simp),
+  `observedEquiv_mk`, round trips `observedMap_observedEquiv_symm`,
+  `observedEquiv_symm_observedMap`, uniqueness
+  `eq_observedEquiv_symm_of_rightInverse`,
+  `eq_observedEquiv_symm_of_leftInverse`. Converse packaging:
+  `exists_inverse_observedMap_iff`, `inter_nonempty_of_rightInverse`.
 
-```text
-{p(l) | a(l) = u} ∩ {q(r) | c(r) = v} ≠ ∅.
-```
+## M1.3 — Surjective reductions and the finite failure
 
-Identify the fiber of `k` over `t` with fine pairs satisfying all three
-conditions: fine compatibility, left observation `u`, and right observation
-`v`. Use the fiber API to separate existence and uniqueness of fine lifts.
+- Sufficient special case, labelled as such: `mem_range_map_iff_of_injective (hb : Injective b)` (criterion becomes componentwise) and
+  `bijective_observedMap_of_injective hb (Surjective a) (Surjective c)`.
+- Restriction to images: `Set.mapsTo_range_range`, `rangeRestrict ha : Set.range a → Set.range b` with `coe_rangeRestrict`, commutation
+  `rangeFactorization_comm`, surjectivity by mathlib's
+  `Set.rangeFactorization_surjective`, the restricted comparison
+  `mapRangeFactorization`, the inclusion `rangeInclusion`,
+  `rangeInclusion_mapRangeFactorization`, and
+  `inter_nonempty_rangeFactorization_iff` /
+  `mem_range_mapRangeFactorization_iff`: a restricted coarse pair is attained
+  exactly when its underlying pair is.
+- Witness `Amalgam/Models/Lifting.lean` (namespace `Amalgam.Models.Lifting`):
+  `L = R = Unit`, `B = Bool`, `p _ = false`, `q _ = true`, coarse objects
+  `Unit`, `a b c` the unique maps, `ha hc` by `rfl`. Theorems `surjective_a`,
+  `surjective_b`, `surjective_c`; `isEmpty_pullback : IsEmpty (p.Pullback q)`;
+  `t₀ := mk () () rfl` with `uniqueCoarsePullback : Unique (p'.Pullback q')`;
+  `not_nonempty_inter_t₀` (the intersection `{false} ∩ {true}` is empty);
+  `t₀_notMem_range_map` and `t₀_notMem_range_observedMap` through
+  `mem_range_map_iff` / `mem_range_observedMap_iff`; `isEmpty_fiber_t₀` through
+  `isEmpty_fiber_map_iff`; `isEmpty_observed`; `not_surjective_map` through
+  `surjective_map_iff`; `not_bijective_observedMap` through
+  `bijective_observedMap_iff`. No minimality is claimed.
 
-Prove that `k_bar` is bijective exactly when the displayed intersection is
-nonempty for every coarse compatible pair. Under that condition expose the
-equivalence or named inverse on all of `P'`, both round-trip laws, and
-uniqueness of the inverse. The unique observed class must not be presented as
-a preferred fine representative or as unique fine lifting.
+## Root exports, README, Status
 
-**Evidence:** exact if-and-only-if statements at the generality of M1.1.
-A sufficient special case such as injectivity of `b` does not close this
-drawer. Status mirrors the image criterion, raw fiber identification, and
-inverse laws with explicit types. Any use of classical choice is visible;
-no computability claim follows merely from existence of the quotient inverse.
+`Amalgam.lean` imports `Core.Comparison`, `Core.Fiber`, `Core.Reduction`,
+`Models.Lifting`, `Models.Overlap`, `Status`. README gained the section
+"Reduction across an overlap" with the subsection "A surjective reduction that
+loses compatibility"; `Amalgam/Status.lean` mirrors each sentence under the
+same headings at independent universes for generic claims and on the concrete
+witness for the failure. Dependency direction: `Core` imports mathlib and
+`Core`; `Models` import `Core`; only the root imports `Status`.
 
-## M1.3 — Surjective reductions and a strict finite failure
+# Verification
 
-Specialize the general setup to objectwise surjective observation maps, as
-required for reductions onto the coarse objects. State how arbitrary
-observations restrict to their images with induced commuting span maps,
-using existing image machinery where applicable.
+- `nix fmt`: no changes. `nix develop -c lake build`: success, zero warnings.
+- `nix flake check`: all checks passed. `rg sorry Amalgam`: none.
+- Axioms (`#print axioms`): criterion theorems `mem_range_map_iff`,
+  `bijective_observedMap_iff`, `subsingleton_fiber_map_iff`,
+  `bijective_observedMap_of_injective`, `mem_range_mapRangeFactorization_iff`
+  use only `propext`, `Quot.sound`; `fiberMapEquivPullback` uses none.
+  `Classical.choice` appears in `observedEquivRange`, `observedEquiv` and its
+  round-trip/uniqueness consequences, and `exists_inverse_observedMap_iff`
+  (through `Function.bijective_iff_has_inverse`). Witness theorems use at most
+  `propext`, `Quot.sound`.
 
-Certify the prescribed finite witness: `L` and `R` are singletons,
-`B = {0,1}`, and their fine restrictions are the distinct overlap values.
-All coarse objects are singletons and all observation maps are surjective.
-The fine pullback is empty, the coarse pullback is a singleton, and its pair
-is not in the image of `k` or `k_bar`. Show the overlap-value intersection
-is empty through the actual M1 API. Do not claim minimality.
+An independent audit of `f2e3027b` against this contract passed every drawer
+and made four bounded edits, included in `17913b28`: `fiberMapEquivProd`
+states the raw fiber literally as pairs of fine views satisfying fine
+compatibility and the two observations, with computation laws;
+`observed_rel_iff_map_eq` now cites `Setoid.ker_def`; the witness theorem was
+renamed from `not_lifts_t₀` to `not_nonempty_inter_t₀`; and Status gained
+examples for the definitional form of `map`, `fiberMapEquivProd`, and
+`bijective_observedMap_iff_surjective_map`, with README wording matched. The
+audit found no verbatim mathlib duplicate among the local `Set` lemmas. All
+changed declarations were re-audited: `fiberMapEquivProd` and
+`not_nonempty_inter_t₀` use no axioms. The working copy is clean after the
+commit.
 
-**Evidence:** named finite data, commutation and surjectivity proofs, the
-unattainable coarse pair, and failure of the exact lifting criterion. Keep
-these finite imports in the model layer. M0's four behaviors remain valid.
+# Request to the reviewer
 
-# Verification and submission
-
-Update the root exports and concise module documentation for the new API.
-Keep the README about compiled mathematics and mirror new mathematical claims
-with explicitly typed `Amalgam/Status.lean` examples. Preserve the dependency
-direction: generic fiber facts are consumed by comparisons and reduction;
-finite witnesses stay downstream.
-
-Run `nix fmt`, `lake build`, and `nix flake check`. Inspect the closing
-declarations and their axioms, excluding `sorry` and new project axioms.
-The next reviewer must inspect the quotient relation, image criterion,
-inverse laws, and finite failure on the production path, as well as the
-cumulative M0 evidence.
-
-Work from this file and perform M1. Commit the candidate and rewrite
-`REVIEW.md` as `READY FOR REVIEW`, `Turn: reviewer`, with the exact
-committed candidate and evidence for M1.1–M1.3. Merely replying in chat is
-not a submission. Do not advance to M2 before the M1 verdict.
+Inspect the quotient relation (`observed_rel_iff`), the image criterion
+(`mem_range_map_iff`), the inverse laws under `observedEquiv`, and the finite
+failure on the production path, together with the cumulative M0 evidence.
+Decide whether M1 is complete. If accepted, rewrite this file as
+`READY FOR WORK`, `Turn: worker`, with the M2 objective, and add the M1
+built-status paragraph to the proposal per Section 23.
 
 # M0 acceptance evidence
 
-The revised comparison criteria directly use the generic fiber criteria;
-comparison-fiber transport uses `Equiv.fiberCongr` and the existing naturality
-law. Precomposition specializes mathlib's `Equiv.subtypeEquivOfSubtype`.
-Public statement strength and the computation laws are preserved; Status
-and the four concrete witnesses are unchanged.
-
-The reviewer reran the full build successfully (697 jobs, no warnings) and
-the repository checks. A disposable Lean audit of the 12 changed or dependent
-declarations reproduced the submitted axiom report: the three global fiber
-criteria use no axioms; the transport and precomposition declarations use
-only `propext` and `Quot.sound`. Independent `simp` probes confirmed both
-precomposition computation laws.
-
-The reviewer invoked the task listing and `nix develop -c nu tasks.nu cache`.
-The task was listed and succeeded against the populated pinned cache,
-reporting no files to download and 8690 already decompressed files.
-Round-specific corrections remain in version history.
+M0 was accepted at `6a33636f` (submission `89c090ae`); the founding proposal
+was accepted at `7159fd31`. Details remain in version history.
