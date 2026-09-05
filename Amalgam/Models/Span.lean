@@ -67,13 +67,13 @@ open Context
 /-! ### The fine and coarse systems -/
 
 /-- Fine state types: two states at `L`, one state at `B` and at `R`. -/
-def fineState : Context → Type
+def FineState : Context → Type
   | L => Bool
   | B => Unit
   | R => Unit
 
 /-- Fine restriction: the identity at `L` and at `R`, the unique map to `B`. -/
-def fineRes : ∀ {c d : Context}, c ≤ d → fineState d → fineState c
+def fineRes : ∀ {c d : Context}, c ≤ d → FineState d → FineState c
   | L, L, _, x => x
   | L, B, h, _ => False.elim h
   | L, R, h, _ => False.elim h
@@ -84,7 +84,7 @@ def fineRes : ∀ {c d : Context}, c ≤ d → fineState d → fineState c
 
 /-- The fine restriction system. -/
 def fine : RestrictionSystem Context where
-  State := fineState
+  State := FineState
   res := fineRes
   res_refl := by
     intro c h x
@@ -194,12 +194,12 @@ theorem fiberEquiv_apply_symm_apply (b : Bool) : fiberEquiv (fiberEquiv.symm b) 
 
 /-- `x₀` and `x₁` have the same observed class: all observed components agree. -/
 theorem observed_x₀_eq_observed_x₁ :
-    (Quotient.mk _ x₀ : φ.observedFamily LR) = Quotient.mk _ x₁ :=
+    (Quotient.mk _ x₀ : φ.ObservedFamily LR) = Quotient.mk _ x₁ :=
   (φ.observedFamily_mk_eq_iff x₀ x₁).2 fun _ => rfl
 
 /-- There is exactly one observed class over `![L, R]`, the class of `x₀`: the injection
 `observedMapFamily` lands in the singleton of coarse families. -/
-instance uniqueObservedFamily : Unique (φ.observedFamily LR) where
+instance uniqueObservedFamily : Unique (φ.ObservedFamily LR) where
   default := Quotient.mk _ x₀
   uniq _ := φ.observedMapFamily_injective (Subsingleton.elim _ _)
 

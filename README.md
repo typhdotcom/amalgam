@@ -279,7 +279,7 @@ existence (`nonempty_fiber_mapFamily_iff`, `isEmpty_fiber_mapFamily_iff`,
 Two fine families are identified when all their observed components agree. That
 relation is the kernel of the raw comparison (`observed_rel_family_iff`),
 equivalently equality under it (`observed_rel_family_iff_mapFamily_eq`), and
-`Hom.observedFamily F` is the quotient `Q_F` by it. The induced injection
+`Hom.ObservedFamily F` is the quotient `Q_F` by it. The induced injection
 `k_bar_F` is `Hom.observedMapFamily F`, the raw comparison on any
 representative (`observedMapFamily_mk`). It is injective
 (`observedMapFamily_injective`) and has the same image as the raw comparison

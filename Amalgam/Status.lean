@@ -928,19 +928,19 @@ example (x x' : S.CompatibleFamily F) :
   φ.observed_rel_family_iff_mapFamily_eq x x'
 
 /-- Fine compatible families pass to the observed quotient. -/
-example : S.CompatibleFamily F → φ.observedFamily F :=
+example : S.CompatibleFamily F → φ.ObservedFamily F :=
   Quotient.mk (Setoid.ker (φ.mapFamily F))
 
 /-- Two fine families have the same observed class exactly when all observed components
 agree. -/
 example (x x' : S.CompatibleFamily F) :
-    (Quotient.mk (Setoid.ker (φ.mapFamily F)) x : φ.observedFamily F) =
+    (Quotient.mk (Setoid.ker (φ.mapFamily F)) x : φ.ObservedFamily F) =
         Quotient.mk (Setoid.ker (φ.mapFamily F)) x' ↔
       ∀ i, φ.toFun (F i) (x.1 i) = φ.toFun (F i) (x'.1 i) :=
   φ.observedFamily_mk_eq_iff x x'
 
 /-- The comparison induced on the observed quotient. -/
-example : φ.observedFamily F → S'.CompatibleFamily F :=
+example : φ.ObservedFamily F → S'.CompatibleFamily F :=
   φ.observedMapFamily F
 
 /-- Factorization: the induced comparison on a class is the raw comparison on a
@@ -968,7 +968,7 @@ example (y : S'.CompatibleFamily F) :
   φ.mem_image_iff y
 
 /-- The observed quotient is the attainable image. -/
-noncomputable example : φ.observedFamily F ≃ φ.image F :=
+noncomputable example : φ.ObservedFamily F ≃ φ.image F :=
   φ.observedFamilyEquivImage F
 
 /-- The identification on a class is the raw comparison on a representative. -/
@@ -978,12 +978,12 @@ example (x : S.CompatibleFamily F) :
   φ.coe_observedFamilyEquivImage_mk x
 
 /-- The identification is the induced comparison on underlying coarse families. -/
-example (q : φ.observedFamily F) :
+example (q : φ.ObservedFamily F) :
     (φ.observedFamilyEquivImage F q : S'.CompatibleFamily F) = φ.observedMapFamily F q :=
   φ.coe_observedFamilyEquivImage q
 
 /-- Round trip: the inverse identification after the identification. -/
-example (q : φ.observedFamily F) :
+example (q : φ.ObservedFamily F) :
     (φ.observedFamilyEquivImage F).symm (φ.observedFamilyEquivImage F q) = q :=
   φ.observedFamilyEquivImage_symm_apply_apply q
 
@@ -1006,7 +1006,7 @@ example (m : FamilyMap F E) : S'.restrict m ∘ φ.mapFamily F = φ.mapFamily E 
   φ.restrict_comp_mapFamily m
 
 /-- Restriction of observed classes. -/
-example (m : FamilyMap F E) : φ.observedFamily F → φ.observedFamily E :=
+example (m : FamilyMap F E) : φ.ObservedFamily F → φ.ObservedFamily E :=
   φ.restrictObserved m
 
 /-- Equal observations restrict to equal observations, which is what makes restriction of
@@ -1022,7 +1022,7 @@ example (m : FamilyMap F E) (x : S.CompatibleFamily F) :
   φ.restrictObserved_mk m x
 
 /-- The quotient commuting square. -/
-example (m : FamilyMap F E) (q : φ.observedFamily F) :
+example (m : FamilyMap F E) (q : φ.ObservedFamily F) :
     φ.observedMapFamily E (φ.restrictObserved m q) = S'.restrict m (φ.observedMapFamily F q) :=
   φ.observedMapFamily_restrictObserved m q
 
@@ -1044,17 +1044,17 @@ example (m : FamilyMap F E) (y : φ.image F) :
   φ.coe_restrictImage m y
 
 /-- The image commuting square. -/
-example (m : FamilyMap F E) (q : φ.observedFamily F) :
+example (m : FamilyMap F E) (q : φ.ObservedFamily F) :
     φ.restrictImage m (φ.observedFamilyEquivImage F q) =
       φ.observedFamilyEquivImage E (φ.restrictObserved m q) :=
   φ.restrictImage_observedFamilyEquivImage m q
 
 /-- Restriction of observed classes along the identity operation is the identity. -/
-example (q : φ.observedFamily F) : φ.restrictObserved (FamilyMap.id F) q = q :=
+example (q : φ.ObservedFamily F) : φ.restrictObserved (FamilyMap.id F) q = q :=
   φ.restrictObserved_id q
 
 /-- Restriction of observed classes along a composite is the composite of restrictions. -/
-example (n : FamilyMap E D) (m : FamilyMap F E) (q : φ.observedFamily F) :
+example (n : FamilyMap E D) (m : FamilyMap F E) (q : φ.ObservedFamily F) :
     φ.restrictObserved (n.comp m) q = φ.restrictObserved n (φ.restrictObserved m q) :=
   φ.restrictObserved_comp n m q
 
@@ -1154,12 +1154,12 @@ example (φ : S.Hom S') :
       Function.Pullback.Observed (φ.naturality hl) (φ.naturality hr) :=
   φ.observedBinaryEquiv hl hr hb
 
-/-- Round trip: the correspondence of quotients after its inverse. -/
+/-- Round trip: the inverse of the correspondence of quotients after the correspondence. -/
 example (φ : S.Hom S') (q : Quotient (Setoid.ker (φ.mapFamily ![l, r]))) :
     (φ.observedBinaryEquiv hl hr hb).symm (φ.observedBinaryEquiv hl hr hb q) = q :=
   φ.observedBinaryEquiv_symm_apply_apply hl hr hb q
 
-/-- Round trip: the inverse of the correspondence of quotients after the correspondence. -/
+/-- Round trip: the correspondence of quotients after its inverse. -/
 example (φ : S.Hom S') (t : Function.Pullback.Observed (φ.naturality hl) (φ.naturality hr)) :
     φ.observedBinaryEquiv hl hr hb ((φ.observedBinaryEquiv hl hr hb).symm t) = t :=
   φ.observedBinaryEquiv_apply_symm_apply hl hr hb t
@@ -1252,21 +1252,21 @@ example (b : Bool) : fiberEquiv (fiberEquiv.symm b) = b := fiberEquiv_apply_symm
 
 /-- The quotient fiber over `y₀` is a singleton, from inhabitedness and the subsingleton
 property separately. -/
-example : Nonempty {q : φ.observedFamily LR // φ.observedMapFamily LR q = y₀} :=
+example : Nonempty {q : φ.ObservedFamily LR // φ.observedMapFamily LR q = y₀} :=
   nonempty_observedFiber
 
-example : Subsingleton {q : φ.observedFamily LR // φ.observedMapFamily LR q = y₀} :=
+example : Subsingleton {q : φ.ObservedFamily LR // φ.observedMapFamily LR q = y₀} :=
   subsingleton_observedFiber
 
-example : Unique {q : φ.observedFamily LR // φ.observedMapFamily LR q = y₀} :=
+example : Unique {q : φ.ObservedFamily LR // φ.observedMapFamily LR q = y₀} :=
   uniqueObservedFiber
 
 /-- There is exactly one observed class over the binary family. -/
-example : Unique (φ.observedFamily LR) := uniqueObservedFamily
+example : Unique (φ.ObservedFamily LR) := uniqueObservedFamily
 
 /-- The observed class of `x₀` is the observed class of `x₁`. -/
 example :
-    (Quotient.mk (Setoid.ker (φ.mapFamily LR)) x₀ : φ.observedFamily LR) =
+    (Quotient.mk (Setoid.ker (φ.mapFamily LR)) x₀ : φ.ObservedFamily LR) =
       Quotient.mk (Setoid.ker (φ.mapFamily LR)) x₁ :=
   observed_x₀_eq_observed_x₁
 

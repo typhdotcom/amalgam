@@ -18,7 +18,7 @@ observed quotient, the attainable image, and their behavior under declared famil
   is attained exactly when such a simultaneous fine lift exists. `nonempty_fiber_mapFamily_iff`,
   `isEmpty_fiber_mapFamily_iff`, `subsingleton_fiber_mapFamily_iff`,
   `nonempty_unique_fiber_mapFamily_iff` separate existence from uniqueness of fine lifts.
-* `observedFamily`, `observedMapFamily`: the quotient `Q_F` of fine families by observed
+* `ObservedFamily`, `observedMapFamily`: the quotient `Q_F` of fine families by observed
   equality, `Setoid.ker k_F`, and the induced injection `k_bar_F`. `observed_rel_family_iff`
   states the relation as agreement of all observed components, `observedMapFamily_mk` is the
   factorization law, `observedMapFamily_injective` and `range_observedMapFamily` give
@@ -44,8 +44,12 @@ observed quotient, the attainable image, and their behavior under declared famil
 ## Conventions
 
 No finiteness, decidability, or surjectivity hypothesis enters; index types and state types may
-be empty. The criterion, quotient, and naturality statements use no choice;
-`observedFamilyEquivImage` is `Setoid.quotientKerEquivRange` and uses classical choice.
+be empty. `observedFamilyEquivImage` is `Setoid.quotientKerEquivRange` and uses classical
+choice, and so do the laws stated in terms of it: its computation and round-trip laws and the
+naturality laws `restrictImage_observedFamilyEquivImage` and
+`restrictImage_comp_observedFamilyEquivImage`. The criterion and fiber statements,
+`restrictObserved`, `restrictImage`, the raw and quotient commuting squares, and
+`image_restrict_subset` use no choice.
 -/
 
 universe u v w
@@ -147,18 +151,18 @@ theorem observed_rel_family_iff_mapFamily_eq (x x' : S.CompatibleFamily F) :
   Setoid.ker_def
 
 /-- The quotient `Q_F` of fine compatible families over `F` by observed equality. -/
-abbrev observedFamily (F : ι → C) : Type _ :=
+abbrev ObservedFamily (F : ι → C) : Type _ :=
   Quotient (Setoid.ker (φ.mapFamily F))
 
 /-- Two fine families have the same observed class exactly when all observed components
 agree. -/
 theorem observedFamily_mk_eq_iff (x x' : S.CompatibleFamily F) :
-    (Quotient.mk _ x : φ.observedFamily F) = Quotient.mk _ x' ↔
+    (Quotient.mk _ x : φ.ObservedFamily F) = Quotient.mk _ x' ↔
       ∀ i, φ.toFun (F i) (x.1 i) = φ.toFun (F i) (x'.1 i) :=
   Quotient.eq.trans (φ.observed_rel_family_iff x x')
 
 /-- The comparison induced on the observed quotient, `k_bar_F`. -/
-def observedMapFamily (F : ι → C) : φ.observedFamily F → S'.CompatibleFamily F :=
+def observedMapFamily (F : ι → C) : φ.ObservedFamily F → S'.CompatibleFamily F :=
   Setoid.kerLift (φ.mapFamily F)
 
 /-- Factorization law: `observedMapFamily` on a class is `mapFamily` on a representative. -/
@@ -213,7 +217,7 @@ theorem image_eq_range_observedMapFamily : φ.image F = Set.range (φ.observedMa
 
 /-- The observed quotient is the attainable image, by the first isomorphism theorem for
 sets. -/
-noncomputable def observedFamilyEquivImage (F : ι → C) : φ.observedFamily F ≃ φ.image F :=
+noncomputable def observedFamilyEquivImage (F : ι → C) : φ.ObservedFamily F ≃ φ.image F :=
   Setoid.quotientKerEquivRange _
 
 /-- `observedFamilyEquivImage` on a class is `mapFamily` on a representative. -/
@@ -223,12 +227,12 @@ noncomputable def observedFamilyEquivImage (F : ι → C) : φ.observedFamily F 
   rfl
 
 /-- `observedFamilyEquivImage` is `observedMapFamily` on underlying families. -/
-@[simp] theorem coe_observedFamilyEquivImage (q : φ.observedFamily F) :
+@[simp] theorem coe_observedFamilyEquivImage (q : φ.ObservedFamily F) :
     (φ.observedFamilyEquivImage F q : S'.CompatibleFamily F) = φ.observedMapFamily F q :=
   rfl
 
 /-- Round trip: `observedFamilyEquivImage.symm` after `observedFamilyEquivImage`. -/
-theorem observedFamilyEquivImage_symm_apply_apply (q : φ.observedFamily F) :
+theorem observedFamilyEquivImage_symm_apply_apply (q : φ.ObservedFamily F) :
     (φ.observedFamilyEquivImage F).symm (φ.observedFamilyEquivImage F q) = q :=
   (φ.observedFamilyEquivImage F).symm_apply_apply q
 
@@ -257,7 +261,7 @@ theorem ker_mapFamily_restrict {x x' : S.CompatibleFamily F}
 
 /-- Restriction of observed classes along `m`, induced by `S.restrict m` on representatives.
 It is well defined on classes by `ker_mapFamily_restrict`. -/
-def restrictObserved : φ.observedFamily F → φ.observedFamily E :=
+def restrictObserved : φ.ObservedFamily F → φ.ObservedFamily E :=
   Quotient.map' (S.restrict m) fun _ _ => φ.ker_mapFamily_restrict m
 
 /-- `restrictObserved` on a class is `S.restrict m` on a representative. -/
@@ -267,7 +271,7 @@ def restrictObserved : φ.observedFamily F → φ.observedFamily E :=
 
 /-- The quotient commuting square: the induced comparison intertwines restriction of observed
 classes with restriction of coarse families. -/
-theorem observedMapFamily_restrictObserved (q : φ.observedFamily F) :
+theorem observedMapFamily_restrictObserved (q : φ.ObservedFamily F) :
     φ.observedMapFamily E (φ.restrictObserved m q) = S'.restrict m (φ.observedMapFamily F q) :=
   Quotient.inductionOn q fun x => (φ.restrict_mapFamily m x).symm
 
@@ -296,7 +300,7 @@ def restrictImage : φ.image F → φ.image E :=
 
 /-- The image commuting square: `observedFamilyEquivImage` intertwines `restrictObserved` and
 `restrictImage`. -/
-theorem restrictImage_observedFamilyEquivImage (q : φ.observedFamily F) :
+theorem restrictImage_observedFamilyEquivImage (q : φ.ObservedFamily F) :
     φ.restrictImage m (φ.observedFamilyEquivImage F q) =
       φ.observedFamilyEquivImage E (φ.restrictObserved m q) :=
   Subtype.ext (φ.observedMapFamily_restrictObserved m q).symm
@@ -323,12 +327,12 @@ end Naturality
 /-! ### Identity and composition -/
 
 /-- Restriction of observed classes along the identity operation is the identity. -/
-theorem restrictObserved_id (q : φ.observedFamily F) :
+theorem restrictObserved_id (q : φ.ObservedFamily F) :
     φ.restrictObserved (FamilyMap.id F) q = q :=
   Quotient.inductionOn q fun x => congrArg (Quotient.mk _) (S.restrict_id x)
 
 /-- Restriction of observed classes along a composite is the composite of restrictions. -/
-theorem restrictObserved_comp (n : FamilyMap E D) (m : FamilyMap F E) (q : φ.observedFamily F) :
+theorem restrictObserved_comp (n : FamilyMap E D) (m : FamilyMap F E) (q : φ.ObservedFamily F) :
     φ.restrictObserved (n.comp m) q = φ.restrictObserved n (φ.restrictObserved m q) :=
   Quotient.inductionOn q fun x => congrArg (Quotient.mk _) (S.restrict_comp n m x)
 
