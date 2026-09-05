@@ -1,4 +1,5 @@
 import Mathlib.Data.Set.Operations
+import Mathlib.Logic.Equiv.Basic
 import Mathlib.Logic.Equiv.Sum
 import Mathlib.Logic.Function.Basic
 import Mathlib.Logic.IsEmpty.Basic
@@ -128,14 +129,20 @@ def fiberComp (g : Y → Z) (f : X → Y) (z : Z) :
   left_inv _ := rfl
   right_inv := by rintro ⟨⟨_, _⟩, ⟨_, hx⟩⟩; cases hx; rfl
 
-/-- Precomposition with an equivalence of the source preserves fibers: the fiber form of
-`Equiv.subtypeEquivOfSubtype`, restated so that `simps` yields fiber-level lemmas. -/
-@[simps]
-def fiberCompEquiv (f : X → Y) (e : X' ≃ X) (y : Y) : {x' // f (e x') = y} ≃ {x // f x = y} where
-  toFun x' := ⟨e x', x'.2⟩
-  invFun x := ⟨e.symm x, by rw [apply_symm_apply, x.2]⟩
-  left_inv x' := Subtype.ext (e.symm_apply_apply x')
-  right_inv x := Subtype.ext (e.apply_symm_apply x)
+/-- Precomposition with an equivalence of the source preserves fibers: the specialization of
+`Equiv.subtypeEquivOfSubtype` to the fiber predicate `f · = y`. -/
+def fiberCompEquiv (f : X → Y) (e : X' ≃ X) (y : Y) : {x' // f (e x') = y} ≃ {x // f x = y} :=
+  subtypeEquivOfSubtype (p := fun x => f x = y) e
+
+/-- `fiberCompEquiv` acts as `e` on underlying points. -/
+@[simp] theorem fiberCompEquiv_apply_coe (f : X → Y) (e : X' ≃ X) (y : Y)
+    (x' : {x' // f (e x') = y}) : (fiberCompEquiv f e y x' : X) = e x' :=
+  rfl
+
+/-- `fiberCompEquiv.symm` acts as `e.symm` on underlying points. -/
+@[simp] theorem fiberCompEquiv_symm_apply_coe (f : X → Y) (e : X' ≃ X) (y : Y)
+    (x : {x // f x = y}) : ((fiberCompEquiv f e y).symm x : X') = e.symm x :=
+  rfl
 
 /-- Postcomposition with an equivalence of the target transports fibers along its inverse. -/
 @[simps]

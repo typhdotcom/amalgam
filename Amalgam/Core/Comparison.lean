@@ -1,6 +1,5 @@
+import Amalgam.Core.Fiber
 import Mathlib.Data.Set.Prod
-import Mathlib.Logic.Equiv.Basic
-import Mathlib.Logic.Unique
 
 /-!
 # Compatible pairs and the comparison map of a commuting square
@@ -185,8 +184,7 @@ theorem injective_lift_iff : Injective (lift f g h) ↔ ∀ x y, f x = f y → g
 /-- Injectivity of the comparison is uniqueness of global extensions over every compatible pair. -/
 theorem injective_lift_iff_forall_subsingleton :
     Injective (lift f g h) ↔ ∀ c, Subsingleton {x // lift f g h x = c} :=
-  ⟨fun hi _ => ⟨fun x y => Subtype.ext (hi (x.2.trans y.2.symm))⟩,
-    fun hs x y hxy => congrArg Subtype.val (@Subsingleton.elim _ (hs _) ⟨x, hxy⟩ ⟨y, rfl⟩)⟩
+  injective_iff_subsingleton_fiber (lift f g h)
 
 /-- Surjectivity of the comparison is existence of a global state over every compatible pair. -/
 theorem surjective_lift_iff :
@@ -196,8 +194,8 @@ theorem surjective_lift_iff :
 
 /-- Surjectivity of the comparison is existence of global extensions over every compatible pair. -/
 theorem surjective_lift_iff_forall_nonempty :
-    Surjective (lift f g h) ↔ ∀ c, Nonempty {x // lift f g h x = c} := by
-  simp only [Surjective, nonempty_subtype]
+    Surjective (lift f g h) ↔ ∀ c, Nonempty {x // lift f g h x = c} :=
+  surjective_iff_nonempty_fiber (lift f g h)
 
 /-- Bijectivity of the comparison is joint separation together with joint attainment. -/
 theorem bijective_lift_iff :
@@ -216,9 +214,8 @@ theorem bijective_lift_iff_existsUnique :
 /-- Bijectivity of the comparison is unique existence of global extensions over every compatible
 pair. -/
 theorem bijective_lift_iff_forall_nonempty_unique :
-    Bijective (lift f g h) ↔ ∀ c, Nonempty (Unique {x // lift f g h x = c}) := by
-  rw [bijective_iff_existsUnique]
-  simp only [unique_subtype_iff_existsUnique]
+    Bijective (lift f g h) ↔ ∀ c, Nonempty (Unique {x // lift f g h x = c}) :=
+  bijective_iff_nonempty_unique_fiber (lift f g h)
 
 end Global
 
@@ -340,8 +337,8 @@ include hf hg in
 /-- Fibers of the comparison map correspond under a coherent equivalence of squares. -/
 def fiberLiftCongr (c : p.Pullback q) :
     {x // lift f g h x = c} ≃ {x' // lift f' g' h' x' = congr eL eR eB hp hq c} :=
-  Equiv.subtypeEquiv eG fun x => by
-    rw [← congr_lift eL eR eB hp hq eG hf hg, (congr eL eR eB hp hq).injective.eq_iff]
+  Equiv.fiberCongr eG (congr eL eR eB hp hq)
+    (fun x => (congr_lift eL eR eB hp hq eG hf hg x).symm) c
 
 /-- `fiberLiftCongr` acts as `eG` on underlying global states. -/
 @[simp] theorem fiberLiftCongr_apply_coe (c : p.Pullback q) (x : {x // lift f g h x = c}) :

@@ -112,5 +112,9 @@ nix develop
 lake build
 ```
 
-`nu tasks.nu` lists the shorthands for building, formatting, and running the
-flake checks.
+`nu tasks.nu cache` runs `lake exe cache get`, which fetches prebuilt mathlib
+artifacts for the pinned dependencies. Run it after changing `lean-toolchain`
+or the mathlib revision, before `lake build`.
+
+`nu tasks.nu` lists the shorthands for building, caching, formatting, and
+running the flake checks.
