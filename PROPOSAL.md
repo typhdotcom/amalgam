@@ -7,8 +7,10 @@
 This is the founding proposal for a new Lean 4 project.
 
 The Lean library currently implements maps, fibers, binary compatibility, the
-exact binary lifting criterion, and finite witnesses for comparison and
-reduction failures. `REVIEW.md` records the current review state.
+exact binary lifting criterion, and restriction systems with compatible
+families, observed quotients, attainable images, and naturality. Finite witnesses
+separate existence from uniqueness and full-family from proper-family content.
+M0–M2 are accepted. `REVIEW.md` records the current review state.
 The remaining theorem packages, criteria, and witnesses below specify work to
 formalize; they are not a report of compiled results.
 
@@ -642,7 +644,7 @@ with a theorem that it, together with the supplied datum, determines all
 remaining admissible images. Do not impose extension of all local families
 as an implicit assumption.
 
-A prospective finite witness uses `L → B ← M → D ← R`. Each of `L`, `M`, and
+A certified finite witness uses `L → B ← M → D ← R`. Each of `L`, `M`, and
 `R` is a singleton, each of `B` and `D` is `{0, 1}`, and all coarse objects are
 singletons. All reduction maps are the unique surjections, so their squares
 commute. Declare `LM`, `MR`, and `LMR` admissible, together with their local
@@ -655,10 +657,10 @@ A       (0, 0, 0, 1)         singleton  empty      empty
 B       (0, 1, 0, 0)         empty      singleton  empty
 ```
 
-This witness is to be certified with the finite-family theory. It separates
+`Amalgam/Models/Zigzag.lean` certifies this witness through the family API. It separates
 equality of full-family content from equality of all admissible content; it
-makes no claim about completeness of the local input datum still to be chosen
-in M3. No smallest-shape claim is made.
+makes no claim about completeness of M3's supplied local input: its two
+systems have different adjacent binary images. No smallest-shape claim is made.
 
 The project must classify what local data determines this collection of
 images and what coherence information remains missing. Binary lifting
@@ -1272,8 +1274,8 @@ span through `bijective_compare₁`, `injective_compare₂`,
 unreached pairs and distinct-state witnesses. `Amalgam/Status.lean` mirrors
 the README's mathematical claims and is imported by the root library. The
 Apache-2.0 Lake package `amalgam` pins Lean and mathlib to `v4.33.1` and provides
-build and cache tasks. The next unresolved question is M1: exactly when
-observing local descriptions preserves their joint compatibility.
+build and cache tasks. M1 consumes this API to characterize when observing
+local descriptions preserves their joint compatibility.
 
 ## M1 — When local reduction preserves compatibility
 
@@ -1295,49 +1297,63 @@ preserving attainment. `Amalgam/Models/Lifting.lean` certifies the Section 10
 witness: all three observations are surjective, but the fine pullback is empty
 and the coarse pullback is a singleton. `not_nonempty_inter_t₀`,
 `t₀_notMem_range_observedMap`, and `not_bijective_observedMap` connect that
-failure to the exact criterion. No minimality is claimed. The next unresolved
-question is M2: construct these comparisons coherently for finite families
-and their declared restrictions.
+failure to the exact criterion. No minimality is claimed. M2 extends these
+comparisons coherently to families and their declared restrictions.
 
 ## M2 — The comparison for finite families
 
-Introduce the weakest restriction interface consumed by the binary result and
-its extension to finite families with shared overlaps. Finiteness here concerns
-the indexing families; state carriers remain arbitrary. Declare which families
-are admissible and which restrictions between families are supplied.
+**Built and accepted.** `Amalgam/System/Restriction.lean` defines restriction
+systems over preorders, compatible families, and declared `FamilyMap`
+operations. Both state carriers and index types are arbitrary and may be
+empty. `Presentation.lean` derives relabeling and redundant-view equivalences
+from restriction laws, with `restrictFiberEquiv` identifying extension choices.
 
-For every admissible `F`, construct both maps from Section 12:
+`System/Comparison.lean` defines `Hom.ObservedFamily`, its injection
+`observedMapFamily`, and the attainable `image`. The closing identification
+`fiberMapFamilyEquiv` and criterion `mem_range_mapFamily_iff` describe fine
+lifts; `observedFamilyEquivImage` identifies observed classes with attained
+content. Raw and quotient fibers share inhabitedness, while quotient fibers
+are subsingletons. `restrict_comp_mapFamily`,
+`observedMapFamily_restrictObserved`, and
+`restrictImage_observedFamilyEquivImage` give the commuting squares, with
+identity/composition laws. `image_restrict_subset` gives the exact general
+inclusion. The quotient-to-image equivalence and its laws use classical choice;
+the restriction maps themselves do not choose fine representatives.
 
-- `k_F : P_F → P'_F`, whose fiber over a coarse family is the type of its
-  fine compatible lifts;
-- `k_bar_F : Q_F → P'_F`, the injection from observed quotient classes, whose
-  image is the attainable content `I_F` and whose fibers are subsingletons.
-
-Prove naturality of both maps under the declared family restrictions, and
-identify `Q_F` with `I_F`. Include binary reduction, presentation invariance,
-and degeneration under redundant views as consequences. Prove the induced
-restriction maps on images and the inclusion in Section 12; equality requires
-an additional theorem.
-
-Retain a calibration case with two fine compatible families mapping constantly
-to one coarse family: the fiber of `k_F` has two elements, while the fiber of
-`k_bar_F` has one observed class. The image-only target does not require
-recovery of the first multiplicity. Also certify the Section 12 finite witness
-separating full-family content from all admissible content.
-
-Do not assert that binary surjectivity implies family surjectivity. That is
-part of the next inverse problem. Do not build an arity-by-arity tower.
+`System/Binary.lean` recovers M0/M1 through `binaryEquiv`,
+`binaryEquiv_mapFamily`, `observedBinaryEquiv`, and
+`mem_range_mapFamily_iff_inter_nonempty`. `Models/Span.lean` gives a raw fiber
+equivalent to `Bool` and a unique quotient fiber. `Models/Zigzag.lean` certifies
+the Section 12 witness through `image_LMR_eq`, `image_LM_ne`, `image_MR_ne`,
+and strict image-restriction inclusions. Status mirrors the public claims.
+The remaining central question is M3: how much of the entire attainable-image
+collection is determined by supplied proper-family content.
 
 ## M3 — The coherent information boundary
 
-Use finite reconnaissance to select one explicit finite context shape with
-shared overlaps. Then fix its admissible families, candidate realizations,
-supplied local lifting or incidence datum, and target equivalence before the
-classification work. The initial target is the entire collection of attainable
-images `I_F`, with its restriction maps, as defined in Section 12. Any stronger
-presentation target needs a named question that requires it. Explicitly list
-which proper-family images the input datum already fixes and which remain to
-be reconstructed.
+The selected shape is the five-context zigzag `L → B ← M → D ← R`, with no
+additional order relations beyond reflexivity. Fix an arbitrary coarse
+restriction system on it. Candidate realizations are fine restriction systems
+with commuting observations surjective at every context; fine carriers may
+vary and are not assumed finite. Admissible families are all eight subfamilies
+of `L, M, R`, including the empty family, with their forgetful restrictions.
+Relabelings and redundant presentations are handled by M2.
+
+Supply the two adjacent binary attainable images `I_LM` and `I_MR` as subsets
+of the fixed coarse family types. The target remains all eight attainable
+images with their restriction maps. Objectwise surjectivity should fix the
+singleton images, and the absence of an outer overlap should fix `I_LR`;
+prove these determination statements along with the empty-family case. This
+makes explicit why the full-family image is the remaining joint question.
+
+Begin with finite reconnaissance testing this information boundary. The
+classification conjecture is that, for supplied adjacent images `A` and `B`,
+the possible full images are exactly the subsets of the coarse compatible
+triples whose `LM` restriction lies in `A` and whose `MR` restriction lies in
+`B`. This is a research target, not a built theorem. Test and then settle it;
+if false, preserve the counterexample and state the sharper exact boundary
+on the same shape and datum. A stronger presentation target needs a named
+question that requires it.
 
 The closing theorem classifies the equivalence on realizations induced by
 the supplied datum and determines exactly whether it fixes that entire target
@@ -1380,6 +1396,11 @@ condition needs
 a strict incompatible datum; an unconditional realizability theorem discharges
 that witness obligation. A constructor for positive examples alone is not a
 classification.
+
+M3's description of all remaining targets may already supply the required
+realizability construction. Reuse that theorem and record the obligations it
+settles; do not create a second classification solely to preserve milestone
+numbering.
 
 Run the closure audit against M3's fixed reconstruction question. A sharp
 negative classification can complete the program. Scalar shadows, larger
