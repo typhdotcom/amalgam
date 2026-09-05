@@ -1,102 +1,120 @@
-State: READY FOR REVIEW
-Turn: reviewer
-Candidate: a566fc2c; previous candidate ed91c378; accepted M2 candidate 0950158f
+State: RETURNED
+Turn: worker
+Candidate: a566fc2c; submission d9443020; accepted M2 candidate 0950158f
 
-# Submission
+# Verdict and objective
 
-Both drawers of the returned round are closed at `a566fc2c`. No existing
-theorem statement or proof changed; R1 adds four lemmas and their Status
-mirrors, R2 is prose in README, two module docstrings, and two Status
-docstrings. No M4 work was started.
+R1 is closed. R2's substantive corrections are sound, but its newly published
+negative control lacks the committed typed Status example required by
+[PROPOSAL.md](PROPOSAL.md), Section 23. Close that evidence gap and the two
+associated reporting details below. M3 is not yet accepted; do not start M4.
+No mathematical defect was found in this revision.
+
+M3 determines exactly what adjacent binary images retain and omit on the
+fixed zigzag: arbitrary prescribed binary images and full image are realizable
+exactly when the full image lies in their coarse join. The datum determines
+the target exactly when that join is empty. Sections 11–14 and 26 of the
+proposal own the contract.
 
 # Accepted foundation
 
-[PROPOSAL.md](PROPOSAL.md), Sections 11–14 and 26, owns this contract. The
-M3 mathematics inspected at `ed91c378` is unchanged: the shared shape and
-eight admissible families, `Candidate`/`Target`, the five fixed images and
-`Candidate.target_eq_iff`, the join with `image_LMR_subset_join`, the tagged
-realization with its three image laws, `exists_realization_iff`,
-`exists_candidate_target_iff`, `datum_determines_target_iff`,
-`realizable_target_iff`, and the `split`/`glue` pair.
+The proposal was accepted at `7159fd31`, M0 at `6a33636f`, M1 at `d7f2ed62`,
+and M2 at `0950158f`. Preserve those capabilities and the fixed candidate
+class, eight admissible families, target, and independent-universe contract.
 
-# Closing evidence
+The M3 mathematics reviewed at `ed91c378` remains unchanged: the five fixed
+images, target equality criterion, join inclusion, tagged realization and its
+image laws, exact realization and determination classifications,
+`realizable_target_iff`, and the strict split/glue pair. This revision adds
+the requested singleton-middle results without changing existing statements.
 
-## R1 — The singleton-middle collapse is a theorem
+# Current drawers
 
-`Amalgam/System/ZigzagTarget.lean`, section "Collapse of the full family at a
-single fine middle state", for an arbitrary fine system
-`S : RestrictionSystem.{0, v} Context` with no finiteness, decidability,
-nonemptiness, or surjectivity hypothesis:
+## R1 — Closed: singleton-middle collapse
 
-- `nonempty_LM_and_MR_of_nonempty_LMR (S) : Nonempty (S.CompatibleFamily LMR) → Nonempty (S.CompatibleFamily LM) ∧ Nonempty (S.CompatibleFamily MR)`, by
-  restriction along `toLM` and `toMR` (no subsingleton hypothesis).
-- `exists_LMR_of_subsingleton_middle (S) [Subsingleton (S.State M)] (a : S.CompatibleFamily LM) (a' : S.CompatibleFamily MR) : ∃ x : S.CompatibleFamily LMR, S.restrict toLM x = a ∧ S.restrict toMR x = a'`:
-  the two supplied families are combined on their (agreeing) middle states;
-  compatibility by `compatible_triple_iff` from the two `compatible_pair_iff`
-  equations, the second transported along `Subsingleton.elim`.
-- `nonempty_LMR_of_subsingleton_middle`, and the requested statement
-  `nonempty_LMR_iff_of_subsingleton_middle (S) [Subsingleton (S.State M)] : Nonempty (S.CompatibleFamily LMR) ↔ Nonempty (S.CompatibleFamily LM) ∧ Nonempty (S.CompatibleFamily MR)`.
+The four new lemmas in `Amalgam/System/ZigzagTarget.lean` establish the
+requested strength for arbitrary fine systems:
 
-Axioms: `nonempty_LM_and_MR_of_nonempty_LMR` uses `propext`; the other three
-use `propext, Quot.sound`. All four are mirrored verbatim in
-`Amalgam/Status.lean` (strict-witness subsection, universe `uV`). README's
-sweep paragraph now attributes the "one middle state forces a full lift"
-explanation to `nonempty_LMR_iff_of_subsingleton_middle` and keeps the
-numeric minima as bounded-search observations; no minimality claim.
+- `nonempty_LM_and_MR_of_nonempty_LMR` restricts a full family, without a
+  subsingleton hypothesis.
+- `exists_LMR_of_subsingleton_middle` combines the two supplied adjacent
+  families and proves that the full family restricts back to both.
+- `nonempty_LMR_of_subsingleton_middle` packages existence.
+- `nonempty_LMR_iff_of_subsingleton_middle` gives the exact equivalence under
+  `[Subsingleton (S.State M)]`.
 
-## R2 — Descriptions match the elaborated hypotheses and formulas
+No finiteness, decidability, nonemptiness, or observation hypothesis was
+introduced. All four have exact Status mirrors. README correctly separates
+this theorem from the sweep's bounded numerical observations. Preserve this
+completed work.
 
-1. README intro: the criteria of M0–M2 carry no finiteness, decidability, or
-   coverage hypothesis; the zigzag classification's candidate class requires
-   objectwise surjective observations, which fixes the empty, singleton, and
-   `LR` images.
-2. README universe paragraph and the "Universe convention" header of
-   `ZigzagClassification.lean`: `Candidate.image_LMR_subset_join` and
-   `subset_join_of_candidate` consume naturality only;
-   `Candidate.target_eq_ofDatum`, `Candidate.target_realizable`, and
-   `target_eq_of_join_eq_empty` also consume the fixed-image lemmas and
-   candidate surjectivity; all hold at an independent fine universe.
-3. `target_eq_of_join_eq_empty` is described, in README and in its docstring,
-   as the sufficiency direction of `datum_determines_target_iff` (from empty
-   join to determination).
-4. `realize`, `realizeHom`, `realizeCandidate` (module headers, docstrings,
-   the two Status docstrings, and README): full image `T` and objectwise
-   surjectivity hold for every `A`, `A'`, `T`; the binary images equal `A`,
-   `A'` only under `T ⊆ join A A'`; the constructors stay usable without the
-   inclusion. The `realize` docstring records the negative control. The
-   reviewer's probe was reproduced on the candidate: over
-   `Amalgam.Models.MiddleSplit.coarse` with `A = A' = ∅`, `T = Set.univ`,
-   `(realizeCandidate A A' T).datum ≠ (∅, ∅)` via `subset_join_of_candidate`,
-   `realizeCandidate_image_LMR`, and `mem_join_iff` at the default coarse
-   family (axioms `propext, Quot.sound`).
-5. `TaggedState` docstring, module header, and README: `solo` is tagged by its
-   origin `p : Σ d, S'.State d`; restriction retains the origin, so two solo
-   copies agree on an overlap only when they copy the same coarse state at
-   the same context, which prevents unwanted compatible pairs.
+## R2 — Remaining: persist the negative control and finish precise reporting
 
-`rg "untagged|forward half|naturality alone|no coverage|realizes all three"`
-over README and `Amalgam/` leaves one hit, the sentence "Necessity is
-naturality alone" about `image_LMR_subset_join`, which is correct.
+The intro, universe descriptions, sufficiency-direction label, unconditional
+full-image and surjectivity claims, conditional binary-image claims, and
+origin-tagged `solo` description now match the implementation.
 
-# Verification
+Three small items remain within this drawer:
 
-- `nix fmt`: no changes. `nix develop -c lake build`: `Build completed successfully (725 jobs)`, zero warnings. `nix flake check`: all checks
-  passed. No source line exceeds 100 characters. Working copy clean after the
-  commit.
-- The 413-constant unfiltered audit of `ed91c378` carries forward; the only
-  new constants are the four R1 lemmas with the axioms named above.
+1. README's realization paragraph now asserts that over
+   `Amalgam.Models.MiddleSplit.coarse`, with `A = A' = ∅` and `T = Set.univ`,
+   `(Zigzag.realizeCandidate (S' := coarse) ∅ ∅ Set.univ).datum ≠ (∅, ∅)`.
+   The statement is true and independently typechecked, but no typed example
+   of it exists in `Amalgam/Status.lean`. Add that exact concrete example
+   using the existing API. `subset_join_of_candidate`,
+   `realizeCandidate_image_LMR`, and the coarse family `y₀` suffice. A scratch
+   probe or a report that it compiled does not fulfill the committed-manifest
+   requirement. No new library abstraction or proof refactor is needed.
+2. The preceding README sentence says that without the inclusion its binary
+   images "are then not `A` and `A'`". State that without assuming the
+   inclusion, the requested binary images are **not guaranteed**. The
+   constructor takes no inclusion proof even for inputs satisfying it; lack
+   of an assumption is not its negation. Keep the concrete negative control
+   as the example establishing the limitation.
+3. Report the audit with its actual selection and count. The six-module
+   unfiltered selection now has **421 constants**, including **58 internal
+   names**. The increase from 413 is four public lemmas plus four generated
+   match auxiliaries, not just four constants. Preserve the distinction
+   between public lemmas and all environment constants in the next report.
 
-# Request to the reviewer
+Closure evidence: the new committed Status example is imported by the root
+aggregator, the README sentence states the precise guarantee, and the next
+submission records the actual audit selection and results.
 
-Check the four collapse lemmas against the required strength, the corrected
-descriptions against the elaborated hypotheses (including the negative
-control), and decide whether M3 can be accepted. On acceptance, update the
-proposal's M3 status and curate M4's remaining obligations: strict
-incompatible targets for each condition of `realizable_target_iff`, and the
-final obligation-to-theorem and public-surface audit.
+# Independent verification
 
-# Prior acceptance evidence
+On `a566fc2c`:
 
-M2 was accepted at `0950158f` (submission `c15aff3c`); M1 at `d7f2ed62`;
-M0 at `6a33636f`; the founding proposal at `7159fd31`. Details remain in
-version history.
+- `nix develop -c lake build`: success, 725 jobs, zero warnings.
+- `nu tasks.nu check`: all flake checks passed, including formatting.
+- No `sorry` or axiom declarations found in `Amalgam/`.
+- Unfiltered axiom audit selected constants by defining module in
+  `System.Zigzag`, `System.ZigzagTarget`, `System.ZigzagRealization`,
+  `System.ZigzagClassification`, `Models.MiddleSplit`, and `Models.Zigzag`.
+  Of 421 constants, 74 use no axioms, 270 use only `propext`, 71 use
+  `propext` and `Quot.sound`, and six use classical choice. Choice remains
+  confined to the existing model set-inequality witnesses.
+- Direct prints: the forward restriction lemma uses only `propext`; the
+  other three new lemmas use only `propext` and `Quot.sound`.
+- The exact concrete negative control above typechecked in a disposable
+  probe, removed after review.
+- The unchanged sweep retains the previous independent results: 872 systems
+  at bound 2 and 1,554,228 at bound 3. It was not rerun for this revision.
+
+# M4 disposition after M3 acceptance
+
+`realizable_target_iff` already establishes M4's main realizability criterion
+through an actual coherent candidate. Do not rebuild that classification.
+The remaining objective will be explicit incompatible targets witnessing
+failure of each of the five fixed-full-entry requirements and the join
+inclusion, followed by the final obligation-to-theorem and public-surface
+closure audit. M3 acceptance and its proposal built-status update precede
+opening that work.
+
+# Next submission
+
+Work from this file and close only the remaining R2 items. Run the full build,
+formatting and flake checks, and the stated axiom audit. Rewrite this file as
+`READY FOR REVIEW`, `Turn: reviewer`, with the exact candidate and evidence
+for every remaining item; retain R1 as closed. Merely replying in chat is not
+a submission.
