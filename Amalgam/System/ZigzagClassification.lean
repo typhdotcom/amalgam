@@ -1,5 +1,8 @@
-import Amalgam.System.ZigzagTarget
+import Amalgam.System.Comparison
+import Amalgam.System.Restriction
+import Amalgam.System.Zigzag
 import Amalgam.System.ZigzagRealization
+import Amalgam.System.ZigzagTarget
 
 /-!
 # Classification of targets at fixed datum on the zigzag
@@ -10,8 +13,8 @@ binary images; the target `c.target : Target S'` is the attainable image on all 
 families, and the target equivalence is equality of all eight subsets (`Target.ext_iff`). No
 refinement of the datum is introduced.
 
-This module combines M3.2 (`Amalgam/System/ZigzagTarget.lean`) with M3.3
-(`Amalgam/System/ZigzagRealization.lean`).
+This module combines the fixed entries of `Amalgam/System/ZigzagTarget.lean` with the realization
+of `Amalgam/System/ZigzagRealization.lean`.
 
 * `Candidate.image_LMR_subset_join`, `subset_join_of_candidate`: for a candidate in any fine
   universe, `I_LMR ⊆ join I_LM I_MR`, by naturality of the family comparison.
@@ -21,7 +24,9 @@ This module combines M3.2 (`Amalgam/System/ZigzagTarget.lean`) with M3.3
   `T ⊆ join A A'`.
 * `Target.ofDatum A A' T`: the target with full coarse content on the empty family, on each
   singleton, and on `LR`, with `LM`-entry `A`, `MR`-entry `A'`, and `LMR`-entry `T`. Every
-  candidate's target has this form at its own datum and full image (`Candidate.target_eq_ofDatum`).
+  candidate's target has this form at its own datum and full image (`Candidate.target_eq_ofDatum`),
+  with that full image inside the join of the datum
+  (`Candidate.exists_subset_join_target_eq_ofDatum`).
 * `exists_candidate_target_iff`, `exists_candidate_target_iff'`: the classification at fixed
   datum. The targets of candidates with datum `(A, A')` are exactly `Target.ofDatum A A' T` for
   `T ⊆ join A A'`; in fields, exactly the targets with full content on the five fixed entries,
@@ -33,16 +38,18 @@ This module combines M3.2 (`Amalgam/System/ZigzagTarget.lean`) with M3.3
   `Target.ofDatum A A' (join A A')` are two distinct targets of candidates with this datum.
 * `realizable_target_iff`: an abstract target arises from some candidate exactly when its five
   fixed entries are full and its `LMR`-entry lies in the join of its `LM`- and `MR`-entries.
-  This is the unconditional converse of M3.3 read at the level of targets, recorded as the
-  realizability consequence (PROPOSAL Section 14) for this shape and datum.
+  This is `exists_realization_iff` read at the level of targets, recorded as the realizability
+  consequence (PROPOSAL Section 14) for this shape and datum.
 
 ## Universe convention
 
 The coarse system lives in `RestrictionSystem.{0, w}`. Statements with a candidate as hypothesis
 (`Candidate.image_LMR_subset_join`, `subset_join_of_candidate`, `Candidate.target_eq_ofDatum`,
-`Candidate.target_realizable`, `target_eq_of_join_eq_empty`) hold for a fine system in any
+`Candidate.exists_subset_join_target_eq_ofDatum`, `Candidate.target_realizable`,
+`target_eq_of_join_eq_empty`) hold for a fine system in any
 universe `v`. The first two consume naturality only; the others also consume the fixed-image
-lemmas of M3.2 and the candidate's objectwise surjectivity. The realization `realize A A' T` has
+lemmas of `Amalgam/System/ZigzagTarget.lean` and the candidate's objectwise surjectivity. The
+realization `realize A A' T` has
 fine states in the coarse universe `w`, so the existential statements and the iff's quantify over
 `Candidate.{w, w}`.
 -/
@@ -128,10 +135,16 @@ theorem Target.eq_ofDatum_iff (t : Target S') {A : Set (S'.CompatibleFamily LM)}
     h.2.2.2.2.2.2.2
 
 /-- Every candidate's target is `Target.ofDatum` at its own datum and full image, by the five
-fixed images of M3.2. -/
+fixed images `target_empty`, `target_l`, `target_m`, `target_r`, `target_lr`. -/
 theorem Candidate.target_eq_ofDatum (c : Candidate.{v, w} S') :
     c.target = Target.ofDatum c.datum.1 c.datum.2 (c.φ.image LMR) :=
   Target.ext c.target_empty c.target_l c.target_m c.target_r rfl c.target_lr rfl rfl
+
+/-- The forward direction of the classification for a candidate in any fine universe: its target
+is `Target.ofDatum` at its own datum and some full image inside the join of that datum. -/
+theorem Candidate.exists_subset_join_target_eq_ofDatum (c : Candidate.{v, w} S') :
+    ∃ T, T ⊆ join c.datum.1 c.datum.2 ∧ c.target = Target.ofDatum c.datum.1 c.datum.2 T :=
+  ⟨_, c.image_LMR_subset_join, c.target_eq_ofDatum⟩
 
 /-- The classification at fixed datum: the targets of candidates with datum `(A, A')` are exactly
 `Target.ofDatum A A' T` for `T ⊆ join A A'`. -/

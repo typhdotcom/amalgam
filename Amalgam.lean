@@ -1,6 +1,7 @@
 import Amalgam.Core.Comparison
 import Amalgam.Core.Fiber
 import Amalgam.Core.Reduction
+import Amalgam.Models.Incompatible
 import Amalgam.Models.Lifting
 import Amalgam.Models.MiddleSplit
 import Amalgam.Models.Overlap

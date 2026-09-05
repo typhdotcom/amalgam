@@ -1,5 +1,5 @@
-import Mathlib.Data.Fintype.Prod
 import Amalgam.Core.Comparison
+import Mathlib.Data.Fintype.Prod
 
 /-!
 # Four certified comparison behaviors

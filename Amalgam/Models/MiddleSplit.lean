@@ -1,10 +1,12 @@
 import Amalgam.System.Binary
 import Amalgam.System.Comparison
+import Amalgam.System.Restriction
 import Amalgam.System.Zigzag
+import Amalgam.System.ZigzagClassification
 import Amalgam.System.ZigzagTarget
 
 /-!
-# M3.1: a strict information-loss witness for the adjacent binary datum
+# A strict information-loss witness for the adjacent binary datum
 
 Two candidate realizations over the same coarse system on `Zigzag.Context` with the same supplied
 datum `(I_LM, I_MR)` and different full images `I_LMR`. The supplied datum therefore does not
@@ -45,6 +47,13 @@ identification of the two independently chosen lifts. `split` exploits exactly t
 lift uses the middle state `false`, the `MR` lift uses `true`, and nothing in `(I_LM, I_MR)`
 distinguishes this from `glue`, where a single middle state serves both. No minimality claim is
 made. The bounded finite sweep behind this choice is recorded in `scripts/zigzag_sweep.py`.
+
+In the other direction, equal targets do not identify fine presentations: `glue` and the tagged
+realization `realizeCandidate Set.univ Set.univ Set.univ` of `coarse` have the same target
+(`target_realizeCandidate_eq_target_glue`), while `glue` has one middle state and the realization
+has at least two (`not_subsingleton_realize_state_M`), so their middle carriers are not equivalent
+(`exists_target_eq_not_nonempty_equiv`). No presentation equivalence is defined here; the witness
+only records that the map from candidates to targets is not injective.
 -/
 
 open Zigzag Zigzag.Context
@@ -297,5 +306,44 @@ theorem datum_eq : splitCandidate.datum = glueCandidate.datum := Prod.ext image_
 /-- The two candidates have different targets: equal supplied data conceal different full images. -/
 theorem target_ne : splitCandidate.target ≠ glueCandidate.target := fun h =>
   image_LMR_ne (congrArg Target.lmr h)
+
+/-! ### Equal targets do not identify presentations -/
+
+/-- The tagged realization of `(Set.univ, Set.univ, Set.univ)` over `coarse` has the same target
+as `glue`: both are `Target.ofDatum Set.univ Set.univ Set.univ`. -/
+theorem target_realizeCandidate_eq_target_glue :
+    (realizeCandidate (S' := coarse) Set.univ Set.univ Set.univ).target = glueCandidate.target :=
+  have hT : (Set.univ : Set (coarse.CompatibleFamily LMR)) ⊆ join Set.univ Set.univ :=
+    fun _ _ => ⟨Set.mem_univ _, Set.mem_univ _⟩
+  Target.ext ((Candidate.target_empty _).trans (Candidate.target_empty _).symm)
+    ((Candidate.target_l _).trans (Candidate.target_l _).symm)
+    ((Candidate.target_m _).trans (Candidate.target_m _).symm)
+    ((Candidate.target_r _).trans (Candidate.target_r _).symm)
+    ((image_LM_realize hT).trans image_LM_glue.symm)
+    ((Candidate.target_lr _).trans (Candidate.target_lr _).symm)
+    ((image_MR_realize hT).trans image_MR_glue.symm)
+    ((image_LMR_realize _ _ _).trans image_LMR_glue.symm)
+
+/-- The `full` tag of `y₀` and the `solo` copy of the coarse middle state are distinct middle
+states of the realization. -/
+theorem full_ne_solo_M :
+    (TaggedState.full ⟨y₀, Set.mem_univ y₀⟩ :
+        TaggedState (S' := coarse) Set.univ Set.univ Set.univ M) ≠
+      TaggedState.solo ⟨M, ()⟩ le_rfl :=
+  nofun
+
+/-- The realization has at least two middle states, while `glue` has one. -/
+theorem not_subsingleton_realize_state_M :
+    ¬Subsingleton ((realizeCandidate (S' := coarse) Set.univ Set.univ Set.univ).S.State M) :=
+  fun h => full_ne_solo_M (h.elim _ _)
+
+/-- Two candidates of `coarse` with the same target whose middle carriers are not equivalent:
+target equality does not recover the fine presentation. -/
+theorem exists_target_eq_not_nonempty_equiv :
+    ∃ c₁ c₂ : Candidate.{0, 0} coarse,
+      c₁.target = c₂.target ∧ ¬Nonempty (c₁.S.State M ≃ c₂.S.State M) :=
+  ⟨glueCandidate, realizeCandidate Set.univ Set.univ Set.univ,
+    target_realizeCandidate_eq_target_glue.symm,
+    fun ⟨e⟩ => not_subsingleton_realize_state_M (@Equiv.subsingleton _ _ e.symm ⟨fun _ _ => rfl⟩)⟩
 
 end Amalgam.Models.MiddleSplit

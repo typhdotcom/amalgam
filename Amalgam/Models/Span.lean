@@ -1,10 +1,12 @@
+import Amalgam.Core.Reduction
 import Amalgam.System.Binary
 import Amalgam.System.Comparison
+import Amalgam.System.Restriction
 
 /-!
 # Calibration case 1: two fine lifts, one observed class
 
-The first finite calibration case of M2.3 on the binary shape `L → B ← R`: two distinct fine
+The first finite calibration case on the binary shape `L → B ← R`: two distinct fine
 compatible families over `![L, R]` are observed as the same coarse family and yield one observed
 class.
 
@@ -17,7 +19,8 @@ their left state (`fineEquiv`). Both map to `y₀`, so the raw fiber over `y₀`
 `Bool` (`fiberEquiv`, an explicit equivalence with both round trips), while the quotient fiber
 over `y₀` is a singleton (`uniqueObservedFiber`), the observed classes of `x₀` and `x₁` agree
 (`observed_x₀_eq_observed_x₁`), and there is exactly one observed class
-(`uniqueObservedFamily`). The pullback picture of M1 agrees through `binaryEquiv`
+(`uniqueObservedFamily`). The pullback picture of `Amalgam/Core/Reduction.lean` agrees through
+`binaryEquiv`
 (`map_binaryEquiv_x₀_eq`, `y₀_mem_image_of_inter_nonempty`).
 
 No counting package is introduced; the two-element description of the fiber is the explicit
@@ -219,7 +222,8 @@ instance uniqueObservedFiber : Unique {q // φ.observedMapFamily LR q = y₀} wh
 
 /-! ### Agreement with the pullback picture -/
 
-/-- Under `binaryEquiv`, M1's comparison `Function.Pullback.map` sends the pairs of `x₀` and `x₁`
+/-- Under `binaryEquiv`, the reduction comparison `Function.Pullback.map` sends the pairs of `x₀`
+and `x₁`
 to the same coarse pair. -/
 theorem map_binaryEquiv_x₀_eq :
     Function.Pullback.map (φ.naturality B_le_L) (φ.naturality B_le_R)
@@ -228,7 +232,7 @@ theorem map_binaryEquiv_x₀_eq :
         (fine.binaryEquiv B_le_L B_le_R le_B_of_le_L_of_le_R x₁) := by
   rw [← φ.binaryEquiv_mapFamily, ← φ.binaryEquiv_mapFamily, mapFamily_x₀, mapFamily_x₁]
 
-/-- `y₀` is attained, by M1's intersection criterion: the fine overlap value `()` is reached from
+/-- `y₀` is attained, by the intersection criterion: the fine overlap value `()` is reached from
 the left state `false` and from the right state. -/
 theorem y₀_mem_image_of_inter_nonempty : y₀ ∈ φ.image LR :=
   (φ.mem_range_mapFamily_iff_inter_nonempty B_le_L B_le_R le_B_of_le_L_of_le_R y₀).2

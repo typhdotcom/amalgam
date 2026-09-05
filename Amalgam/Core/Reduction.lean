@@ -1,4 +1,5 @@
 import Amalgam.Core.Comparison
+import Amalgam.Core.Fiber
 import Mathlib.Data.Setoid.Basic
 import Mathlib.Logic.Equiv.Set
 

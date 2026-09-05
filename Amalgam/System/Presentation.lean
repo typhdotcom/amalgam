@@ -34,7 +34,7 @@ A binary overlap is the family `![l, r]` over a preorder with a context `b ≤ l
 shared-overlap shape `L → B ← M → D ← R` is the family `![L, M, R]` over a preorder with
 `B ≤ L`, `B ≤ M`, `D ≤ M`, `D ≤ R`; its subfamilies `![L, M]` and `![M, R]` are reached by
 forgetful `FamilyMap`s with reflexive inequalities (`toLM`, `toMR` in
-`Amalgam/Models/Zigzag.lean`). Concrete preorders are not built here.
+`Amalgam/System/Zigzag.lean`). Concrete preorders are not built here.
 
 Index types are arbitrary and may be empty: over an empty index type the compatible-family type
 is a singleton (`RestrictionSystem.uniqueOfIsEmpty`). State types may be empty.

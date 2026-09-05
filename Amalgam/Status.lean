@@ -1,6 +1,7 @@
 import Amalgam.Core.Comparison
 import Amalgam.Core.Fiber
 import Amalgam.Core.Reduction
+import Amalgam.Models.Incompatible
 import Amalgam.Models.Lifting
 import Amalgam.Models.MiddleSplit
 import Amalgam.Models.Overlap
@@ -1540,6 +1541,12 @@ declared family label. -/
 example (t t' : Zigzag.Target S') : t = t' ↔ ∀ f : Zigzag.Family, t.image f = t'.image f :=
   Zigzag.Target.ext_iff_image
 
+/-- The target equivalence is equality of the eight subsets, field by field. -/
+example (t t' : Zigzag.Target S') :
+    t = t' ↔ t.empty = t'.empty ∧ t.l = t'.l ∧ t.m = t'.m ∧ t.r = t'.r ∧ t.lm = t'.lm ∧
+      t.lr = t'.lr ∧ t.mr = t'.mr ∧ t.lmr = t'.lmr :=
+  Zigzag.Target.ext_iff
+
 /-- Five entries are the same for every candidate: the empty family, each single view, and the
 two outer views. -/
 example (c : Zigzag.Candidate.{uV, uW} S') :
@@ -1643,6 +1650,19 @@ example {S : RestrictionSystem.{0, uV} Context} (φ : S.Hom S')
     (hLM : φ.image Zigzag.LM = A) (hMR : φ.image Zigzag.MR = A')
     (hLMR : φ.image Zigzag.LMR = T) : T ⊆ Zigzag.join A A' :=
   Zigzag.subset_join_of_images φ hLM hMR hLMR
+
+/-- The coarse states dictated by a witness: a full coarse family dictates a state at every
+context; an `LM`-family at every context below `L` or `M`; an `MR`-family at every context below
+`M` or `R`. -/
+example (y : S'.CompatibleFamily Zigzag.LMR) (c : Context) : S'.State c := Zigzag.stateLMR y c
+
+example (a : S'.CompatibleFamily Zigzag.LM) (c : Context) (h : c ≤ Context.L ∨ c ≤ Context.M) :
+    S'.State c :=
+  Zigzag.stateLM a c h
+
+example (a' : S'.CompatibleFamily Zigzag.MR) (c : Context)
+    (h : c ≤ Context.M ∨ c ≤ Context.R) : S'.State c :=
+  Zigzag.stateMR a' c h
 
 /-- The tagged fine system of `(A, A', T)`: tagged fine states with tag-preserving restriction.
 For every `A`, `A'` and `T` its observation is objectwise surjective and has full image `T`; it
@@ -1911,6 +1931,13 @@ example (S : RestrictionSystem.{0, uV} Context) [Subsingleton (S.State Context.M
     Nonempty (S.CompatibleFamily Zigzag.LMR) :=
   Zigzag.nonempty_LMR_of_subsingleton_middle S hLM hMR
 
+/-- Targets do not recover fine presentations: two candidates of `coarse` with equal targets
+whose fine middle carriers are not equivalent as types. -/
+example :
+    ∃ c₁ c₂ : Zigzag.Candidate.{0, 0} coarse,
+      c₁.target = c₂.target ∧ ¬Nonempty (c₁.S.State Context.M ≃ c₂.S.State Context.M) :=
+  exists_target_eq_not_nonempty_equiv
+
 /-- The negative control for the realization without the inclusion: over the all-singleton
 coarse system with `A = A' = ∅` and `T = Set.univ`, the packaged candidate's datum is not
 `(∅, ∅)`, because its full image `Set.univ` must lie in the join of its actual binary images. -/
@@ -1979,6 +2006,14 @@ example (c : Zigzag.Candidate.{uV, uW} S') :
     c.target = Zigzag.Target.ofDatum c.datum.1 c.datum.2 (c.φ.image Zigzag.LMR) :=
   c.target_eq_ofDatum
 
+/-- Packaged: every candidate, in any fine universe, has full image inside the join of its datum
+and target in the shape `Target.ofDatum`. -/
+example (c : Zigzag.Candidate.{uV, uW} S') :
+    ∃ T : Set (S'.CompatibleFamily Zigzag.LMR),
+      T ⊆ Zigzag.join c.datum.1 c.datum.2 ∧
+        c.target = Zigzag.Target.ofDatum c.datum.1 c.datum.2 T :=
+  c.exists_subset_join_target_eq_ofDatum
+
 /-- The classification at fixed datum: the targets of candidates with datum `(A, A')` are exactly
 `Target.ofDatum A A' U` for `U ⊆ join A A'`. -/
 example (t : Zigzag.Target S') :
@@ -2035,6 +2070,150 @@ example (t : Zigzag.Target S') :
   Zigzag.realizable_target_iff t
 
 end ClassificationSection
+
+/-! ### Strict incompatible targets -/
+
+section IncompatibleTargets
+
+open Amalgam.Models.MiddleSplit Amalgam.Models.Incompatible
+
+/-- The full coarse content on `LMR` lies in the join of the full contents on `LM` and `MR`. -/
+example :
+    (Set.univ : Set (coarse.CompatibleFamily Zigzag.LMR)) ⊆
+      Zigzag.join (Set.univ : Set (coarse.CompatibleFamily Zigzag.LM))
+        (Set.univ : Set (coarse.CompatibleFamily Zigzag.MR)) :=
+  univ_subset_join_univ_univ
+
+/-- For an arbitrary coarse system, every pair of adjacent subsets is the datum of a candidate:
+the adjacent datum carries no realizability condition of its own. -/
+example {S' : RestrictionSystem.{0, uW} Context} (A : Set (S'.CompatibleFamily Zigzag.LM))
+    (A' : Set (S'.CompatibleFamily Zigzag.MR)) :
+    ∃ c : Zigzag.Candidate.{uW, uW} S', c.datum = (A, A') :=
+  exists_candidate_datum A A'
+
+/-- The target that is empty on the empty family and full everywhere else. -/
+example : Zigzag.Target coarse := noEmpty
+
+/-- It violates the empty-family condition. -/
+example : noEmpty.empty ≠ (Set.univ : Set (coarse.CompatibleFamily Zigzag.empty)) :=
+  noEmpty_empty_ne_univ
+
+/-- It satisfies the other five conditions. -/
+example :
+    noEmpty.l = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.L))) ∧
+      noEmpty.m = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.M))) ∧
+        noEmpty.r = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.R))) ∧
+          noEmpty.lr = (Set.univ : Set (coarse.CompatibleFamily Zigzag.LR)) ∧
+            noEmpty.lmr ⊆ Zigzag.join noEmpty.lm noEmpty.mr :=
+  noEmpty_satisfies_others
+
+/-- No candidate of `coarse` has it as target. -/
+example : ¬ ∃ c : Zigzag.Candidate.{0, 0} coarse, c.target = noEmpty := noEmpty_not_realizable
+
+/-- The target that is empty on the single view `L` and full everywhere else. -/
+example : Zigzag.Target coarse := noL
+
+/-- It violates the condition on the single view `L`. -/
+example : noL.l ≠ (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.L))) :=
+  noL_l_ne_univ
+
+/-- It satisfies the other five conditions. -/
+example :
+    noL.empty = (Set.univ : Set (coarse.CompatibleFamily Zigzag.empty)) ∧
+      noL.m = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.M))) ∧
+        noL.r = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.R))) ∧
+          noL.lr = (Set.univ : Set (coarse.CompatibleFamily Zigzag.LR)) ∧
+            noL.lmr ⊆ Zigzag.join noL.lm noL.mr :=
+  noL_satisfies_others
+
+/-- No candidate of `coarse` has it as target. -/
+example : ¬ ∃ c : Zigzag.Candidate.{0, 0} coarse, c.target = noL := noL_not_realizable
+
+/-- The target that is empty on the single view `M` and full everywhere else. -/
+example : Zigzag.Target coarse := noM
+
+/-- It violates the condition on the single view `M`. -/
+example : noM.m ≠ (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.M))) :=
+  noM_m_ne_univ
+
+/-- It satisfies the other five conditions. -/
+example :
+    noM.empty = (Set.univ : Set (coarse.CompatibleFamily Zigzag.empty)) ∧
+      noM.l = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.L))) ∧
+        noM.r = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.R))) ∧
+          noM.lr = (Set.univ : Set (coarse.CompatibleFamily Zigzag.LR)) ∧
+            noM.lmr ⊆ Zigzag.join noM.lm noM.mr :=
+  noM_satisfies_others
+
+/-- No candidate of `coarse` has it as target. -/
+example : ¬ ∃ c : Zigzag.Candidate.{0, 0} coarse, c.target = noM := noM_not_realizable
+
+/-- The target that is empty on the single view `R` and full everywhere else. -/
+example : Zigzag.Target coarse := noR
+
+/-- It violates the condition on the single view `R`. -/
+example : noR.r ≠ (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.R))) :=
+  noR_r_ne_univ
+
+/-- It satisfies the other five conditions. -/
+example :
+    noR.empty = (Set.univ : Set (coarse.CompatibleFamily Zigzag.empty)) ∧
+      noR.l = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.L))) ∧
+        noR.m = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.M))) ∧
+          noR.lr = (Set.univ : Set (coarse.CompatibleFamily Zigzag.LR)) ∧
+            noR.lmr ⊆ Zigzag.join noR.lm noR.mr :=
+  noR_satisfies_others
+
+/-- No candidate of `coarse` has it as target. -/
+example : ¬ ∃ c : Zigzag.Candidate.{0, 0} coarse, c.target = noR := noR_not_realizable
+
+/-- The target that is empty on the two outer views and full everywhere else. -/
+example : Zigzag.Target coarse := noLR
+
+/-- It violates the condition on the two outer views. -/
+example : noLR.lr ≠ (Set.univ : Set (coarse.CompatibleFamily Zigzag.LR)) := noLR_lr_ne_univ
+
+/-- It satisfies the other five conditions. -/
+example :
+    noLR.empty = (Set.univ : Set (coarse.CompatibleFamily Zigzag.empty)) ∧
+      noLR.l = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.L))) ∧
+        noLR.m = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.M))) ∧
+          noLR.r = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.R))) ∧
+            noLR.lmr ⊆ Zigzag.join noLR.lm noLR.mr :=
+  noLR_satisfies_others
+
+/-- No candidate of `coarse` has it as target. -/
+example : ¬ ∃ c : Zigzag.Candidate.{0, 0} coarse, c.target = noLR := noLR_not_realizable
+
+/-- The target that is empty on `LM` and full everywhere else, so its join is empty while its
+full entry is not. -/
+example : Zigzag.Target coarse := noJoin
+
+/-- It violates the join inclusion. -/
+example : ¬ noJoin.lmr ⊆ Zigzag.join noJoin.lm noJoin.mr := noJoin_lmr_not_subset_join
+
+/-- It satisfies the other five conditions. -/
+example :
+    noJoin.empty = (Set.univ : Set (coarse.CompatibleFamily Zigzag.empty)) ∧
+      noJoin.l = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.L))) ∧
+        noJoin.m = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.M))) ∧
+          noJoin.r = (Set.univ : Set (coarse.CompatibleFamily (Zigzag.single Context.R))) ∧
+            noJoin.lr = (Set.univ : Set (coarse.CompatibleFamily Zigzag.LR)) :=
+  noJoin_satisfies_others
+
+/-- No candidate of `coarse` has it as target. -/
+example : ¬ ∃ c : Zigzag.Candidate.{0, 0} coarse, c.target = noJoin := noJoin_not_realizable
+
+/-- The positive control: the six conditions are jointly satisfiable. -/
+example :
+    ∃ c : Zigzag.Candidate.{0, 0} coarse,
+      c.target =
+        Zigzag.Target.ofDatum (Set.univ : Set (coarse.CompatibleFamily Zigzag.LM))
+          (Set.univ : Set (coarse.CompatibleFamily Zigzag.MR))
+          (∅ : Set (coarse.CompatibleFamily Zigzag.LMR)) :=
+  ofDatum_univ_univ_empty_realizable
+
+end IncompatibleTargets
 
 end InformationBoundary
 

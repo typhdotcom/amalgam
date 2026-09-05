@@ -1,3 +1,5 @@
+import Amalgam.Core.Comparison
+import Amalgam.Core.Fiber
 import Amalgam.Core.Reduction
 import Amalgam.System.Restriction
 import Mathlib.Data.Fin.VecNotation
@@ -12,19 +14,21 @@ greatest among common coarser contexts: `hl : b ≤ l`, `hr : b ≤ r`, and
 (`isGreatest_lowerBounds_pair_iff`); no lattice structure and no uniqueness of `b` is assumed.
 Under `hb`, agreement at every common coarser context reduces to agreement at `b`
 (`compatible_pair_iff`), so the compatible families over `![l, r]` are the compatible pairs
-`Function.Pullback (S.res hl) (S.res hr)` of M0 (`binaryEquiv`).
+`Function.Pullback (S.res hl) (S.res hr)` of `Amalgam/Core/Comparison.lean` (`binaryEquiv`).
 
-Under this identification the raw family comparison `Hom.mapFamily` of a morphism `φ` is M1's
-observed comparison `Function.Pullback.map (φ.naturality hl) (φ.naturality hr)` for the
-observations `φ.toFun l`, `φ.toFun b`, `φ.toFun r` (`Hom.binaryEquiv_mapFamily`). The fine-lift
-fibers, the attained image, and the observed quotient transport accordingly
-(`Hom.fiberMapFamilyBinaryEquiv`, `Hom.mem_range_mapFamily_iff_mem_range_map`,
-`Hom.image_range_mapFamily`, `Hom.observedBinaryEquiv`), and
-M1's intersection criterion is recovered for families
-(`Hom.mem_range_mapFamily_iff_inter_nonempty`, `Hom.bijective_kerLift_mapFamily_iff_forall`).
+Under this identification the raw family comparison `Hom.mapFamily` of a morphism `φ` is the
+observed comparison `Function.Pullback.map (φ.naturality hl) (φ.naturality hr)` of
+`Amalgam/Core/Reduction.lean` for the observations `φ.toFun l`, `φ.toFun b`, `φ.toFun r`
+(`Hom.binaryEquiv_mapFamily`). The fine-lift fibers, the attained image, and the observed
+quotient transport accordingly (`Hom.fiberMapFamilyBinaryEquiv`,
+`Hom.mem_range_mapFamily_iff_mem_range_map`, `Hom.image_range_mapFamily`,
+`Hom.observedBinaryEquiv`), and the intersection criterion `Function.Pullback.mem_range_map_iff`
+is recovered for families (`Hom.mem_range_mapFamily_iff_inter_nonempty`,
+`Hom.bijective_kerLift_mapFamily_iff_forall`).
 
 The observed quotient of a family comparison is written `Quotient (Setoid.ker (φ.mapFamily F))`
-with injection `Setoid.kerLift (φ.mapFamily F)`, the M1 construction applied to `φ.mapFamily F`.
+with injection `Setoid.kerLift (φ.mapFamily F)`, the construction of `Function.Pullback.Observed`
+applied to `φ.mapFamily F`.
 
 ## Indexing
 
@@ -122,7 +126,7 @@ namespace Hom
 
 variable {S} {S' : RestrictionSystem.{u, w} C} (φ : S.Hom S')
 
-/-- The raw comparison of binary families is M1's observed comparison
+/-- The raw comparison of binary families is the observed comparison
 `Function.Pullback.map (φ.naturality hl) (φ.naturality hr)` of the observations `φ.toFun l`,
 `φ.toFun b`, `φ.toFun r`, under `binaryEquiv`. -/
 theorem binaryEquiv_mapFamily (x : S.CompatibleFamily ![l, r]) :
@@ -136,8 +140,8 @@ theorem binaryEquiv_comp_mapFamily :
       Function.Pullback.map (φ.naturality hl) (φ.naturality hr) ∘ S.binaryEquiv hl hr hb :=
   rfl
 
-/-- Fine-lift fibers of the family comparison over `y` are the fine-lift fibers of M1's
-comparison over the pair of `y`. -/
+/-- Fine-lift fibers of the family comparison over `y` are the fine-lift fibers of
+`Function.Pullback.map` over the pair of `y`. -/
 def fiberMapFamilyBinaryEquiv (y : S'.CompatibleFamily ![l, r]) :
     {x // φ.mapFamily ![l, r] x = y} ≃
       {s // Function.Pullback.map (φ.naturality hl) (φ.naturality hr) s =
@@ -160,7 +164,8 @@ def fiberMapFamilyBinaryEquiv (y : S'.CompatibleFamily ![l, r]) :
       (S.binaryEquiv hl hr hb).symm s :=
   rfl
 
-/-- A coarse binary family is attained exactly when its pair is attained by M1's comparison. -/
+/-- A coarse binary family is attained exactly when its pair is attained by
+`Function.Pullback.map`. -/
 theorem mem_range_mapFamily_iff_mem_range_map (y : S'.CompatibleFamily ![l, r]) :
     y ∈ Set.range (φ.mapFamily ![l, r]) ↔
       S'.binaryEquiv hl hr hb y ∈
@@ -168,8 +173,8 @@ theorem mem_range_mapFamily_iff_mem_range_map (y : S'.CompatibleFamily ![l, r]) 
   rw [← Function.nonempty_fiber_iff_mem_range, ← Function.nonempty_fiber_iff_mem_range]
   exact (φ.fiberMapFamilyBinaryEquiv hl hr hb y).nonempty_congr
 
-/-- The attained image of the binary family comparison is the attained image of M1's comparison,
-as sets under `binaryEquiv`. -/
+/-- The attained image of the binary family comparison is the attained image of
+`Function.Pullback.map`, as sets under `binaryEquiv`. -/
 theorem image_range_mapFamily :
     S'.binaryEquiv hl hr hb '' Set.range (φ.mapFamily ![l, r]) =
       Set.range (Function.Pullback.map (φ.naturality hl) (φ.naturality hr)) := by
@@ -177,7 +182,7 @@ theorem image_range_mapFamily :
     (S.binaryEquiv hl hr hb).range_eq_univ, Set.image_univ]
 
 include hb in
-/-- M1's intersection criterion for binary families: a coarse family `y` is attained exactly when
+/-- The intersection criterion for binary families: a coarse family `y` is attained exactly when
 the fine overlap values at `b` reached from fine states at `l` observed as `y.1 0` and from fine
 states at `r` observed as `y.1 1` have a common element. -/
 theorem mem_range_mapFamily_iff_inter_nonempty (y : S'.CompatibleFamily ![l, r]) :
@@ -188,7 +193,7 @@ theorem mem_range_mapFamily_iff_inter_nonempty (y : S'.CompatibleFamily ![l, r])
 
 /-! ### The observed quotient -/
 
-/-- The observed quotient of the binary family comparison is M1's observed quotient, by
+/-- The observed quotient of the binary family comparison is `Function.Pullback.Observed`, by
 transporting the kernel relation along `binaryEquiv`. -/
 def observedBinaryEquiv :
     Quotient (Setoid.ker (φ.mapFamily ![l, r])) ≃
@@ -223,7 +228,7 @@ theorem observedBinaryEquiv_apply_symm_apply
     φ.observedBinaryEquiv hl hr hb ((φ.observedBinaryEquiv hl hr hb).symm t) = t :=
   (φ.observedBinaryEquiv hl hr hb).apply_symm_apply t
 
-/-- The commuting square of the quotient injections: M1's `observedMap` after
+/-- The commuting square of the quotient injections: `Function.Pullback.observedMap` after
 `observedBinaryEquiv` is `binaryEquiv` after the family injection `Setoid.kerLift`. -/
 theorem observedMap_observedBinaryEquiv (q : Quotient (Setoid.ker (φ.mapFamily ![l, r]))) :
     Function.Pullback.observedMap (φ.naturality hl) (φ.naturality hr)
@@ -239,7 +244,7 @@ theorem observedMap_comp_observedBinaryEquiv :
   funext (φ.observedMap_observedBinaryEquiv hl hr hb)
 
 /-- The inverse square: the family injection after `observedBinaryEquiv.symm` is
-`binaryEquiv.symm` after M1's `observedMap`. -/
+`binaryEquiv.symm` after `Function.Pullback.observedMap`. -/
 theorem kerLift_observedBinaryEquiv_symm
     (t : Function.Pullback.Observed (φ.naturality hl) (φ.naturality hr)) :
     Setoid.kerLift (φ.mapFamily ![l, r]) ((φ.observedBinaryEquiv hl hr hb).symm t) =
@@ -249,7 +254,7 @@ theorem kerLift_observedBinaryEquiv_symm
     rw [← observedMap_observedBinaryEquiv, Equiv.apply_symm_apply]
 
 include hb in
-/-- The family injection is surjective exactly when M1's `observedMap` is. -/
+/-- The family injection is surjective exactly when `Function.Pullback.observedMap` is. -/
 theorem surjective_kerLift_mapFamily_iff :
     Function.Surjective (Setoid.kerLift (φ.mapFamily ![l, r])) ↔
       Function.Surjective (Function.Pullback.observedMap (φ.naturality hl) (φ.naturality hr)) := by
@@ -257,7 +262,7 @@ theorem surjective_kerLift_mapFamily_iff :
     (φ.observedBinaryEquiv hl hr hb).surjective_comp]
 
 include hb in
-/-- The family injection is bijective exactly when M1's `observedMap` is. -/
+/-- The family injection is bijective exactly when `Function.Pullback.observedMap` is. -/
 theorem bijective_kerLift_mapFamily_iff :
     Function.Bijective (Setoid.kerLift (φ.mapFamily ![l, r])) ↔
       Function.Bijective (Function.Pullback.observedMap (φ.naturality hl) (φ.naturality hr)) := by

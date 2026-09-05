@@ -1,3 +1,4 @@
+import Amalgam.Core.Comparison
 import Amalgam.Core.Reduction
 
 /-!

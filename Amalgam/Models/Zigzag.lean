@@ -1,5 +1,6 @@
 import Amalgam.System.Binary
 import Amalgam.System.Comparison
+import Amalgam.System.Restriction
 import Amalgam.System.Zigzag
 
 /-!
@@ -38,8 +39,9 @@ of attainable images is strictly included (`ssubset_restrict_image_LMR_A`,
 `ssubset_restrict_image_LMR_B`), and the two systems have equal full-family content
 (`image_LMR_eq`) but different `LM` and `MR` content (`image_LM_ne`, `image_MR_ne`).
 
-No smallest-shape claim is made, and no M3 datum is refuted: the witness separates full-family
-content from all-family content and nothing more.
+No smallest-shape claim is made, and nothing is claimed about the adjacent binary datum
+`(I_LM, I_MR)`: the two systems have different adjacent binary images, so the witness separates
+full-family content from all-family content and nothing more.
 -/
 
 open Zigzag Zigzag.Context

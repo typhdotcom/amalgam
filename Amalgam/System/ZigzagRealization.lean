@@ -1,5 +1,6 @@
 import Amalgam.System.Binary
 import Amalgam.System.Comparison
+import Amalgam.System.Restriction
 import Amalgam.System.Zigzag
 
 /-!

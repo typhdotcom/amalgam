@@ -8,7 +8,9 @@ global states to those pairs, the reduction of compatible pairs across an
 observed overlap, restriction systems over a preorder of contexts with their
 compatible families, family comparison, and binary recovery, and the exact
 classification of the attainable images on the five-context zigzag determined
-by its adjacent binary datum. Everything is stated for arbitrary types, and
+by its adjacent binary datum, with strict controls certifying that each
+condition of its realizability criterion is necessary. Everything is stated for
+arbitrary types, and
 carriers and fibers may be empty. The criteria on fibers, compatible pairs,
 reduction, restriction systems, family comparison, and binary recovery carry no
 finiteness, decidability, or coverage hypothesis. The zigzag classification's
@@ -436,8 +438,9 @@ neither induced map on attainable images is surjective
 (`not_surjective_restrictImage_A`, `not_surjective_restrictImage_B`). The two
 systems have equal full-family images (`image_LMR_eq`) while their `LM` and
 `MR` images differ (`image_LM_ne`, `image_MR_ne`), so full-family content does
-not determine all-family content. No smallest-shape claim is made, and no M3
-datum is refuted.
+not determine all-family content. No smallest-shape claim is made; the pair
+says nothing about the adjacent datum `(I_LM, I_MR)` studied below, since its
+two systems already differ there.
 
 ## The zigzag information boundary
 
@@ -532,7 +535,7 @@ J(A_LM, A_MR) =
 with membership `mem_join_iff`.
 
 Necessity is naturality alone. `image_LMR_subset_join` says
-`I_LMR ⊆ J(I_LM, I_MR)` for every morphism, consuming M2's
+`I_LMR ⊆ J(I_LM, I_MR)` for every morphism, consuming the family naturality
 `mapsTo_restrict_image`; no surjectivity of the observation is used and the fine
 system may live in any universe. `subset_join_of_images` is the same statement
 for named images.
@@ -610,7 +613,11 @@ The two candidates therefore supply the same binary images (`image_LM_eq`,
 named coarse family `y₀`, which `glue` attains (`y₀_mem_image_glue`) and `split`
 does not (`y₀_notMem_image_split`). Packaged as candidates of `coarse`
 (`splitCandidate`, `glueCandidate`), they have equal supplied datum
-(`datum_eq`) and different targets (`target_ne`). Both observations are surjective at every
+(`datum_eq`) and different targets (`target_ne`). Targets do not recover fine
+presentations: `exists_target_eq_not_nonempty_equiv` gives two candidates of
+`coarse` with equal targets whose fine middle carriers are not even equivalent
+as types (`glueCandidate` and the tagged realization of `(univ, univ, univ)`).
+Both observations are surjective at every
 context (`surjective_φsplit`, `surjective_φglue`), and all four adjacent binary
 comparisons are surjective onto the coarse binary families
 (`surjective_observedMapFamily_LM_split`, `surjective_observedMapFamily_MR_split`,
@@ -696,9 +703,12 @@ says every candidate's target, in any fine universe, has full content on the
 five fixed entries and `LMR`-entry contained in the join of its `LM`- and
 `MR`-entries, and `realizable_target_iff` says those conditions are exactly the
 ones a target satisfies to arise from some candidate. That settles which target
-collections arise from any candidate on this shape, with no further hypothesis;
-it records rather than closes M4's obligation, which decides what closure
-requirements remain.
+collections arise from any candidate on this shape, with no further hypothesis.
+Its any-universe forward half is `Candidate.target_realizable`, and
+`Candidate.exists_subset_join_target_eq_ofDatum` packages, for a candidate at
+any fine universe, the full image as a subset of the join with the target in
+the shape `Target.ofDatum`. The strict incompatible targets below certify that
+each of its six conditions is necessary.
 
 The universe convention is the one the earlier subsections use. Statements
 with a candidate as hypothesis hold at any fine universe:
@@ -711,6 +721,53 @@ tagged realization, whose fine states are built from the coarse ones, so
 `exists_candidate_iff`, `exists_candidate_target_iff`,
 `exists_candidate_target_iff'`, `datum_determines_target_iff` and
 `realizable_target_iff` quantify over candidates at the coarse universe.
+
+### Strict incompatible targets
+
+`Amalgam/Models/Incompatible.lean` certifies that no condition of
+`realizable_target_iff` is redundant. It reuses the all-singleton coarse system
+`coarse`, where every coarse compatible-family type is a singleton, so every
+entry of a `Target coarse` is `∅` or `Set.univ` and the controls are as small as
+the shape allows.
+
+| Target | Violated condition | Certificate |
+| --- | --- | --- |
+| `noEmpty` | `empty = Set.univ` | `noEmpty_empty_ne_univ` |
+| `noL` | `l = Set.univ` | `noL_l_ne_univ` |
+| `noM` | `m = Set.univ` | `noM_m_ne_univ` |
+| `noR` | `r = Set.univ` | `noR_r_ne_univ` |
+| `noLR` | `lr = Set.univ` | `noLR_lr_ne_univ` |
+| `noJoin` | `lmr ⊆ join lm mr` | `noJoin_lmr_not_subset_join` |
+
+The first five targets are full on every entry except the named one, which is
+`∅`. `noJoin` is full on every entry except `LM`, which is `∅`, so its join is
+empty while its `LMR` entry is `Set.univ`; the named coarse family `y₀`
+witnesses the failed inclusion. Each target satisfies the five conditions it
+does not violate: `noEmpty_satisfies_others`, `noL_satisfies_others`,
+`noM_satisfies_others`, `noR_satisfies_others`, `noLR_satisfies_others` and
+`noJoin_satisfies_others`, where the full entries meet the join inclusion
+through `univ_subset_join_univ_univ`. Nonrealizability goes through the accepted
+criterion: `noEmpty_not_realizable`, `noL_not_realizable`, `noM_not_realizable`,
+`noR_not_realizable`, `noLR_not_realizable` and `noJoin_not_realizable` each say
+that no candidate of `coarse` has that target, by `realizable_target_iff`
+together with the violated condition. These are abstract targets, not candidate
+systems violating their own laws, and no minimality is claimed.
+
+`ofDatum_univ_univ_empty_realizable` is the positive control: the six conditions
+are jointly satisfiable, since `Target.ofDatum Set.univ Set.univ ∅` is the
+target of a candidate.
+
+The adjacent datum itself carries no realizability condition.
+`exists_candidate_datum` gives, for an arbitrary coarse system and an arbitrary
+pair `(A, A')` of adjacent subsets, a candidate with exactly that datum, by
+`exists_candidate_iff` at the empty full image. Four things are therefore
+distinct: that each adjacent view lifts is the datum; that two such lifts are
+compatible over the coarse overlap is membership in `join`; that the full family
+lifts simultaneously in the fine system is the `LMR` entry; and how freely that
+entry sits inside the join is the residual at fixed datum. Two separate adjacent
+lifts supply no common fine middle representative, and the join records coarse
+compatibility only, which is why the `LMR` entry stays free below the join
+rather than being fixed by the datum.
 
 ## Four comparison behaviors
 
@@ -746,7 +803,8 @@ universes for the generic statements, an arbitrary coarse system on the fixed
 zigzag shape with candidates at explicit independent fine universes for the
 information boundary, and the concrete finite models
 for the four comparison behaviors, the surjective reduction, the two
-calibration cases, and the strict middle-split witness. The root
+calibration cases, the strict middle-split witness, and the strict incompatible
+targets. The root
 `Amalgam` aggregator imports the manifest, so a full build checks it; no library
 module imports it.
 

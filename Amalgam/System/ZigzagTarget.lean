@@ -1,7 +1,8 @@
-import Amalgam.System.Zigzag
 import Amalgam.System.Binary
 import Amalgam.System.Comparison
 import Amalgam.System.Presentation
+import Amalgam.System.Restriction
+import Amalgam.System.Zigzag
 
 /-!
 # Candidate realizations and the reconstruction target on the zigzag
@@ -24,7 +25,7 @@ empty, single L, single M, single R, LM, LR, MR, LMR
 as a subset of the fixed coarse type over `F`. The target equivalence is equality of all eight
 subsets (`Target.ext_iff`): not bijection of images, not presentation equivalence.
 
-## Results (M3.2)
+## Results
 
 * `image_empty`, `image_single`, `image_LR`: every candidate has the full coarse image on the
   empty family, on each singleton, and on `LR`. The empty family has one compatible family on
@@ -294,7 +295,7 @@ theorem target_mr : c.target.mr = c.datum.2 := rfl
 /-- The `LMR` entry of the target is the full image. -/
 theorem target_lmr : c.target.lmr = c.φ.image LMR := rfl
 
-/-- The closing equivalence of M3.2: two candidates, with fine systems in possibly different
+/-- The closing equivalence: two candidates, with fine systems in possibly different
 universes, have the same target exactly when they have the same supplied datum and the same full
 image. The five other entries are fixed by `target_empty`, `target_l`, `target_m`, `target_r`,
 and `target_lr`. -/

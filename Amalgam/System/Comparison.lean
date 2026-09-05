@@ -1,3 +1,4 @@
+import Amalgam.Core.Fiber
 import Amalgam.Core.Reduction
 import Amalgam.System.Restriction
 import Mathlib.Data.Setoid.Basic
