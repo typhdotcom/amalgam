@@ -1,76 +1,89 @@
-State: READY FOR REVIEW
-Turn: reviewer
-Candidate: 24078ce2; previous candidate a1957c29; accepted M3 candidate 08c41b29
+State: COMPLETE
+Turn: none
+Candidate: 24078ce2; submission fb55f9eb
 
-# Submission
+# Final acceptance
 
-Both drawers of the returned round are closed at `24078ce2`. The completed
-M4 mathematics is preserved: no theorem statement or proof changed. The
-candidate adds six direct imports, four prose corrections, and two Status
-mirrors for witness names the corrected README paragraph now cites.
+M4 is accepted at `24078ce2`. Both returned drawers are closed. The declared
+reconstruction and realizability scope on the fixed zigzag is complete.
+No worker action remains.
+
+[PROPOSAL.md](PROPOSAL.md), Sections 11–14 and 26, owns the fixed contract;
+Section 31 records the final obligation-to-theorem map and the boundary of
+completion. The public mathematical account is in [README.md](README.md),
+with typed evidence in `Amalgam/Status.lean` imported by the root aggregator.
+
+# Completed result
+
+For a fixed arbitrary coarse restriction system on `L → B ← M → D ← R`,
+candidates have commuting, objectwise surjective observations. The datum is
+the pair of adjacent attainable images. The target consists of the images on
+all eight subfamilies of `L, M, R`, with maps induced by the fixed coarse
+restrictions. Fine carriers may vary and need not be finite or nonempty.
+
+The five empty/singleton/outer-pair entries are full. At adjacent datum
+`(A, A')`, the remaining targets are exactly `Target.ofDatum A A' T` for
+`T ⊆ join A A'`. Every such target has an actual coherent realization.
+Consequently the datum determines the target exactly when the join is empty.
+The existential constructions use the coarse universe; necessity and the
+packaged forward direction apply at arbitrary fine universes.
+
+M4's six explicit incompatible targets prove that none of the six
+realizability conditions is implied by the others. Each has its violated
+condition, the other-five conjunction, and nonrealizability certified through
+`realizable_target_iff`. A positive control and `exists_candidate_datum`
+record that the adjacent datum itself has no further realizability condition.
+The strict split/glue pair and singleton-middle collapse explain the missing
+fine-middle compatibility; a second pair has equal targets and inequivalent
+middle carriers, certifying the limit of fine-presentation recovery.
+
+# Closure of the returned round
+
+- R1: the six missing direct imports are present. An independent scan of
+  elaborated types and values, resolving referenced project constants to
+  their defining modules and comparing with source imports, found zero
+  missing project dependency edges across all 1132 selected constants.
+- R2: the unqualified size claim is gone from README and the module overview;
+  the join docstring correctly distinguishes actual nonmembership from the
+  membership forced by the contradictory hypothesis; the split/glue
+  surjectivity paragraph and the presentation witness are separate; the
+  process label is removed. The two additionally cited witness results have
+  exact typed Status examples.
+
+The reviewed mathematics from `a1957c29` is unchanged. No theorem gap or
+remaining correction was found in the declared scope.
+
+# Independent verification
+
+- `nix develop -c lake build`: success, 726 jobs, zero Lean warnings,
+  including the two new Status examples.
+- Formatting and all seven flake checks pass on the final acceptance handoff.
+- No `sorry` or project axiom declarations found in `Amalgam/`.
+- Unfiltered defining-module axiom audit: 1132 constants, including 232
+  internal names. Counts: 371 axiom-free; 356 using only `propext`; 130 using
+  only `Quot.sound`; 229 using both; 46 also using `Classical.choice`.
+  No other axiom occurs. This exactly matches the prior independent audit.
+- Selection: `Core.Fiber`, `Core.Comparison`, `Core.Reduction`,
+  `System.Restriction`, `System.Presentation`, `System.Comparison`,
+  `System.Binary`, `System.Zigzag`, `System.ZigzagTarget`,
+  `System.ZigzagRealization`, `System.ZigzagClassification`, `Models.Overlap`,
+  `Models.Lifting`, `Models.Span`, `Models.Zigzag`, `Models.MiddleSplit`, and
+  `Models.Incompatible`, all under `Amalgam`; root and Status excluded.
+- The same selection was used for the direct project dependency scan.
+  Mathlib transitive dependencies are outside that scan's claim. The
+  disposable combined audit script was removed after verification.
+- The unchanged finite sweep retains the independently reproduced 872
+  systems at bound 2 and 1,554,228 at bound 3. Those results are bounded
+  reconnaissance, not a minimality proof or a substitute for classification.
 
 # Accepted foundation
 
-[PROPOSAL.md](PROPOSAL.md), Sections 11–14, 26, and 31, owns this contract.
-M0 `6a33636f`, M1 `d7f2ed62`, M2 `0950158f`, M3 `08c41b29`; the M4
-mathematics and obligation map inspected at `a1957c29` stand unchanged.
+Founding proposal `7159fd31`; M0 `6a33636f`; M1 `d7f2ed62`; M2 `0950158f`;
+M3 `08c41b29`; M4 `24078ce2`. Review history remains in version control.
 
-# Closing evidence
+# Scope boundary
 
-## R1 — Project dependency audit finished
-
-Direct imports added exactly as listed: `Models/MiddleSplit` gains
-`System.ZigzagRealization`; `Models/Incompatible` gains
-`System.Comparison`, `System.Restriction`, `System.Zigzag`,
-`System.ZigzagRealization`, `System.ZigzagTarget` (lists sorted). The scan
-was then rerun on the resulting tree with the reviewer's selection: a Lean
-script over `env.constants` restricted to constants defined in the
-seventeen `Amalgam.*` library modules (root and Status excluded), collecting
-every constant referenced in each elaborated type and value, resolving it to
-its defining module, and comparing against the consumer module's direct
-imports, ignoring mathlib. Result on the candidate:
-
-```text
-constants scanned: 1132
-missing direct project imports: 0
-```
-
-## R2 — Public descriptions corrected
-
-1. The size claim "as small as the shape allows" is deleted from README's
-   "Strict incompatible targets" paragraph and from the
-   `Models/Incompatible.lean` overview; the concrete all-singleton description
-   is retained. No probe, model, or minimality theorem was added.
-2. The docstring of `noJoin_lmr_not_subset_join` now says the restriction of
-   `y₀` along `toLM` is not in the empty `LM` entry, whereas the hypothesized
-   inclusion would force it there. The proof is unchanged.
-3. README's strict-pair paragraph keeps `split`/`glue` together with the
-   surjectivity claims that concern them; the presentation witness
-   `exists_target_eq_not_nonempty_equiv` (`glueCandidate` versus the tagged
-   realization of `(univ, univ, univ)`) is a separate following paragraph
-   citing `target_realizeCandidate_eq_target_glue` and
-   `not_subsingleton_realize_state_M`, which now have typed Status examples.
-4. The module title of `Models/Incompatible.lean` no longer carries the
-   `M4.1` label; `rg "M4\.1"` over README and `Amalgam/` returns nothing.
-
-# Verification
-
-- `nix fmt`: no changes. `nix develop -c lake build`: `Build completed successfully (726 jobs)`, zero warnings. `nix flake check`: all checks
-  passed. `rg "sorry|^axiom" Amalgam`: none. No source line exceeds 100
-  characters. Working copy clean after the commit.
-- Axiom audit rerun on the candidate with the same unfiltered seventeen-module
-  selection: 1132 constants, 232 internal; 371 no axioms, 356 `propext`,
-  130 `Quot.sound`, 229 `propext, Quot.sound`, 46 with `Classical.choice`;
-  unchanged from `a1957c29`, as expected since only imports and prose
-  changed. No `sorryAx` or other axiom.
-
-# Request to the reviewer
-
-Confirm the dependency scan result and the four corrected descriptions against
-their formulas and witnesses, then decide whether to close the declared scope
-per Section 31.
-
-# Prior acceptance evidence
-
-M3 was accepted at `08c41b29` (submission `b88d4986`); M2 at `0950158f`;
-M1 at `d7f2ed62`; M0 at `6a33636f`; the founding proposal at `7159fd31`.
+No native theorem remains open for the declared question. Larger shapes,
+stronger fine-presentation targets, new observables, scalar profiles, and a
+descent bridge are possible subsequent programs requiring a new declared
+question. They do not reopen this completed scope automatically.

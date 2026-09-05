@@ -12,10 +12,12 @@ families, observed quotients, attainable images, and naturality. On the fixed
 zigzag, it classifies all targets at given adjacent binary images and proves
 the exact realizability criterion. Finite witnesses separate existence from
 uniqueness and full-family from proper-family content.
-M0–M3 are accepted. M4 retains the incompatible-target witnesses and closure
-audit. `REVIEW.md` records the current review state.
-The remaining theorem packages, criteria, and witnesses below specify work to
-formalize; they are not a report of compiled results.
+M0–M4 are accepted. The declared reconstruction and realizability problem on
+the fixed zigzag is complete, including strict incompatible targets and the
+closure audit. `REVIEW.md` records the final acceptance. Section 31 maps the
+closed obligations to their compiled evidence. Broader questions and theorem
+packages below remain a research horizon; they are not additional claims of
+compiled results or outstanding obligations of this completed scope.
 
 The project begins from a clean repository and a clean mathematical context.
 Earlier repositories are evidence and possible theorem donors, not inherited
@@ -1401,14 +1403,22 @@ tracks or prerequisites for M1.
 
 ## M4 — Realizability and closure on the chosen shape
 
-**Partly discharged by accepted M3.** `realizable_target_iff` already proves
+**Built and accepted.** `realizable_target_iff` proves
 that an abstract target is realizable exactly when its five fixed entries are
 full and its full entry lies in the join of its adjacent entries.
 `exists_candidate_target_iff` describes every remaining target at fixed datum;
 the converse constructs an actual restriction system with objectwise
-surjective observations. The remaining work is a strict incompatible target
-for each of the six conditions and the closure audit below. Reuse this
-classification without adding a second realization framework.
+surjective observations. `Amalgam/Models/Incompatible.lean` supplies six
+explicit targets: `noEmpty`, `noL`, `noM`, `noR`, `noLR`, and `noJoin`. Each
+has a certificate of its violated condition, a conjunction certifying the
+other five, and a nonrealizability proof through the accepted criterion.
+`ofDatum_univ_univ_empty_realizable` is a positive control;
+`exists_candidate_datum` records that every adjacent datum is realizable,
+using the empty full image. `Candidate.exists_subset_join_target_eq_ofDatum`
+packages the forward classification at any fine universe. The MiddleSplit
+witness `exists_target_eq_not_nonempty_equiv` gives equal targets with
+inequivalent fine middle carriers. Status mirrors the public claims. The
+Section 31 closure audit is complete; the following contract is discharged.
 
 For exactly the shape, datum, and target fixed in M3, characterize which
 abstract data arises from a coherent realization. Retain all admissible images
@@ -1440,10 +1450,11 @@ ______________________________________________________________________
 
 # 27. Questions that should drive the project
 
-The active question is when local reduction preserves constraints on joint
-realization, and what supplied data determines the answer coherently. Q2--Q4
-and Q6 support its classification on the chosen shape. The other questions
-enter when that classification consumes them.
+The initial program asked when local reduction preserves constraints on joint
+realization and what supplied data determines the answer coherently. M0–M4
+settle the declared instance of that question on the chosen shape. The
+questions below describe a broader research horizon; further work requires a
+new declared question and does not follow automatically from this list.
 
 ### Q1 — Single-observation reconstruction
 
@@ -1598,6 +1609,30 @@ result changes the ontology, rewrite the roadmap around the stronger question.
 ______________________________________________________________________
 
 # 31. Stopping and completion
+
+**Declared scope complete.** M4 was accepted at `24078ce2`. The fixed coarse
+zigzag, objectwise-surjective candidate class, adjacent-image datum, and target
+of all eight images with induced coarse restriction maps have an exact
+information boundary and a necessary-and-sufficient realizability criterion.
+The final review found no unresolved native theorem required for this scope.
+
+| Closed obligation | Compiled evidence |
+| --- | --- |
+| Fixed class, datum, target, and admissible comparisons | `Context`, the eight families and their `FamilyMap`s; `Candidate`, `Candidate.datum`, `Target`, `Target.ext_iff_image` |
+| Exact information boundary at the supplied datum | `Candidate.target_eq_iff`, `datum_determines_target_iff`, `target_eq_of_join_eq_empty` |
+| Entire image collection and its induced maps | Five fixed-image lemmas, `Candidate.target_eq_ofDatum`, `Candidate.exists_subset_join_target_eq_ofDatum`, `Candidate.restrictImage_setCongr_of_target_eq` |
+| Exact realizability and remaining targets | `exists_realization_iff`, `exists_candidate_iff`, `exists_candidate_target_iff`, `realizable_target_iff`, with the tagged fine-system construction |
+| Strict witnesses for information loss and proper conditions | `MiddleSplit.datum_eq`, `MiddleSplit.target_ne`, singleton-middle collapse; six `Incompatible` targets with violated-condition, other-five, and nonrealizability certificates |
+| Reconstruction and transport laws | The accepted fiber, comparison, quotient, family-presentation, and binary equivalences with their round trips; `exists_target_eq_not_nonempty_equiv` records the limit of presentation recovery |
+| Public surface and proof audit | Root-imported `Status.lean`; direct project dependencies checked over all 1132 library constants; only `propext`, `Quot.sound`, and `Classical.choice` occur; root build and all seven flake checks pass |
+
+The existential constructions use the coarse universe; necessity and the
+packaged forward direction hold at arbitrary fine universes. The residual
+freedom at a fixed adjacent datum is exactly the subsets of its coarse join.
+There is no remaining worker objective in this scope. Larger shapes, stronger
+presentation targets, new observables, scalar profiles, and a descent bridge
+require separately declared questions. The stopping criteria below are
+satisfied for the completed scope and remain the standard for a later one.
 
 The project is not complete merely because every planned file exists.
 
