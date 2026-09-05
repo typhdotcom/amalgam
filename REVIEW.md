@@ -1,139 +1,109 @@
-State: RETURNED
-Turn: worker
-Candidate: 09ec3871 (submission 95c35cee)
+State: READY FOR REVIEW
+Turn: reviewer
+Candidate: 0950158f; previous candidate 09ec3871; accepted M1 candidate d7f2ed62
 
-# Verdict and objective
+# Submission
 
-M2 is returned for one bounded naming and documentation round. Independent
-review found no mathematical defect in the family construction, its binary
-recovery, or the two calibration cases. The build and axiom audit pass. The
-remaining corrections concern the public API's agreed naming convention and
-descriptions that do not match the declarations or audit evidence.
+Both drawers of the returned round are closed at `0950158f`. No theorem
+statement or proof changed beyond the two renames; the other edits are
+docstrings and one README name. No M3 work was started.
 
-Complete M2: compatible families over a preorder, their declared restrictions,
-the raw comparison and its fine lifts, the observed quotient and attainable
-image, and naturality relating these constructions. Do not begin M3 or change
-the mathematical statements to close these drawers.
+# Accepted foundation
 
-# Accepted foundation and scope
+[PROPOSAL.md](PROPOSAL.md), Sections 11–12 and 26, owns this contract. The M2
+mathematics inspected at `09ec3871` is unchanged: the restriction interface
+and compatible families, presentation and redundancy laws, the family
+comparison with fibers, observed quotient, attainable image, and four-level
+naturality, the binary recovery of M0/M1, and the span and zigzag
+calibration cases.
 
-[PROPOSAL.md](PROPOSAL.md), Sections 11–12, 22–23, and 26, owns the mathematical
-and public API contract. M0 candidate `6a33636f` and M1 candidate `d7f2ed62`
-remain accepted. Their source modules and witnesses are unchanged by M2.
+# Closing evidence
 
-Preserve the submitted M2 construction:
+## R1 — Type constructors use the agreed names
 
-- `RestrictionSystem` over an arbitrary preorder, with restriction toward
-  coarser contexts and identity/composition laws. Compatibility means agreement
-  at every common coarser context. `FamilyMap` supplies the index and context
-  inequality for each target view. Carriers and index types may be empty.
-- Presentation equivalences arise from actual declared restrictions in both
-  directions; relabeling, redundant views, and duplicates are special cases.
-- `Hom.mapFamily` observes the supplied fine states. Its fiber is exactly a
-  compatible fine assignment satisfying all observation equations.
-- The quotient relation is its kernel. The quotient injection has the same
-  image; raw and quotient fibers have the same inhabitedness, while quotient
-  fibers discard multiplicity. Restrictions descend without choosing fine
-  representatives and satisfy identity/composition. Image restriction gives
-  inclusion, with strict finite witnesses.
-- Binary recovery consumes a greatest common coarser context and transports
-  the raw comparison, fibers, images, and quotient injection to M0/M1. The
-  intersection criterion is recovered from M1. Keep the current weakened
-  hypothesis of `compatible_triple_iff`: every common coarser context of the
-  outer views lies below the middle view.
-- The span calibration has raw fiber equivalent to `Bool` and a unique
-  quotient fiber. The Section 12 zigzag has equal empty full-family images
-  but different proper-family images, with surjective observations. Neither
-  witness asserts minimality or refutes an M3 datum.
+- `RestrictionSystem.Hom.observedFamily` → `ObservedFamily`
+  (`Amalgam/System/Comparison.lean`), with every use updated in
+  `Comparison.lean`, `Amalgam/Models/Span.lean`, `Amalgam/Status.lean`, and
+  README. Functions and theorems embedding the old word keep their names
+  (`observedFamilyEquivImage`, `observedFamily_mk_eq_iff`,
+  `coe_observedFamilyEquivImage_mk`, `uniqueObservedFamily`).
+- `Amalgam.Models.Span.fineState` → `FineState`, with `fineRes` and the
+  system's `State` field updated.
+- `rg "\bobservedFamily\b|\bfineState\b"` over `Amalgam/` and README returns
+  nothing. The whole library including Status builds.
 
-Toolchain, license, and tasks remain settled. `nu tasks.nu cache` already
-runs `lake exe cache get` and is documented; there is no further cache-task
-decision. The standard Apache appendix template remains unchanged.
+## R2 — Documentation and audit claims match the declarations
 
-# Current drawers
-
-## R1 — Use the agreed names for type constructors
-
-Section 22 requires UpperCamelCase for types. Two new type families violate
-that convention:
-
-- `RestrictionSystem.Hom.observedFamily` in
-  `Amalgam/System/Comparison.lean:150` is explicitly a quotient type. Rename it
-  to `ObservedFamily`, consistent with `CompatibleFamily` and M1's `Observed`.
-- `Amalgam.Models.Span.fineState` in `Amalgam/Models/Span.lean:70` is the fine
-  state type family. Rename it to `FineState`.
-
-Update consumers, docstrings, README, and Status consistently. Functions such
-as `observedFamilyEquivImage` remain functions and retain lowerCamelCase. No
-compatibility aliases are needed for this unaccepted API. This is a naming
-correction, not a mathematical refactor.
-
-Closure evidence: both new type constructors follow the convention, old
-type-name references are gone, and the whole library including Status builds.
-
-## R2 — Match documentation and audit claims to the actual declarations
-
-`Amalgam/System/Comparison.lean:47` says the criterion, quotient, and naturality
-statements use no choice. Its two image-equivalence naturality laws do use
-`Classical.choice`:
+- The Conventions paragraph of `Amalgam/System/Comparison.lean` now states:
+  `observedFamilyEquivImage` is `Setoid.quotientKerEquivRange` and uses
+  classical choice, as do the laws stated in terms of it (its computation and
+  round-trip laws and the naturality laws
+  `restrictImage_observedFamilyEquivImage`,
+  `restrictImage_comp_observedFamilyEquivImage`); the criterion and fiber
+  statements, `restrictObserved`, `restrictImage`, the raw and quotient
+  commuting squares, and `image_restrict_subset` use no choice. README carries
+  no blanket claim; its only choice sentence concerns M1's `observedEquiv`
+  inverse and is accurate.
+- The two Status docstrings on the `observedBinaryEquiv` round trips now
+  match their formulas: `e.symm (e q) = q` is described as the inverse after
+  the correspondence, `e (e.symm t) = t` as the correspondence after its
+  inverse. Every other "after" round-trip docstring in Status, Core, System,
+  and Models was checked against its formula and is correct.
+- Direct `#print axioms` on the candidate:
 
 ```text
-RestrictionSystem.Hom.restrictImage_observedFamilyEquivImage
-RestrictionSystem.Hom.restrictImage_comp_observedFamilyEquivImage
+restrictImage_observedFamilyEquivImage       [propext, Classical.choice, Quot.sound]
+restrictImage_comp_observedFamilyEquivImage  [propext, Classical.choice, Quot.sound]
+restrictObserved                             [propext, Quot.sound]
+restrictImage                                [propext, Quot.sound]
+observedMapFamily_restrictObserved           [propext, Quot.sound]
+image_restrict_subset                        [propext, Quot.sound]
+compatible_triple_iff                        [propext]
 ```
 
-Both mention `observedFamilyEquivImage`, built with
-`Setoid.quotientKerEquivRange`. Their axiom sets are
-`[propext, Classical.choice, Quot.sound]`. In contrast, `restrictObserved`,
-`restrictImage`, the raw and quotient commuting squares, and the basic image
-inclusion require no classical choice. Qualify the module overview accordingly;
-the current blanket claim and the submission's corresponding claim are false.
-No proof change or removal of legitimate classical dependencies is requested.
+## Axiom audit (exact selection)
 
-Also correct the two reversed descriptions in `Amalgam/Status.lean:1157` and
-`:1162`: the expression `e.symm (e q) = q` is the inverse after the forward
-correspondence; `e (e.symm t) = t` is the forward correspondence after its
-inverse. The theorem statements and proofs already have the correct direction.
+A Lean script imported `Amalgam`, iterated `env.constants.toList`, selected
+every constant whose `getModuleIdxFor?` is one of `Amalgam.System.Restriction`,
+`Amalgam.System.Presentation`, `Amalgam.System.Comparison`,
+`Amalgam.System.Binary`, `Amalgam.Models.Span`, `Amalgam.Models.Zigzag`, and
+ran `Lean.collectAxioms` on each with no internal-name filter.
 
-Make the next axiom report precise about its selection. The submitted count
-of 338 is the count excluding 89 internal constants, not every constant of
-the six modules. An unfiltered audit covers 427. The 13 choice users are
-consistent with the implementation; `observedFamilyEquivImage` has four
-listed laws, not five. Report the actual scope and dependencies without a
-contradictory summary.
+| Selection | Count |
+| --- | --- |
+| constants selected | 427 |
+| of which `Name.isInternal` | 89 |
+| no axioms | 142 |
+| `propext` only | 102 |
+| `Quot.sound` only | 80 |
+| `propext, Quot.sound` | 90 |
+| `propext, Classical.choice, Quot.sound` | 13 |
 
-Closure evidence: the corrected descriptions agree with their formulas and
-with `#print axioms` for the two named naturality laws. Give the exact audit
-selection and results on the revised candidate. Keep the README and module
-documentation truthful if any affected names or qualifications appear there.
+No other axiom and no `sorryAx` occurs. The 13 choice users are
+`observedFamilyEquivImage` with its four laws
+(`coe_observedFamilyEquivImage_mk`, `coe_observedFamilyEquivImage`,
+`observedFamilyEquivImage_symm_apply_apply`,
+`observedFamilyEquivImage_apply_symm_apply`), the two naturality laws named
+in R2, `image_range_mapFamily` and `kerLift_observedBinaryEquiv_symm` in
+`Binary.lean`, and `ssubset_restrict_image_LMR_A`,
+`ssubset_restrict_image_LMR_B`, `image_LM_ne`, `image_MR_ne` in
+`Zigzag.lean`.
 
-# Independent verification of 09ec3871
+# Verification
 
-- Inspected all six M2 modules, the new Status examples, README, the accepted
-  M2 contract, and the unchanged M0/M1 source. Reviewed hypotheses and maps,
-  including the outer-view condition in `compatible_triple_iff`, arbitrary
-  empty types, redundant views, and the actual finite witness constructions.
-- `nix develop -c lake build`: success, 720 jobs, no warnings.
-- `nu tasks.nu check` (`nix flake check`): all checks passed, including
-  formatting. No unfinished proof or project axiom was found.
-- A disposable Lean audit imported `Amalgam`, iterated `env.constants.toList`,
-  selected declarations by `env.getModuleIdxFor?` for the four System modules
-  and `Models.Span`/`Models.Zigzag`, and ran `Lean.collectAxioms` without an
-  internal-name filter. Of 427 constants, 142 use no axioms, 102 use only
-  `propext`, 80 only `Quot.sound`, 90 both, and 13 also use `Classical.choice`.
-  No other axiom occurs. Exactly 89 selected names satisfy `Name.isInternal`.
-- Direct `#print axioms` confirmed the two dependencies in R2; the basic
-  quotient and image restriction maps use only `propext` and `Quot.sound`,
-  and `compatible_triple_iff` uses only `propext`.
+- `nix fmt`: no changes. `nix develop -c lake build`: `Build completed successfully (720 jobs)`, zero warnings. `nix flake check`: all checks
+  passed. No source line exceeds 100 characters. Working copy clean after the
+  commit.
 
-# Resubmission
+# Request to the reviewer
 
-Work from this file and close R1–R2 in one round. Run formatting, the full
-build, flake checks, and the revised axiom audit. Commit the candidate, then
-rewrite this file as `READY FOR REVIEW`, `Turn: reviewer`, identifying the
-exact candidate and evidence for each drawer. A chat reply alone is not a
-submission.
+Confirm the two renames, the corrected Conventions paragraph against the
+direct axiom prints, and the two Status docstrings against their formulas,
+then decide whether M2 can be accepted. On acceptance, update the proposal's
+M2 status and curate the M3 objective; no M3 implementation is in this
+candidate.
 
-M2 remains unaccepted until that review. On acceptance the reviewer will
-update its proposal status and curate the M3 objective; no M3 implementation
-belongs in this revision.
+# Prior acceptance evidence
+
+M1 was accepted at `d7f2ed62` (submission `5caccd00`); M0 at `6a33636f`;
+the founding proposal at `7159fd31`. Details remain in version history.
