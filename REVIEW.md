@@ -1,127 +1,206 @@
-State: READY FOR WORK
-Turn: worker
-Candidate: —; accepted M3 candidate 08c41b29, submission b88d4986
+State: READY FOR REVIEW
+Turn: reviewer
+Candidate: a1957c29; accepted M3 candidate 08c41b29 (submission b88d4986)
 
-# Acceptance and next objective
+# Submission
 
-M3 is accepted. Both returned drawers are closed. The exact realization
-negative control is now a committed typed Status example, the README states
-the conditional guarantee precisely, and the audit report matches the
-independent 421-constant selection. The proposal records M3's built status.
-
-M4 closes realizability on the same fixed zigzag. Its classification theorem
-is already proved by M3. Supply the strict incompatible targets demonstrating
-its proper conditions, then audit the declared reconstruction question for
-closure. Do not enlarge the shape, datum, candidate class, or target.
+M4 — realizability closure on the fixed zigzag — is submitted at `a1957c29`.
+M4.1 supplies six explicit abstract targets, one per condition of
+`realizable_target_iff`, each violating exactly its condition and proved
+nonrealizable through the accepted criterion, plus the theorem that the
+adjacent datum itself carries no realizability condition. M4.2 records the
+obligation-to-theorem map for Section 31, and the public-surface audit
+yielded direct imports, process-free docstrings, and two small theorems. No
+theorem debt remains in the declared scope. The shape, datum, candidate
+class, and target are unchanged from M3.
 
 # Accepted foundation
 
-[PROPOSAL.md](PROPOSAL.md), Sections 11–14, 26, and 31, owns the mathematical
-contract. M0 was accepted at `6a33636f`, M1 at `d7f2ed62`, M2 at `0950158f`,
-and M3 at `08c41b29`; the founding proposal was accepted at `7159fd31`.
+[PROPOSAL.md](PROPOSAL.md), Sections 11–14, 26, and 31, owns this contract.
+M0 `6a33636f`, M1 `d7f2ed62`, M2 `0950158f`, M3 `08c41b29` are reused
+unchanged in statement and proof; this candidate adds declarations, direct
+imports, and docstring corrections only.
 
-Fix an arbitrary coarse restriction system on `L → B ← M → D ← R`.
-Candidates have commuting, objectwise surjective observations; fine carriers
-may vary and need not be finite or nonempty. The datum consists of the two
-adjacent images. The target consists of the images on all eight subfamilies
-of `L, M, R`, with maps induced by the fixed coarse restrictions. Target
-equality does not assert equivalence of fine presentations.
-
-M3 supplies the following completed obligations:
-
-- `Candidate.target_eq_iff` and
-  `Candidate.restrictImage_setCongr_of_target_eq`: the datum and full image
-  determine the entire target and its induced maps; five entries are full.
-- `exists_realization_iff` and `exists_candidate_iff`: a prescribed triple
-  `(A, A', T)` is realized exactly when `T ⊆ join A A'`. The converse is an
-  actual coherent fine system, not a collection of unrelated function ranges.
-- `exists_candidate_target_iff` and its field form: all remaining targets at
-  fixed datum, with no further condition on the adjacent subsets themselves.
-- `datum_determines_target_iff`: target determination exactly when the join is
-  empty. `target_eq_of_join_eq_empty` supplies sufficiency across independent
-  fine universes. The existential constructions use the coarse universe.
-- `realizable_target_iff`: an abstract target is realizable exactly when its
-  empty, `L`, `M`, `R`, and `LR` entries are full and its `LMR` entry is
-  contained in the join of its `LM` and `MR` entries.
-- `Models.MiddleSplit`: equal adjacent images with different full images;
-  the singleton-middle collapse explains why adjacent lifts combine when
-  the fine middle carrier is a subsingleton.
-
-# Current drawers
+# Closing evidence
 
 ## M4.1 — Strict incompatible targets
 
-Give six explicit finite abstract targets through the existing `Target` API:
-for each of the five fixed-full-entry conditions and for the join inclusion,
-one target violating that condition while satisfying the other five. Prove
-the failed condition and nonrealizability through the accepted criterion.
-These are abstract targets, not candidate systems that violate their own laws.
-The all-singleton coarse system already available in `Models.MiddleSplit`
-suffices; reuse it rather than introduce another realization framework.
+`Amalgam/Models/Incompatible.lean` (namespace `Amalgam.Models.Incompatible`),
+over the all-singleton `Amalgam.Models.MiddleSplit.coarse`, where every
+target entry is `∅` or `Set.univ`. Six abstract `Target coarse` values:
 
-Keep the controls small and named. They must expose the actual target fields
-and certify the other conditions, rather than establish only an opaque
-negation of an existential. Put their public README claims in exact typed
-Status examples. No minimality claim is required.
+| Target | Violated condition | Other five | Nonrealizable |
+| --- | --- | --- | --- |
+| `noEmpty` (`empty := ∅`) | `noEmpty_empty_ne_univ` | `noEmpty_satisfies_others` | `noEmpty_not_realizable` |
+| `noL` (`l := ∅`) | `noL_l_ne_univ` | `noL_satisfies_others` | `noL_not_realizable` |
+| `noM` (`m := ∅`) | `noM_m_ne_univ` | `noM_satisfies_others` | `noM_not_realizable` |
+| `noR` (`r := ∅`) | `noR_r_ne_univ` | `noR_satisfies_others` | `noR_not_realizable` |
+| `noLR` (`lr := ∅`) | `noLR_lr_ne_univ` | `noLR_satisfies_others` | `noLR_not_realizable` |
+| `noJoin` (`lm := ∅`, rest `univ`) | `noJoin_lmr_not_subset_join` | `noJoin_satisfies_others` | `noJoin_not_realizable` |
 
-This establishes the necessity of each stated condition. The adjacent datum
-itself has no extra realizability condition: an empty full image is permitted
-for every pair of adjacent subsets by the accepted construction. Reuse that
-result when explaining the distinction between separate adjacent lifts,
-coarse overlap compatibility, simultaneous fine lifting, and freedom in the
-full image. Do not infer a common fine middle representative from two separate
-lifts or impose a global assignment on the candidate class.
+Each `*_satisfies_others` is the five-way conjunction in the exact shape of
+the criterion minus the violated conjunct; each `*_not_realizable` is
+`¬ ∃ c : Candidate.{0, 0} coarse, c.target = …`, obtained by projecting the
+violated conjunct out of `realizable_target_iff` (`coarse` is
+`RestrictionSystem.{0, 0} Context`, so `Candidate.{0, 0}` is the class the
+criterion quantifies over). `noJoin_lmr_not_subset_join` exhibits `y₀` in
+the `LMR` entry whose `toLM`-restriction would have to lie in `∅`. Shared
+certificates: `univ_subset_join_univ_univ`; positive control
+`ofDatum_univ_univ_empty_realizable`. The adjacent datum has no extra
+condition: `exists_candidate_datum (A A') : ∃ c : Candidate.{w, w} S', c.datum = (A, A')` for any coarse `S'`, from `exists_candidate_iff` at
+`T = ∅`. The module docstring separates separate adjacent lifts, coarse
+overlap compatibility (the join), simultaneous fine lifting (the full image),
+and the residual freedom of the full image inside the join; no common fine
+middle representative is inferred and no global assignment is imposed. No
+minimality claim. All mirrored in README ("Strict incompatible targets") and
+Status (27 typed examples).
 
 ## M4.2 — Closure of the declared question
 
-Audit the proposal's Section 31 obligations against the actual API. Record a
-compact obligation-to-theorem map in the submission, including the fixed
-realization class and target equivalence, all admissible images and their
-maps, exact realizability, residual freedom, and strict witnesses. Any durable
-mathematical consequence belongs in the existing proposal or README with its
-Status evidence; REVIEW.md remains the single active coordination artifact.
+### Obligation-to-theorem map (Section 31)
 
-Inspect root imports and direct module dependencies, statement assumptions
-and universe qualifications, public naming and docstrings, README-to-Status
-coverage, and axiom dependencies. Check the reconstruction and transport laws
-actually claimed, without inventing an inverse to the noninjective map from
-fine presentations to their observable targets.
+1. **Datum, comparisons, class, target equivalence fixed and recorded.**
+   `System/Zigzag.lean`: `Zigzag.Context` with its order lemmas; families
+   `empty`, `single`, `LM`, `LR`, `MR`, `LMR`; the thirteen declared
+   `FamilyMap`s. `System/ZigzagTarget.lean`: `Candidate` (fine system,
+   morphism, objectwise surjectivity), `Candidate.datum`, `Target` (eight
+   subsets), `Candidate.target`, `Family`, `Target.image`. The target
+   equivalence is literal equality of eight subsets: `Target.ext`,
+   `Target.ext_iff`, `Target.ext_iff_image`.
+2. **Datum-induced equivalence classified exactly.** `Candidate.target_eq_iff`
+   (independent fine universes), `datum_determines_target_iff`,
+   `target_eq_of_join_eq_empty`, `exists_candidate_iff`,
+   `exists_candidate_target_iff`, `exists_candidate_target_iff'`: same datum
+   is the target equivalence exactly when the join is empty, and otherwise
+   splits into classes indexed by the subsets of the join.
+3. **Gap to the whole target collection with its maps.** Fixed entries
+   `image_empty`, `image_single`, `image_LR`, `Candidate.target_empty/_l/_m/_r/_lr`;
+   datum entries `target_lm`, `target_mr`; `Candidate.target_eq_ofDatum` and
+   the packaged `Candidate.exists_subset_join_target_eq_ofDatum` (any fine
+   universe); induced maps `coe_restrictImage_eq`, `restrictImage_setCongr`,
+   `Candidate.restrictImage_setCongr_of_target_eq`, inclusion
+   `Hom.image_restrict_subset`. The full-image-only clause is discharged
+   because datum plus full image determine the seven other entries, whose maps
+   are restrictions of the fixed coarse maps.
+4. **Realizability necessary and sufficient, residual freedom characterized.**
+   `exists_realization_iff`, `exists_candidate_iff`, `realizable_target_iff`
+   with any-universe forward half `Candidate.target_realizable`; necessity at
+   any universe `image_LMR_subset_join`, `subset_join_of_images`,
+   `Candidate.image_LMR_subset_join`, `subset_join_of_candidate`; construction
+   `realize`, `realizeHom`, `surjective_realizeHom`, `image_LM/MR/LMR_realize`,
+   `realizeCandidate`; freedom exactly the subsets of the join,
+   `unique_full_image_iff`, `image_LMR_determined_iff`; necessity of each
+   condition by M4.1.
+5. **Strict witnesses and round trips.** No refinement of the datum was
+   introduced, so none is owed. Strict pairs `Models/MiddleSplit`
+   (`datum_eq`, `target_ne`) and `Models/Zigzag` (`image_LMR_eq`,
+   `image_LM_ne`, `image_MR_ne`); collapse `nonempty_LMR_iff_of_subsingleton_middle`.
+   Round trips: `observedEquivRange`, `observedEquiv` (with uniqueness),
+   `observedFamilyEquivImage`, `binaryEquiv`, `observedBinaryEquiv`, `relabel`,
+   `redundancyEquiv`, `restrictEquiv`, `restrictFiberEquiv`, `Span.fiberEquiv`.
+   No inverse from targets to fine presentations is claimed; the map from
+   candidates to targets is noninjective: `exists_target_eq_not_nonempty_equiv`
+   (two candidates of `coarse` with equal targets whose middle carriers are
+   not equivalent as types, via `target_realizeCandidate_eq_target_glue`,
+   `full_ne_solo_M`, `not_subsingleton_realize_state_M`).
+6. **Closure audit.** Below.
 
-Identify any unresolved native theorem required for this classification and
-resolve it before submission. Distinguish stronger presentation targets,
-larger shapes, and new observables as a research horizon, not as debt in this
-scope. If the declared obligations are discharged, submit M4 for final closure;
-do not open another milestone merely because more theorems are possible.
+### Native-theorem check
+
+Nothing missing for the declared classification. The `Candidate.{w, w}`
+restriction on the existential iffs is necessary, not an omission: below the
+coarse universe a large coarse carrier admits no objectwise surjection, so the
+class can be empty while the join is nonempty; every direction not needing
+existence is stated at arbitrary fine universes. One class-level remark, no
+change made: surjectivity at `B` and `D` is consumed by no theorem
+(`target_l/_m/_r/_lr` use `L`, `M`, `R`; `realize` is surjective
+everywhere), so the classification is verbatim exact for the class
+"surjective at `L`, `M`, `R`"; the declared class is kept.
+
+### Public surface
+
+- Root `Amalgam.lean` lists all seventeen modules.
+- Direct imports added so no module relies on transitive imports:
+  `Core/Reduction` (+ `Core.Fiber`), `System/Comparison` (+ `Core.Fiber`),
+  `System/Binary` (+ `Core.Comparison`, `Core.Fiber`), `System/ZigzagTarget`,
+  `System/ZigzagRealization` (+ `System.Restriction`),
+  `System/ZigzagClassification` (+ `System.Comparison`, `System.Restriction`,
+  `System.Zigzag`), `Models/Lifting` (+ `Core.Comparison`), `Models/Span`
+  (+ `Core.Reduction`, `System.Restriction`), `Models/Zigzag`,
+  `Models/MiddleSplit` (+ `System.Restriction`; MiddleSplit also
+  `System.ZigzagClassification`); `Models/Overlap` import order sorted.
+- Every hypothesis in `System/Zigzag*.lean` and `System/Binary.lean` is
+  consumed; universe docstrings match the code.
+- Process language removed from 24 docstring sites (milestone labels,
+  reviewer references) in `Binary`, `Span`, `ZigzagTarget`,
+  `ZigzagClassification`, `Models/Zigzag`, `MiddleSplit`; a stale location
+  of `toLM`/`toMR` in `Presentation.lean` corrected; README no longer names
+  milestones. Every backticked identifier in module docstrings resolves.
+- README-to-Status: the names `stateLMR`, `stateLM`, `stateMR`,
+  `Target.ext_iff`, `Candidate.exists_subset_join_target_eq_ofDatum`, and
+  `exists_target_eq_not_nonempty_equiv` now have typed examples; every
+  declaration name in README appears in Status.
+
+### Research horizon, not debt
+
+The strongest theorem a critic could ask for is recovery of the fine
+presentation from the target; the proposal excludes it (Section 31:
+observable content need not recover a unique presentation; Section 12 keeps
+presentation equivalence a separate target), no presentation equivalence is
+defined, and `exists_target_eq_not_nonempty_equiv` shows it is false even at
+the level of carrier equivalence. Horizon: a presentation target with a
+declared equivalence of fine systems; larger shapes (more interior views, or a
+genuine common coarser context of `L` and `R`); observables beyond attainable
+images (fiber multiplicities, quotient fibers as data); the Descent bridge;
+finite profiles and counts. None changes the fixed datum, target, or class.
 
 # Verification
 
-For M4, run the root Lean build, formatting and all flake checks, and check
-for `sorry` or project axioms. Report the axiom audit's exact module selection,
-counts including generated and internal constants, and every classical-choice
-user in the new work. Explain any change from the accepted audit rather than
-carrying counts forward across source changes.
+- `nix fmt`: no changes. `nix develop -c lake build`: `Build completed successfully (726 jobs)`, zero warnings. `nix flake check`: all checks
+  passed. `rg "sorry|^axiom" Amalgam`: none. No source line exceeds 100
+  characters. Working copy clean after the commit.
 
-M3 acceptance evidence:
+- Axiom audit, unfiltered: selection by `getModuleIdxFor?` over all
+  seventeen library modules (`Core.Fiber`, `Core.Comparison`,
+  `Core.Reduction`, `System.Restriction`, `System.Presentation`,
+  `System.Comparison`, `System.Binary`, `System.Zigzag`,
+  `System.ZigzagTarget`, `System.ZigzagRealization`,
+  `System.ZigzagClassification`, `Models.Overlap`, `Models.Lifting`,
+  `Models.Span`, `Models.Zigzag`, `Models.MiddleSplit`,
+  `Models.Incompatible`), `Lean.collectAxioms` on every constant:
 
-- The current root build passed: 725 jobs, zero warnings, including the new
-  negative-control Status example.
-- The candidate changes since the previous review are limited to that example,
-  the README sentence, and the submission report. The six audited modules
-  are unchanged, so the previous direct audit remains applicable.
-- Unfiltered defining-module selection: `System.Zigzag`, `ZigzagTarget`,
-  `ZigzagRealization`, `ZigzagClassification`, `Models.MiddleSplit`, and
-  `Models.Zigzag`, all under `Amalgam`. It contains 421 constants, 58 of them
-  internal: 74 axiom-free, 270 using only `propext`, 71 using `propext` and
-  `Quot.sound`, and six using classical choice as well. The six choice users
-  remain the model set-inequality witnesses. Four public collapse lemmas plus
-  four generated match auxiliaries explain the increase from 413.
-- The unchanged sweep retains the independently reproduced 872 systems at
-  bound 2 and 1,554,228 at bound 3; these remain bounded observations.
-- Formatting and all seven flake checks passed on the acceptance handoff.
+  | Selection | Count |
+  | --- | --- |
+  | constants selected (including generated and internal) | 1132 |
+  | of which `Name.isInternal` | 232 |
+  | no axioms | 371 |
+  | `propext` only | 356 |
+  | `Quot.sound` only | 130 |
+  | `propext, Quot.sound` | 229 |
+  | `propext, Classical.choice, Quot.sound` | 46 |
 
-# Next submission
+  No other axiom and no `sorryAx`. Change from the accepted M3 selection:
+  the six M3-audited modules now hold 428 constants (+1
+  `Candidate.exists_subset_join_target_eq_ofDatum`, +6 for the MiddleSplit
+  noninjectivity witness: four public theorems and two generated
+  auxiliaries), with the same six choice users; the sixteen previously
+  existing modules total 1104 constants with 36 choice users; the new
+  `Models.Incompatible` adds 28 constants of which 10 use choice, all through
+  `Set.empty_ne_univ`: the five `*_ne_univ` theorems and the five
+  `*_not_realizable` theorems built on them (`noJoin`'s two use none).
+  Choice users in the new work outside `Incompatible`: none. The 36 prior
+  users are the M1/M2 quotient-to-image equivalences and their laws, the two
+  `Binary` transport lemmas, the eight `decide`-based `Overlap` witnesses,
+  and the six model set-inequality witnesses.
 
-Work from this file and perform M4.1 and M4.2. Rewrite it as
-`READY FOR REVIEW`, `Turn: reviewer`, with the exact implementation candidate
-and evidence for each drawer. Keep the accepted M3 result explicit. Merely
-replying in chat is not a submission.
+# Request to the reviewer
+
+Check the six strict targets against the criterion's conditions, the
+obligation map against Section 31, and the public-surface changes. If the
+declared obligations are discharged, close the scope explicitly per Section
+31; do not open another milestone merely because more theorems are possible.
+
+# Prior acceptance evidence
+
+M3 was accepted at `08c41b29` (submission `b88d4986`); M2 at `0950158f`;
+M1 at `d7f2ed62`; M0 at `6a33636f`; the founding proposal at `7159fd31`.
