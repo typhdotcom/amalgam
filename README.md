@@ -55,7 +55,8 @@ iff every compatible pair is amalgamated by some global state, equivalently iff
 every fiber is nonempty; and it is bijective iff every compatible pair is
 amalgamated by exactly one global state, equivalently iff every fiber has a
 unique element. Uniqueness and existence stay separate: a subsingleton fiber
-expresses uniqueness only when an extension exists.
+expresses uniqueness only when an extension exists, and the empty fiber over
+`unreached₂` below is a subsingleton.
 
 The fiber of the first projection over a left view is the fiber of `q` over its
 overlap value, and symmetrically for the second projection. Exchanging the two
@@ -65,8 +66,8 @@ comparison. A coherent equivalence of squares transports compatible pairs
 (`Function.Pullback.fiberLiftCongr`), and leaves injectivity, surjectivity, and
 bijectivity of the comparison unchanged. At the opposite extreme, if the overlap
 is a subsingleton then every pair of local views is compatible, the compatible
-pairs are `L × R`, and the comparison is bijective exactly when the joint map
-`x ↦ (f x, g x)` is.
+pairs are `L × R`, and the comparison is injective, surjective, or bijective
+exactly when the joint map `x ↦ (f x, g x)` is.
 
 ## Four comparison behaviors
 

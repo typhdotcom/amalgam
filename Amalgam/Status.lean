@@ -294,6 +294,16 @@ variable {L : Type uX} {R : Type uY} {G : Type uZ} {B : Sort uX'} {p : L → B} 
 example : p.Pullback q ≃ L × R :=
   Function.Pullback.equivProdOfSubsingleton
 
+/-- Over a trivial overlap the comparison is injective exactly when the joint map is. -/
+example (f : G → L) (g : G → R) (h : ∀ x, p (f x) = q (g x)) :
+    Function.Injective (Function.Pullback.lift f g h) ↔ Function.Injective fun x => (f x, g x) :=
+  Function.Pullback.injective_lift_iff_of_subsingleton h
+
+/-- Over a trivial overlap the comparison is surjective exactly when the joint map is. -/
+example (f : G → L) (g : G → R) (h : ∀ x, p (f x) = q (g x)) :
+    Function.Surjective (Function.Pullback.lift f g h) ↔ Function.Surjective fun x => (f x, g x) :=
+  Function.Pullback.surjective_lift_iff_of_subsingleton h
+
 /-- Over a trivial overlap the comparison is bijective exactly when the joint map is. -/
 example (f : G → L) (g : G → R) (h : ∀ x, p (f x) = q (g x)) :
     Function.Bijective (Function.Pullback.lift f g h) ↔ Function.Bijective fun x => (f x, g x) :=
@@ -349,6 +359,11 @@ example : p unreached₂.fst = q unreached₂.snd := Function.Pullback.comm unre
 
 /-- The unreached pair has no global extension. -/
 example : IsEmpty {s // compare₂ s = unreached₂} := isEmpty_fiber_unreached₂
+
+/-- Uniqueness without existence: the same empty fiber is a subsingleton. -/
+example : Subsingleton {s // compare₂ s = unreached₂} :=
+  (Function.Pullback.injective_lift_iff_forall_subsingleton (f := f₂) (g := g₂) comm₂).1
+    injective_compare₂ unreached₂
 
 /-! ### Surjective, not injective -/
 

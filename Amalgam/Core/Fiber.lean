@@ -128,8 +128,8 @@ def fiberComp (g : Y → Z) (f : X → Y) (z : Z) :
   left_inv _ := rfl
   right_inv := by rintro ⟨⟨_, _⟩, ⟨_, hx⟩⟩; cases hx; rfl
 
-/-- Precomposition with an equivalence of the source preserves fibers. Compare
-`Equiv.subtypeEquivOfSubtype`. -/
+/-- Precomposition with an equivalence of the source preserves fibers: the fiber form of
+`Equiv.subtypeEquivOfSubtype`, restated so that `simps` yields fiber-level lemmas. -/
 @[simps]
 def fiberCompEquiv (f : X → Y) (e : X' ≃ X) (y : Y) : {x' // f (e x') = y} ≃ {x // f x = y} where
   toFun x' := ⟨e x', x'.2⟩

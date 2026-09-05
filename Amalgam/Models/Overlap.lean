@@ -17,8 +17,7 @@ behaviors are four different global realizations of one and the same local situa
 
 Failures of existence are certified by an explicit compatible pair together with `IsEmpty` for its
 comparison fiber; failures of uniqueness by two distinct global states with equal comparison value.
-The positive properties are obtained from the criteria of `Amalgam.Core.Comparison`, so the
-witnesses certify the comparison construction itself rather than a bare finite function.
+The positive properties are obtained from the criteria of `Amalgam.Core.Comparison`.
 
 The opposite extreme, a trivial overlap, needs no witness here: for `Subsingleton B` every pair of
 local views is compatible and `Function.Pullback.equivProdOfSubsingleton` identifies the compatible
