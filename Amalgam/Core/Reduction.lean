@@ -19,16 +19,22 @@ Fix spans `L ─p→ B ←q─ R` and `L' ─p'→ B' ←q'─ R'` of arbitrary 
   `Setoid.ker map`, and the induced injection `k_bar`. `observed_rel_iff` states the relation as
   agreement of observed components, `observedMap_injective` and `range_observedMap` give
   injectivity and equality of images, and `observedEquivRange` identifies the quotient with the
-  common image. Fibers of `observedMap` are subsingletons, `subsingleton_fiber_observedMap`.
+  common image. Fibers of `observedMap` are subsingletons, `subsingleton_fiber_observedMap`;
+  by equality of images they are nonempty exactly when the raw fibers of `map` are, so the
+  quotient preserves existence of a fine lift while discarding its multiplicity.
 * `mem_range_map_iff`: a coarse compatible pair `t` is attained exactly when
   `p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})` is nonempty, i.e. some fine overlap value is
   reached from both sides above `t`. `fiberMapEquiv`, `fiberMapEquivProd`,
   `fiberMapEquivPullback`, `nonempty_fiber_map_iff`, `subsingleton_fiber_map_iff` describe the
   fine lifts of `t` and separate their existence from their uniqueness.
 * `bijective_observedMap_iff`: `observedMap` is bijective exactly when the criterion holds at
-  every coarse compatible pair. Under the criterion `observedEquiv` is the inverse, with both
-  round trips and uniqueness `eq_observedEquiv_symm_of_rightInverse`,
-  `eq_observedEquiv_symm_of_leftInverse`; `exists_inverse_observedMap_iff` packages the converse.
+  every coarse compatible pair. Under the criterion `observedEquiv` is the equivalence
+  `Observed ha hc ≃ p'.Pullback q'` extending the quotient injection, its forward function being
+  `observedMap` (`observedEquiv_apply`); the inverse accepting a coarse compatible pair is
+  `observedEquiv.symm : p'.Pullback q' → Observed ha hc`, with both round trips
+  `observedMap_observedEquiv_symm`, `observedEquiv_symm_observedMap` and uniqueness
+  `eq_observedEquiv_symm_of_rightInverse`, `eq_observedEquiv_symm_of_leftInverse`;
+  `exists_inverse_observedMap_iff` packages the converse.
 * `mem_range_map_iff_of_injective`, `bijective_observedMap_of_injective`: with an injective
   overlap observation `b` the criterion is componentwise, and surjective `a`, `c` then suffice.
   This is a sufficient special case only.
@@ -40,9 +46,10 @@ Fix spans `L ─p→ B ←q─ R` and `L' ─p'→ B' ←q'─ R'` of arbitrary 
 
 Empty types are allowed and no finiteness, decidability, or surjectivity hypothesis enters the
 core statements. The criterion theorems use no choice; `observedEquiv` uses `Equiv.ofBijective`
-and hence classical choice. Its inverse selects an observed class, never a fine representative,
-and asserts nothing about uniqueness of fine lifts. Carriers are `Type*` because the criterion
-is a set of fine overlap values and the restriction uses `Set.range b`.
+and hence classical choice. Its inverse `observedEquiv.symm` selects an observed class over a
+coarse pair, never a fine representative, and asserts nothing about uniqueness of fine lifts.
+Carriers are `Type*` because the criterion is a set of fine overlap values and the restriction
+uses `Set.range b`.
 -/
 
 namespace Set
@@ -204,8 +211,9 @@ theorem observedEquivRange_apply_symm_apply (t : Set.range (map ha hc)) :
     observedEquivRange ha hc ((observedEquivRange ha hc).symm t) = t :=
   (observedEquivRange ha hc).apply_symm_apply t
 
-/-- Every fiber of the induced comparison is a subsingleton: an observed class is unique. This
-says nothing about the raw fibers of `map`, the fine lifts. -/
+/-- Every fiber of the induced comparison is a subsingleton: an observed class is unique. By
+`range_observedMap` it is nonempty exactly when the raw fiber of `map` over `t` is, but it
+identifies all fine lifts of `t`, so it asserts no uniqueness of those fine lifts. -/
 theorem subsingleton_fiber_observedMap (t : p'.Pullback q') :
     Subsingleton {x // observedMap ha hc x = t} :=
   (injective_iff_subsingleton_fiber _).1 (observedMap_injective ha hc) t
@@ -400,9 +408,11 @@ section Inverse
 variable (h : ∀ t : p'.Pullback q', (p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty)
 
 /-- Under the lifting criterion the observed quotient is equivalent to all coarse compatible
-pairs. The inverse is obtained by classical choice from bijectivity; it selects the observed
-class over a coarse pair, not a fine representative, and asserts nothing about uniqueness of
-fine lifts. -/
+pairs. Its forward function is `observedMap` (`observedEquiv_apply`), so it extends the quotient
+injection to all coarse compatible pairs; the inverse accepting a coarse pair is
+`observedEquiv.symm`, obtained by classical choice from bijectivity. That inverse selects the
+observed class over a coarse pair, not a fine representative, and asserts nothing about
+uniqueness of fine lifts. -/
 noncomputable def observedEquiv : Observed ha hc ≃ p'.Pullback q' :=
   Equiv.ofBijective _ ((bijective_observedMap_iff ha hc).2 h)
 

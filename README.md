@@ -95,9 +95,14 @@ quotient with that common image, with both round-trip laws and the computation
 law on a class.
 
 The exact lifting criterion says which coarse compatible pairs are attained.
-Coarse compatibility asserts only that the two coarse views agree after `b`,
-while the criterion asks for an actual common fine overlap value: a coarse
-compatible pair `(u, v)` is attained if and only if
+Coarse compatibility of `(u, v)` asserts only `p' u = q' v`, an equality of
+coarse overlap values; `b` acts on fine overlap values and does not occur in it.
+Only once fine representatives `a l = u` and `c r = v` are supplied does
+commutation turn that equality into `b (p l) = b (q r)`. Such representatives
+need not exist, because objectwise surjectivity is not assumed: every fine
+object may be empty while the coarse objects are singletons. The criterion asks
+for more, namely an actual common fine overlap value: a coarse compatible pair
+`(u, v)` is attained if and only if
 
 ```text
 {p(l) | a(l) = u} ∩ {q(r) | c(r) = v} ≠ ∅.
@@ -118,21 +123,37 @@ lifts of its two components (`fiberMapEquivPullback`). These are
 the fine lifts, and existence and uniqueness stay separate: the fiber is
 nonempty exactly under the criterion, empty exactly when the criterion fails, a
 subsingleton exactly when any two fine pairs observed as that coarse pair
-coincide, and has a unique element exactly under unique existence. The fibers of
-the induced comparison are unrelated to these: every one of them is a
-subsingleton, because an observed class is unique, which asserts nothing about
-fine lifts.
+coincide, and has a unique element exactly under unique existence.
+
+The fibers of the induced comparison stand in an exact relation to these. Over a
+coarse pair `t` the raw fiber `{s // map ha hc s = t}` and the quotient fiber
+`{x // observedMap ha hc x = t}` are nonempty together, since the two
+comparisons have the same image (`range_observedMap`); existence of a fine lift
+of `t` and existence of an observed class over `t` are the same statement. What
+the quotient discards is multiplicity: over an attained pair it identifies all
+the fine lifts into a single observed class. Every quotient fiber is a
+subsingleton whether or not the pair is attained
+(`subsingleton_fiber_observedMap`), so a coarse pair carries either no observed
+class or exactly one; that is a statement about observed classes and establishes
+no uniqueness of a fine lift.
 
 The closing theorem `bijective_observedMap_iff` is that the induced comparison
 is bijective exactly when the criterion holds at every coarse compatible pair.
 Equivalently the raw comparison is surjective, and the two comparisons are
 surjective together. Under the criterion `Function.Pullback.observedEquiv` is
-the inverse on all coarse compatible pairs, with both round-trip laws, and it is
-the only right inverse and the only left inverse of the induced comparison. A
-two-sided inverse exists exactly under the criterion, and any right inverse
-forces the criterion everywhere. That inverse is obtained from bijectivity by
-classical choice, and it picks the observed class over a coarse pair, never a
-fine representative; no uniqueness of fine lifts follows from it.
+the equivalence `Observed ha hc ≃ p'.Pullback q'` extending the quotient
+injection: its forward function is the induced comparison
+(`observedEquiv_apply`). The inverse, which accepts a coarse compatible pair, is
+`observedEquiv.symm` of type `p'.Pullback q' → Observed ha hc`. It satisfies
+both round-trip laws (`observedMap_observedEquiv_symm` and
+`observedEquiv_symm_observedMap`), and it is the only right inverse and the only
+left inverse of the induced comparison
+(`eq_observedEquiv_symm_of_rightInverse`,
+`eq_observedEquiv_symm_of_leftInverse`). A two-sided inverse exists exactly
+under the criterion, and any right inverse forces the criterion everywhere. That
+inverse is obtained from bijectivity by classical choice, and it picks the
+observed class over a coarse pair, never a fine representative; no uniqueness of
+fine lifts follows from it.
 
 As a sufficient special case only, an injective overlap observation makes the
 criterion componentwise: a coarse pair is attained exactly when each of its

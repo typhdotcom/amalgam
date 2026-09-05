@@ -429,7 +429,8 @@ example (t : Set.range (Function.Pullback.map ha hc)) :
         ((Function.Pullback.observedEquivRange ha hc).symm t) = t :=
   Function.Pullback.observedEquivRange_apply_symm_apply ha hc t
 
-/-- Every fiber of the induced comparison is a subsingleton: an observed class is unique. -/
+/-- Every fiber of the induced comparison is a subsingleton: an observed class is unique. This is
+no uniqueness of a fine lift. -/
 example (t : p'.Pullback q') :
     Subsingleton {x // Function.Pullback.observedMap ha hc x = t} :=
   Function.Pullback.subsingleton_fiber_observedMap ha hc t
@@ -483,6 +484,15 @@ example (t : p'.Pullback q') :
     Nonempty {s // Function.Pullback.map ha hc s = t} ↔
       (p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty :=
   Function.Pullback.nonempty_fiber_map_iff ha hc t
+
+/-- A coarse pair has a fine lift exactly when it has an observed class: over each coarse pair
+the raw fiber and the quotient fiber are nonempty together. -/
+example (t : p'.Pullback q') :
+    Nonempty {s // Function.Pullback.map ha hc s = t} ↔
+      Nonempty {x // Function.Pullback.observedMap ha hc x = t} :=
+  (Function.Pullback.nonempty_fiber_map_iff ha hc t).trans
+    ((Function.nonempty_fiber_iff_mem_range _ t).trans
+      (Function.Pullback.mem_range_observedMap_iff ha hc t)).symm
 
 /-- Absence of a fine lift is failure of the lifting criterion at that coarse pair. -/
 example (t : p'.Pullback q') :
@@ -549,7 +559,8 @@ section Inverse
 variable (h : ∀ t : p'.Pullback q', (p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty)
 
 /-- Under the criterion the observed quotient is equivalent to all coarse compatible pairs. The
-inverse is obtained by classical choice. -/
+forward function is the induced comparison; the inverse accepting a coarse pair is its `symm`,
+obtained by classical choice. -/
 noncomputable example : Function.Pullback.Observed ha hc ≃ p'.Pullback q' :=
   Function.Pullback.observedEquiv ha hc h
 
