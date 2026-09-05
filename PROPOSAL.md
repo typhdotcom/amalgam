@@ -6,8 +6,9 @@
 
 This is the founding proposal for a new Lean 4 project.
 
-The Lean library currently implements maps, fibers, binary compatibility, and
-four finite comparison behaviors. `REVIEW.md` records the current review state.
+The Lean library currently implements maps, fibers, binary compatibility, the
+exact binary lifting criterion, and finite witnesses for comparison and
+reduction failures. `REVIEW.md` records the current review state.
 The remaining theorem packages, criteria, and witnesses below specify work to
 formalize; they are not a report of compiled results.
 
@@ -1276,22 +1277,27 @@ observing local descriptions preserves their joint compatibility.
 
 ## M1 — When local reduction preserves compatibility
 
-Use the binary setup of Section 10 with arbitrary types and commuting maps.
-Prove the core statements without surjectivity, then specialize to objectwise
-surjective reductions. Only the explicit witnesses require finite carriers.
-The target is equality of attainable coarse compatible pairs; it does not
-require recovery of fine multiplicities.
+**Built and accepted.** `Amalgam/Core/Reduction.lean` defines the raw map
+`Function.Pullback.map` and the quotient injection `observedMap` using the
+accepted comparison API and mathlib's quotient constructions.
+`observed_rel_iff`, `observedMap_injective`, and `range_observedMap` establish
+the relation defined by observed equality, injectivity, and equality of images.
+The closing theorems `mem_range_map_iff` and `bijective_observedMap_iff` give
+the exact criterion in terms of common fine overlap values, with arbitrary
+carriers and no surjectivity assumptions. `fiberMapEquivProd` and `fiberMapEquivPullback`
+identify fine lifts. Raw and quotient fibers share inhabitedness while the
+quotient discards multiplicity; Status certifies this distinction.
 
-Construct `k : P → P'` and the induced injection `k_bar : Q → P'`.
-Characterize the image of `k_bar` by the intersection of fine overlap values
-available above each coarse pair. Prove that `k_bar` is an equivalence exactly when every
-coarse compatible pair lifts, and give the inverse and both round trips under
-that condition. Characterize the fibers of `k` separately.
-
-Certify the singleton/two-point-overlap failure witness in Section 10.
-The milestone closes with the necessary-and-sufficient lifting criterion,
-not merely a sufficient condition such as injectivity of the overlap reduction.
-Keep global extension through a supplied `G` separate from this local lifting.
+Under the criterion, `observedEquiv` extends the injection to an equivalence;
+its `.symm` is the inverse, with both round trips and uniqueness. The module
+also restricts arbitrary observations to surjections onto their images while
+preserving attainment. `Amalgam/Models/Lifting.lean` certifies the Section 10
+witness: all three observations are surjective, but the fine pullback is empty
+and the coarse pullback is a singleton. `not_nonempty_inter_t₀`,
+`t₀_notMem_range_observedMap`, and `not_bijective_observedMap` connect that
+failure to the exact criterion. No minimality is claimed. The next unresolved
+question is M2: construct these comparisons coherently for finite families
+and their declared restrictions.
 
 ## M2 — The comparison for finite families
 
