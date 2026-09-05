@@ -360,8 +360,9 @@ exactly when that holds at every coarse compatible family.
 For the shared-overlap shape, `compatible_triple_iff` reduces compatibility of
 a family over `![L, M, R]` to the two overlap equations, under three
 hypotheses: `B` is greatest among the common coarser contexts of `L` and `M`,
-`D` is greatest among those of `M` and `R`, and `L` and `R` have no common
-coarser context.
+`D` is greatest among those of `M` and `R`, and every common coarser context of
+`L` and `R` lies below `M`. The last holds in particular when `L` and `R` have
+no common coarser context.
 
 ### Two calibration cases
 
@@ -394,8 +395,9 @@ attained through the intersection criterion
 `D ≤ R` (`B_le_L`, `B_le_M`, `D_le_M`, `D_le_R`), with `B` greatest among the
 common coarser contexts of `L` and `M`, `D` greatest among those of `M` and
 `R`, and no common coarser context of `L` and `R`
-(`le_B_of_le_L_of_le_M`, `le_D_of_le_M_of_le_R`, `not_le_L_of_le_R`), which are
-the three hypotheses `compatible_triple_iff` consumes. Every fine system
+(`le_B_of_le_L_of_le_M`, `le_D_of_le_M_of_le_R`, `not_le_L_of_le_R`); the last
+gives vacuously the third hypothesis `compatible_triple_iff` consumes
+(`le_M_of_le_L_of_le_R`). Every fine system
 `sys lb mb md rd` has singleton state types at `L`, `M` and `R` and two-point
 state types at `B` and `D`, and is determined by its four restriction values in
 the arrow order `L→B, M→B, M→D, R→D`; the two fine systems of the witness are

@@ -31,8 +31,9 @@ with injection `Setoid.kerLift (φ.mapFamily F)`, the M1 construction applied to
 Binary families are indexed by `Fin 2` through `![l, r]`, so the two states of a family `x` are
 `x 0` and `x 1`, the dependent tuple of a pair is `Fin.cons`, and `Fin.forall_fin_two` and
 `match` on `Fin` literals discharge index case analysis. The shared-overlap shape
-`L → B ← M → D ← R` is indexed by `Fin 3` through `![L, M, R]` (`compatible_triple_iff`): two
-views with no common coarser context impose no condition on each other.
+`L → B ← M → D ← R` is indexed by `Fin 3` through `![L, M, R]` (`compatible_triple_iff`): the
+condition between the outer views follows from the two overlap equations once every common
+coarser context of `L`, `R` lies below `M`.
 -/
 
 universe u v w
@@ -283,26 +284,32 @@ section Triple
 
 variable {L M R B D : C} (hBL : B ≤ L) (hBM : B ≤ M) (hDM : D ≤ M) (hDR : D ≤ R)
   (hB : ∀ ⦃c⦄, c ≤ L → c ≤ M → c ≤ B) (hD : ∀ ⦃c⦄, c ≤ M → c ≤ R → c ≤ D)
-  (hLR : ∀ ⦃c⦄, c ≤ L → c ≤ R → False)
+  (hLR : ∀ ⦃c⦄, c ≤ L → c ≤ R → c ≤ M)
 
 include hB hD hLR in
 /-- On the shape `L → B ← M → D ← R`, with `B` greatest among common coarser contexts of `L`, `M`,
-`D` greatest among those of `M`, `R`, and no common coarser context of `L`, `R`, a family over
-`![L, M, R]` is compatible exactly when it satisfies the two overlap equations. -/
+`D` greatest among those of `M`, `R`, and every common coarser context of `L`, `R` below `M`, a
+family over `![L, M, R]` is compatible exactly when it satisfies the two overlap equations. The
+last hypothesis holds in particular when `L`, `R` have no common coarser context. -/
 theorem compatible_triple_iff (x : ∀ i, S.State (![L, M, R] i)) :
     S.Compatible ![L, M, R] x ↔
       S.res hBL (x 0) = S.res hBM (x 1) ∧ S.res hDM (x 1) = S.res hDR (x 2) where
   mp h := ⟨h (i := 0) (j := 1) hBL hBM, h (i := 1) (j := 2) hDM hDR⟩
   mpr h := by
+    have key : ∀ ⦃c⦄ (hi : c ≤ L) (hj : c ≤ R), S.res hi (x 0) = S.res hj (x 2) := by
+      intro c hi hj
+      have hM := hLR hi hj
+      calc S.res hi (x 0) = S.res hM (x 1) := S.res_eq_res_of_res_eq_res hBL hBM hB h.1 hi hM
+        _ = S.res hj (x 2) := S.res_eq_res_of_res_eq_res hDM hDR hD h.2 hM hj
     intro c i j hi hj
     match i, j, hi, hj with
     | 0, 0, _, _ => rfl
     | 0, 1, hi, hj => exact S.res_eq_res_of_res_eq_res hBL hBM hB h.1 hi hj
-    | 0, 2, hi, hj => exact (hLR hi hj).elim
+    | 0, 2, hi, hj => exact key hi hj
     | 1, 0, hi, hj => exact (S.res_eq_res_of_res_eq_res hBL hBM hB h.1 hj hi).symm
     | 1, 1, _, _ => rfl
     | 1, 2, hi, hj => exact S.res_eq_res_of_res_eq_res hDM hDR hD h.2 hi hj
-    | 2, 0, hi, hj => exact (hLR hj hi).elim
+    | 2, 0, hi, hj => exact (key hj hi).symm
     | 2, 1, hi, hj => exact (S.res_eq_res_of_res_eq_res hDM hDR hD h.2 hj hi).symm
     | 2, 2, _, _ => rfl
 

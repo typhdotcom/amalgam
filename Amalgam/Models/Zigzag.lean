@@ -6,9 +6,9 @@ import Amalgam.System.Comparison
 
 The finite witness of PROPOSAL Section 12, certified with the finite-family theory. The five-point
 preorder `Context` has `B ≤ L`, `B ≤ M`, `D ≤ M`, `D ≤ R`; `B` is the greatest common coarser
-context of `L`, `M`, `D` that of `M`, `R`, and `L`, `R` have no common coarser context. Every fine
-system has singleton states at `L`, `M`, `R` and two-point states at `B`, `D`, and is determined by
-its four restriction values listed in the arrow order
+context of `L` and `M`; `D` is that of `M` and `R`; and `L`, `R` have no common coarser context.
+Every fine system has singleton states at `L`, `M`, `R` and two-point states at `B`, `D`, and is
+determined by its four restriction values listed in the arrow order
 
 ```text
 L→B, M→B, M→D, R→D
@@ -102,6 +102,10 @@ theorem le_D_of_le_M_of_le_R : ∀ ⦃c : Context⦄, c ≤ M → c ≤ R → c 
 theorem not_le_L_of_le_R : ∀ ⦃c : Context⦄, c ≤ L → c ≤ R → False := by
   intro c _ _
   cases c <;> trivial
+
+/-- Vacuously, every common coarser context of `L` and `R` lies below `M`. -/
+theorem le_M_of_le_L_of_le_R : ∀ ⦃c : Context⦄, c ≤ L → c ≤ R → c ≤ M :=
+  fun _ hL hR => (not_le_L_of_le_R hL hR).elim
 
 end Context
 
@@ -236,7 +240,7 @@ theorem compatible_MR_iff (lb mb md rd : Bool) (x : ∀ i, State (MR i)) :
 theorem compatible_LMR_iff (lb mb md rd : Bool) (x : ∀ i, State (LMR i)) :
     (sys lb mb md rd).Compatible LMR x ↔ lb = mb ∧ md = rd :=
   (sys lb mb md rd).compatible_triple_iff B_le_L B_le_M D_le_M D_le_R le_B_of_le_L_of_le_M
-    le_D_of_le_M_of_le_R not_le_L_of_le_R x
+    le_D_of_le_M_of_le_R le_M_of_le_L_of_le_R x
 
 /-! ### The witness table: fine families -/
 

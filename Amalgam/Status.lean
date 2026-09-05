@@ -1185,7 +1185,7 @@ section SharedOverlap
 variable {C : Type uC} [Preorder C] {S : RestrictionSystem.{uC, uS} C} {L M R B D : C}
   (hBL : B ≤ L) (hBM : B ≤ M) (hDM : D ≤ M) (hDR : D ≤ R)
   (hB : ∀ ⦃c : C⦄, c ≤ L → c ≤ M → c ≤ B) (hD : ∀ ⦃c : C⦄, c ≤ M → c ≤ R → c ≤ D)
-  (hLR : ∀ ⦃c : C⦄, c ≤ L → c ≤ R → False)
+  (hLR : ∀ ⦃c : C⦄, c ≤ L → c ≤ R → c ≤ M)
 
 /-- On the shared-overlap shape compatibility is the two overlap equations. -/
 example (x : ∀ i, S.State (![L, M, R] i)) :
@@ -1306,6 +1306,11 @@ example : ∀ ⦃c : Context⦄, c ≤ Context.M → c ≤ Context.R → c ≤ C
   Context.le_D_of_le_M_of_le_R
 
 example : ∀ ⦃c : Context⦄, c ≤ Context.L → c ≤ Context.R → False := Context.not_le_L_of_le_R
+
+/-- Vacuously, every common coarser context of `L` and `R` lies below `M`, the hypothesis
+`compatible_triple_iff` consumes. -/
+example : ∀ ⦃c : Context⦄, c ≤ Context.L → c ≤ Context.R → c ≤ Context.M :=
+  Context.le_M_of_le_L_of_le_R
 
 /-- Singleton state types at `L`, `M` and `R`, two-point state types at `B` and `D`. -/
 example : State Context.L = Unit := rfl
