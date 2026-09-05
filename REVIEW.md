@@ -1,120 +1,149 @@
-State: READY FOR REVIEW
-Turn: reviewer
-Candidate: 6a33636f; previous candidate d33ec042; accepted proposal baseline 7159fd31
+State: READY FOR WORK
+Turn: worker
+Candidate: —; accepted M0 candidate 6a33636f, submission 89c090ae
 
-# Submission
+# Verdict and active objective
 
-Both drawers of the returned round are closed at `6a33636f`. The M0
-mathematics, public names, statement strength, Status coverage, and the four
-witnesses are unchanged; only proof bodies, one definition body, imports, the
-task runner, and the README build section changed. No M1 work and no accepted
-built-status paragraph were added.
+M0 is accepted without remaining corrections. R1–R2 are closed. Its durable
+built status and closing theorem names are recorded in
+[the proposal's M0 section](PROPOSAL.md#26-initial-milestones).
 
-# Accepted foundation and resolved decisions
+The active objective is **M1 — When local reduction preserves compatibility**.
+Determine exactly which compatible coarse pairs come from compatible fine
+pairs. The closing result must identify the attainable image by an actual
+common fine overlap value and characterize when the quotient of fine pairs
+by observed equality is equivalent to all coarse compatible pairs.
 
-[PROPOSAL.md](PROPOSAL.md) remains the research contract.
+This is a local lifting question. It does not assert extension to a separately
+supplied global realization or recover hidden fine multiplicities from
+observed classes.
 
-- Arbitrary carriers, independent universes, empty fibers, and the absence of
-  finiteness or coverage hypotheses in the core criteria are preserved.
-- Mathlib's `Function.Pullback` and the fiber subtype `{x // f x = y}` remain
-  the only representations; no wrapper or bundled square exists.
+# Accepted foundation
+
+[PROPOSAL.md](PROPOSAL.md), especially Sections 10 and 26, owns this contract.
+
+- Keep ordinary maps on arbitrary carriers, allowing empty types. Commutation
+  alone supports the core constructions and image criterion. Objectwise
+  surjectivity specializes them to reductions; finiteness supplies witnesses.
+- Reuse the accepted generic fiber API and mathlib's `Function.Pullback`.
+  Inspect `Function.mapPullback` and standard quotient/image constructions
+  before introducing alternatives. Any wrapper must improve the statements.
+- Preserve the distinction between the raw comparison's fine-lift fibers and
+  the quotient injection's subsingleton fibers.
 - The later target remains all admissible attainable images with their
-  restriction maps, distinct from fine multiplicity and presentation
-  equivalence. M1–M4 retain their accepted scope.
-- License: the Apache appendix placeholders are left unchanged, as resolved.
-- Cache task: added as resolved; no dependency pin changed.
+  restriction maps. Finite-family indexing, M3's shape selection, profiles,
+  and the Descent bridge remain outside this round.
+- Keep the pinned toolchain, license, root exports, Status discipline, and
+  development tasks. The Apache appendix placeholders are resolved and stay
+  unchanged. `nu tasks.nu cache` is implemented and verified.
 
-# Closing evidence
+# Datum and target
 
-## R1 — The comparison API consumes the generic fiber API
+Fix spans `L ─p→ B ←q─ R` and `L' ─p'→ B' ←q'─ R'`, with maps
+`a : L → L'`, `b : B → B'`, and `c : R → R'` satisfying
+`p' ∘ a = b ∘ p` and `q' ∘ c = b ∘ q`.
 
-`Amalgam/Core/Comparison.lean` now begins with `import Amalgam.Core.Fiber`
-(the `Mathlib.Logic.Equiv.Basic` and `Mathlib.Logic.Unique` imports moved
-into `Fiber.lean`, which already needed them). Changed bodies, statements
-unchanged:
+Write `P = Function.Pullback p q` and `P' = Function.Pullback p' q'`.
+The raw map `k : P → P'` sends a fine compatible pair to its two observed
+components. On `P`, declare two pairs equivalent exactly when both observed
+components agree. Let `Q` be the quotient and `k_bar : Q → P'` its induced
+map. The base `P'` and its labels are fixed. The target is equality of the
+attainable coarse content with all of `P'`, not recovery of fine pairs.
 
-- `injective_lift_iff_forall_subsingleton` :=
-  `injective_iff_subsingleton_fiber (lift f g h)`.
-- `surjective_lift_iff_forall_nonempty` :=
-  `surjective_iff_nonempty_fiber (lift f g h)`.
-- `bijective_lift_iff_forall_nonempty_unique` :=
-  `bijective_iff_nonempty_unique_fiber (lift f g h)`.
-- `fiberLiftCongr … c` :=
-  `Equiv.fiberCongr eG (congr eL eR eB hp hq) (fun x => (congr_lift … x).symm) c`,
-  so comparison-fiber transport is the generic fiber transport along `eG`
-  and the pullback equivalence, with naturality `congr_lift` supplying the
-  intertwining law. `fiberLiftCongr_apply_coe` and
-  `fiberLiftCongr_symm_apply_coe` keep their statements (`= eG x`,
-  `= eG.symm x`) and both close by `rfl`; a scratch check confirmed `simp`
-  proves them from the simp set.
+# Current work and closing evidence
 
-`Amalgam/Core/Fiber.lean`: `Equiv.fiberCompEquiv f e y` is now
-`subtypeEquivOfSubtype (p := fun x => f x = y) e`, mathlib's subtype
-equivalence specialized to the fiber predicate; its docstring says so. The
-two simp lemmas `fiberCompEquiv_apply_coe : ↑(… x') = e ↑x'` and
-`fiberCompEquiv_symm_apply_coe : ↑(….symm x) = e.symm ↑x` are stated by hand
-and close by `rfl`, with the same statements the generated lemmas had.
+## M1.1 — Canonical comparison and observed quotient
 
-Comparison-specific proofs that the generic API does not supply are retained:
-the pointwise `_fiber_lift_iff` family (which rewrite through `lift_eq_iff`),
-`injective_lift_iff`, `surjective_lift_iff`, `bijective_lift_iff`,
-`bijective_lift_iff_existsUnique`, projection fibers, `swap`, `congr`, and
-the trivial-overlap reduction.
+Construct `k`, the observed-equality quotient, and `k_bar`. Prove the
+projection and factorization laws, injectivity of `k_bar`, and equality of
+the two maps' images. Identify `Q` with their common image using a named
+equivalence with its round-trip laws. Do not assume injectivity or define
+the quotient using any finer relation than agreement of observed components.
 
-Axiom audit of every changed declaration (`#print axioms` in a scratch file
-importing `Amalgam`):
+**Evidence:** declarations at arbitrary independent universes, with no
+finiteness, decidability, or surjectivity hypotheses in these statements.
+The quotient relation is proved equivalent to equality under `k`.
+The API uses the accepted pullback/fiber constructions and standard quotient
+machinery rather than duplicating them.
 
-| Declaration | Axioms |
-| --- | --- |
-| `injective_lift_iff_forall_subsingleton` | none |
-| `surjective_lift_iff_forall_nonempty` | none |
-| `bijective_lift_iff_forall_nonempty_unique` | none |
-| `fiberLiftCongr`, `_apply_coe`, `_symm_apply_coe` | propext, Quot.sound |
-| `injective/surjective/bijective_lift_iff_of_congr` | propext, Quot.sound |
-| `Equiv.fiberCompEquiv`, `_apply_coe`, `_symm_apply_coe` | propext, Quot.sound |
+## M1.2 — Exact lifting criterion and inverse
 
-`Classical.choice` does not appear in any of them. `Status.lean` and
-`Models/Overlap.lean` compile unchanged, so every typed Status example and all
-four witnesses still hold at their previous strength.
-
-## R2 — Cache task and build workflow
-
-`tasks.nu` gains `main cache` running `lake exe cache get`, listed in the
-help output between `build` and `check`. README's Building section says to run
-`nu tasks.nu cache` after changing `lean-toolchain` or the mathlib revision,
-before `lake build`. No pin changed and no automatic update was added.
-
-Invocation in the development shell (`nix develop -c nu tasks.nu cache`):
+For each coarse compatible pair `t = (u,v)`, prove equivalence between its
+membership in the attainable image and:
 
 ```text
-Using cache from origin: (some leanprover-community/mathlib4)
-No files to download
-Already decompressed 8690 file(s)
+{p(l) | a(l) = u} ∩ {q(r) | c(r) = v} ≠ ∅.
 ```
 
-`nix develop -c nu tasks.nu` lists build, cache, check, fmt.
+Identify the fiber of `k` over `t` with fine pairs satisfying all three
+conditions: fine compatibility, left observation `u`, and right observation
+`v`. Use the fiber API to separate existence and uniqueness of fine lifts.
 
-# Verification
+Prove that `k_bar` is bijective exactly when the displayed intersection is
+nonempty for every coarse compatible pair. Under that condition expose the
+equivalence or named inverse on all of `P'`, both round-trip laws, and
+uniqueness of the inverse. The unique observed class must not be presented as
+a preferred fine representative or as unique fine lifting.
 
-Run on the candidate tree, all successful:
+**Evidence:** exact if-and-only-if statements at the generality of M1.1.
+A sufficient special case such as injectivity of `b` does not close this
+drawer. Status mirrors the image criterion, raw fiber identification, and
+inverse laws with explicit types. Any use of classical choice is visible;
+no computability claim follows merely from existence of the quotient inverse.
 
-- `nix develop -c lake build`: `Build completed successfully (697 jobs)`,
-  zero warnings.
-- `nix fmt`: no changes. `nix flake check`: all checks passed.
-- `rg sorry Amalgam`: no matches.
-- Working copy clean after the commit.
+## M1.3 — Surjective reductions and a strict finite failure
 
-# Request to the reviewer
+Specialize the general setup to objectwise surjective observation maps, as
+required for reductions onto the coarse objects. State how arbitrary
+observations restrict to their images with induced commuting span maps,
+using existing image machinery where applicable.
 
-Check that the consolidation neither weakened the API nor reduced Status
-coverage, then decide whether M0 can be accepted. If accepted, rewrite this
-file as `READY FOR WORK`, `Turn: worker`, with the M1 objective from
-[Section 26](PROPOSAL.md#26-initial-milestones), and add the M0 built-status
-paragraph to the proposal per Section 23.
+Certify the prescribed finite witness: `L` and `R` are singletons,
+`B = {0,1}`, and their fine restrictions are the distinct overlap values.
+All coarse objects are singletons and all observation maps are surjective.
+The fine pullback is empty, the coarse pullback is a singleton, and its pair
+is not in the image of `k` or `k_bar`. Show the overlap-value intersection
+is empty through the actual M1 API. Do not claim minimality.
 
-# Proposal acceptance evidence
+**Evidence:** named finite data, commutation and surjectivity proofs, the
+unattainable coarse pair, and failure of the exact lifting criterion. Keep
+these finite imports in the model layer. M0's four behaviors remain valid.
 
-The founding proposal at `7159fd31` was accepted (SHA-256
-`43dc0ab30372cde3f9134073ca68bf507e3fd9b11d5a050991a068c5a4dfbe6c`); R1–R4
-of that round closed without remaining corrections. Details remain in
-version history.
+# Verification and submission
+
+Update the root exports and concise module documentation for the new API.
+Keep the README about compiled mathematics and mirror new mathematical claims
+with explicitly typed `Amalgam/Status.lean` examples. Preserve the dependency
+direction: generic fiber facts are consumed by comparisons and reduction;
+finite witnesses stay downstream.
+
+Run `nix fmt`, `lake build`, and `nix flake check`. Inspect the closing
+declarations and their axioms, excluding `sorry` and new project axioms.
+The next reviewer must inspect the quotient relation, image criterion,
+inverse laws, and finite failure on the production path, as well as the
+cumulative M0 evidence.
+
+Work from this file and perform M1. Commit the candidate and rewrite
+`REVIEW.md` as `READY FOR REVIEW`, `Turn: reviewer`, with the exact
+committed candidate and evidence for M1.1–M1.3. Merely replying in chat is
+not a submission. Do not advance to M2 before the M1 verdict.
+
+# M0 acceptance evidence
+
+The revised comparison criteria directly use the generic fiber criteria;
+comparison-fiber transport uses `Equiv.fiberCongr` and the existing naturality
+law. Precomposition specializes mathlib's `Equiv.subtypeEquivOfSubtype`.
+Public statement strength and the computation laws are preserved; Status
+and the four concrete witnesses are unchanged.
+
+The reviewer reran the full build successfully (697 jobs, no warnings) and
+the repository checks. A disposable Lean audit of the 12 changed or dependent
+declarations reproduced the submitted axiom report: the three global fiber
+criteria use no axioms; the transport and precomposition declarations use
+only `propext` and `Quot.sound`. Independent `simp` probes confirmed both
+precomposition computation laws.
+
+The reviewer invoked the task listing and `nix develop -c nu tasks.nu cache`.
+The task was listed and succeeded against the populated pinned cache,
+reporting no files to download and 8690 already decompressed files.
+Round-specific corrections remain in version history.

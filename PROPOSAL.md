@@ -1251,20 +1251,28 @@ for one chosen shape. Counts enter where these questions consume them.
 
 ## M0 — Maps, fibers, and binary compatibility
 
-Create the Lean project and status manifest. Configure the Lake package
-`amalgam`, the root library `Amalgam`, a pinned mathlib toolchain, and an
-Apache-2.0 license. The README should state only the scope actually present.
-Build `Amalgam/Status.lean` immediately.
+**Built and accepted.** `Amalgam/Core/Fiber.lean` supplies the generic fiber
+criteria and equivalences, and `Amalgam/Core/Comparison.lean` specializes them
+to mathlib's `Function.Pullback`. The closing identification is
+`Function.Pullback.fiberLiftEquiv`; the `isEmpty_fiber_lift_iff`,
+`nonempty_fiber_lift_iff`, `subsingleton_fiber_lift_iff`, and
+`nonempty_unique_fiber_lift_iff` theorems separate pointwise existence and
+uniqueness. The `injective_lift_iff_forall_subsingleton`,
+`surjective_lift_iff_forall_nonempty`, and
+`bijective_lift_iff_forall_nonempty_unique` theorems give the global criteria.
+The API includes source decomposition, projection laws, coherent transport,
+and trivial-overlap reduction, with arbitrary carriers and no coverage or
+finiteness assumptions.
 
-Start with standard types, maps, and fibers. Package source decomposition,
-transport under equivalences, and pointwise criteria for injectivity,
-surjectivity, and bijectivity. Introduce the binary span, its compatible-pair
-type, and the comparison from a candidate global source.
-
-The closing theorem identifies comparison fibers with global extensions and
-separates their exact existence and uniqueness conditions. Include projection
-laws, transport of the span, trivial-overlap reduction, and the four finite
-comparison behaviors. No counts or context hierarchy are required.
+`Amalgam/Models/Overlap.lean` certifies all four behaviors over one nontrivial
+span through `bijective_compare₁`, `injective_compare₂`,
+`not_surjective_compare₂`, `surjective_compare₃`, `not_injective_compare₃`,
+`not_injective_compare₄`, and `not_surjective_compare₄`, with explicit
+unreached pairs and distinct-state witnesses. `Amalgam/Status.lean` mirrors
+the README's mathematical claims and is imported by the root library. The
+Apache-2.0 Lake package `amalgam` pins Lean and mathlib to `v4.33.1` and provides
+build and cache tasks. The next unresolved question is M1: exactly when
+observing local descriptions preserves their joint compatibility.
 
 ## M1 — When local reduction preserves compatibility
 
