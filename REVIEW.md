@@ -1,10 +1,10 @@
 State: READY FOR REVIEW
 Turn: reviewer
-Candidate: 150b9e27; accepted M1 candidate d7f2ed62; accepted M0 candidate 6a33636f
+Candidate: 09ec3871; accepted M1 candidate d7f2ed62; accepted M0 candidate 6a33636f
 
 # Submission
 
-M2 — The comparison for finite families — is implemented at `150b9e27`.
+M2 — The comparison for finite families — is implemented at `09ec3871`.
 The restriction interface, compatible families, declared family restrictions
 with their laws, presentation invariance and redundancy, the family raw
 comparison with its fibers, observed quotient, attainable image and
@@ -127,7 +127,9 @@ no lattice assumed):
   `mem_range_mapFamily_iff_inter_nonempty`, `surjective_kerLift_mapFamily_iff`,
   `bijective_kerLift_mapFamily_iff`, `bijective_kerLift_mapFamily_iff_forall`.
 - `compatible_triple_iff` for `![L, M, R]` under `B` greatest common coarser
-  of `L, M`, `D` of `M, R`, and no common coarser context of `L, R`.
+  of `L, M`, `D` of `M, R`, and every common coarser context of `L, R` lying
+  below `M` (weaker than “no common coarser context”, which the zigzag model
+  satisfies and from which `le_M_of_le_L_of_le_R` derives the hypothesis).
 
 `Amalgam/Models/Span.lean` (case 1): preorder `Context` with `B_le_L`,
 `B_le_R`, `le_B_of_le_L_of_le_R`; `fine` (states `Bool` at `L`, `Unit`
@@ -143,7 +145,7 @@ class); pullback agreement `map_binaryEquiv_x₀_eq`,
 
 `Amalgam/Models/Zigzag.lean` (case 2, Section 12): preorder `Context` with
 `B_le_L`, `B_le_M`, `D_le_M`, `D_le_R`, `le_B_of_le_L_of_le_M`,
-`le_D_of_le_M_of_le_R`, `not_le_L_of_le_R`; `sys lb mb md rd` with states
+`le_D_of_le_M_of_le_R`, `not_le_L_of_le_R`, `le_M_of_le_L_of_le_R`; `sys lb mb md rd` with states
 `Unit` at `L, M, R` and `Bool` at `B, D`, restriction values in the arrow order
 `L→B, M→B, M→D, R→D`; `sysA = sys false false false true`,
 `sysB = sys false true false false`; `coarse` (all `Unit`,
@@ -172,8 +174,8 @@ import `System`; only the root imports `Status`.
 - `nix fmt`: no changes. `nix develop -c lake build`: success, zero
   warnings. `nix flake check`: all checks passed. `rg sorry Amalgam`: none.
 - Axioms: a Lean script collected the axioms of every constant
-  of the six M2 modules (337 constants including generated projections):
-  119 use none, 63 `propext`, 65 `Quot.sound`, 77 `propext, Quot.sound`,
+  of the six M2 modules (338 constants including generated projections):
+  119 use none, 64 `propext`, 65 `Quot.sound`, 77 `propext, Quot.sound`,
   13 `propext, Classical.choice, Quot.sound`. Nothing else appears; no
   `sorryAx`. The choice users are `observedFamilyEquivImage` and its five
   laws (`Setoid.quotientKerEquivRange`), `restrictImage_observedFamilyEquivImage`
@@ -183,10 +185,14 @@ import `System`; only the root imports `Status`.
   criterion, naturality, and fiber iff is choice-free.
 
 An independent audit of `a20bb87b` against this contract passed every
-drawer. Its additions are in `150b9e27`: `uniqueObservedFamily` in the span
+drawer. Its additions are in `09ec3871`: `uniqueObservedFamily` in the span
 model, the two round-trip laws of `observedBinaryEquiv`, and docstring
 corrections in `Binary.lean` and `Presentation.lean`; the orchestrator added
-the matching Status examples. Two name collisions between the concurrently
+the matching Status examples. The audit also proved that the third hypothesis
+of `compatible_triple_iff` can be weakened to “every common coarser context of
+`L`, `R` lies below `M`” and exhibited a counterexample showing some such
+hypothesis is necessary; the weaker statement is now the library theorem, with
+the zigzag model discharging it through `le_M_of_le_L_of_le_R`. Two name collisions between the concurrently
 written modules (`Hom.fiberRestrict`, `Hom.mem_range_mapFamily_iff`) were
 resolved before the witnesses were built: one definition kept in
 `Comparison.lean`, the binary transport lemma renamed to
