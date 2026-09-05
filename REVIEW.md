@@ -1,176 +1,209 @@
-State: READY FOR WORK
-Turn: worker
-Candidate: —; accepted M1 candidate d7f2ed62, submission 5caccd00
+State: READY FOR REVIEW
+Turn: reviewer
+Candidate: 150b9e27; accepted M1 candidate d7f2ed62; accepted M0 candidate 6a33636f
 
-# Verdict and active objective
+# Submission
 
-M1 is accepted without remaining corrections. R1–R2 are closed. The proposal's
-[M1 section](PROPOSAL.md#26-initial-milestones) records the built API, closing
-theorems, and strict finite failure.
-
-The active objective is **M2 — The comparison for finite families**.
-Construct the attainable observed content of each declared compatible family,
-together with its restrictions to other declared families. The central
-theorem must identify the fine-lift fibers and observed quotient and prove
-that comparison commutes with those restrictions. M2 prepares the objects for
-the coherent inverse problem; it does not settle M3's classification.
+M2 — The comparison for finite families — is implemented at `150b9e27`.
+The restriction interface, compatible families, declared family restrictions
+with their laws, presentation invariance and redundancy, the family raw
+comparison with its fibers, observed quotient, attainable image and
+naturality at all four levels, the binary recovery of M0/M1, and both finite
+calibration cases are compiled. No `sorry`, no project axiom; classical
+choice appears only where named below. M0 and M1 modules are unchanged. No
+M3 shape or datum was selected and no counting hierarchy was introduced.
 
 # Accepted foundation
 
-[PROPOSAL.md](PROPOSAL.md), Sections 11–12 and 26, owns the M2 contract.
+[PROPOSAL.md](PROPOSAL.md), Sections 11–12 and 26, owns this contract.
 
-- M0 is accepted at `6a33636f`; M1 at `d7f2ed62`. Reuse their generic fiber,
-  comparison, quotient/image, and lifting results where they apply.
-- Carriers remain arbitrary types, possibly empty. Finite families concern
-  indexing, not finiteness or decidability of state types.
-- Raw fibers record fine compatible lifts. Quotient fibers record observed
-  classes. They share inhabitedness; quotient injectivity does not imply
-  uniqueness of fine lifts.
-- The target is the collection of attainable images for every declared
-  admissible family, with its induced restriction maps on the fixed coarse
-  datum. A full-family image need not determine proper-family images.
-- Restriction naturality gives image inclusion. Surjectivity or equality of
-  restricted images requires an additional theorem.
-- A supplied global realization is separate from compatible descriptions.
-  Do not assume every local family extends globally.
-- Do not select M3's research shape or datum, classify local sufficiency,
-  introduce a counting hierarchy, or start the Descent bridge in this round.
-- Keep the pinned build setup, Status discipline, resolved Apache appendix,
-  and existing build/cache tasks.
+- M0 (`6a33636f`) and M1 (`d7f2ed62`) are reused: fibers as
+  `{x // f x = y}`, `Function.Pullback`, `Function.Pullback.map`, `Observed`,
+  `mem_range_map_iff`; quotients through `Setoid.ker`, `Setoid.kerLift`,
+  `Setoid.quotientKerEquivRange`.
+- Carriers and index types are arbitrary, possibly empty; nothing in
+  `Amalgam/System/` assumes finiteness, decidability, or surjectivity.
+- Raw fibers are fine lifts; quotient fibers are observed classes; they share
+  inhabitedness and the quotient discards multiplicity.
+- Naturality gives image inclusion only; equality and surjectivity are never
+  claimed and are refuted by the second calibration case.
+- Toolchain, license, tasks, and Status discipline unchanged.
 
-# Datum and construction
+# Datum and construction (as built)
 
-Use a preorder of contexts with a state type at each context and restriction
-maps toward coarser contexts satisfying identity and composition. This
-supports the binary span and the shared-overlap shape required below without
-category-theoretic infrastructure. Name the order direction in the API.
+`Amalgam/System/Restriction.lean`. `RestrictionSystem C` over `[Preorder C]`:
+`State : C → Type`, `res : c ≤ d → State d → State c` (the order reads `c ≤ d`
+as “`c` is coarser than `d`”), laws `res_refl`, `res_trans`.
+`Compatible F x := ∀ ⦃c i j⦄ (hi : c ≤ F i) (hj : c ≤ F j), res hi (x i) = res hj (x j)`; `CompatibleFamily F` its subtype. A declared operation is
+`FamilyMap F E` (`index : κ → ι`, `le : ∀ k, E k ≤ F (index k)`), with `id`,
+`comp`; `restrict m x := fun k => res (m.le k) (x (m.index k))` acts by
+actual restriction; `restrict_id` (by `res_refl`), `restrict_comp` (by
+`res_trans`). `Hom S S'` is an observation per context with `naturality`;
+`Hom.mapFamily` is `k_F`; `restrict_mapFamily` its naturality.
 
-For a finite indexed family of contexts, a compatible assignment consists of
-one state per local context, agreeing after restriction to every common
-coarser context. Expose which families and restriction operations are declared
-admissible; a map between underlying products alone does not make an operation
-admissible. The interface must support forgetting local views and restricting
-a view along a supplied context restriction.
-
-A fine and coarse restriction system on the same context shape, with
-component observation maps commuting with restriction, induce
-`k_F : P_F → P'_F` for each admissible family. Define `Q_F` by agreement of
-all observed components, its injection `k_bar_F : Q_F → P'_F`, and the
-attainable image `I_F`. These are schematic names; choose standard Lean names
-and reuse existing constructions. State the setup explicitly before claiming
-a theorem about it. No componentwise surjectivity is implicit.
-
-# Current work and closing evidence
+# Closing evidence
 
 ## M2.1 — Compatible families and their restrictions
 
-Implement the restriction interface and compatible-family type at the weakest
-hypotheses the statements consume. Define family restriction maps and prove
-their identity/composition laws. Their action must be actual restriction of
-the supplied state assignments, not an arbitrary function assumed to preserve
-an opaque compatibility predicate.
+`Amalgam/System/Presentation.lean` (namespace `RestrictionSystem`):
 
-Prove invariance under relabeling the same finite presentation. Prove the
-redundancy law: adding a view already obtained by restricting an included
-context adds no information, and forgetting it is an equivalence. Use the
-restriction laws to discharge the added compatibility conditions. Include
-duplicate occurrences as a presentation case. Expose the equivalences and
-both round trips.
-
-**Evidence:** concrete definitions and theorem statements, with a dependency
-graph showing which restriction laws are consumed. The interface represents
-both a binary overlap and `L → B ← M → D ← R`. Empty families and empty
-state types are accounted for by the definitions, without coverage assumptions.
+- Relabeling: `relabel (e : κ ≃ ι) : CompatibleFamily F ≃ CompatibleFamily (F ∘ e)` with `relabel_apply`, `relabel_symm_apply(_coe)`, round trips
+  `relabel_symm_relabel`, `relabel_relabel_symm`, and `restrict_relabel`,
+  `relabel_restrict`, `relabel_relabel`, `relabel_refl_apply`. Consumes
+  `res_refl`.
+- Redundancy (general form): for `σ : κ → ι`, `h : ∀ k, G k ≤ F (σ k)`,
+  `redundancyEquiv σ h : CompatibleFamily (Sum.elim F G) ≃ CompatibleFamily F`
+  forgets forwards (`FamilyMap.inl`) and extends backwards by
+  `res (h k) (x (σ k))` (`FamilyMap.extend`, `Compatible.extend`), with
+  `redundancyEquiv_apply`, `redundancyEquiv_symm_apply`, round trips
+  `forget_extend`, `extend_forget`, and `bijective_restrict_inl`. Consumes
+  `res_refl`, `res_trans`, and `Compatible` at the added context. Cases:
+  `addViewEquiv` (one added view) and `duplicateEquiv` with
+  `bijective_restrict_inl_duplicate` (duplicate occurrence).
+- General reverse-operation form: `restrict_endo`, `restrict_restrict`,
+  `restrictEquiv`, `bijective_restrict`.
+- Fibers of family restrictions: `restrictFiberEquiv m z : {x // restrict m x = z} ≃ {x // ∀ k, res (m.le k) (x.1 (m.index k)) = z.1 k}` (extension
+  choices), `subsingleton_fiber_restrict`, `subsingleton_fiber_restrict_inl`.
+- Shapes: `compatible_fin_two_iff` (binary family); `uniqueOfIsEmpty` (empty
+  family); the shared-overlap shape is `![L, M, R]` (see `compatible_triple_iff`
+  below).
 
 ## M2.2 — Comparison, fibers, quotients, and naturality
 
-Construct the raw comparison by observing each component. Identify its fiber
-over a coarse compatible family as fine assignments satisfying compatibility
-and every component observation equation. Derive the image criterion as
-existence of such a simultaneous fine lift.
+`Amalgam/System/Comparison.lean` (namespace `RestrictionSystem.Hom`, for
+`φ : S.Hom S'`):
 
-Use the observed-equality quotient to construct the injection and identify
-its image with `I_F`, with factorization and round-trip laws for the
-quotient-to-image equivalence. Establish shared inhabitedness of raw and
-quotient fibers, separately from the latter's automatic subsingleton property.
-
-For every declared family restriction `F → E`, construct the corresponding
-maps on fine families, coarse families, quotient classes, and attainable
-images. Prove the commuting diagrams for the raw and quotient comparisons.
-Quotient restriction must be well-defined on observed classes, not chosen
-fine representatives. Preserve identity/composition through these maps.
-
-**Evidence:** the actual naturality equalities, image restriction maps, and
-
-```text
-restrict_(F,E)(I_F) ⊆ I_E.
-```
-
-Do not claim equality or surjectivity from naturality. Describe fibers of the
-family restrictions as extension choices from the smaller assignment and
-relate them to the full-family lift constraints. The relationship must track
-the same shared local states, not independently chosen lifts.
+- Raw fibers: `fiberMapFamilyEquiv y : {x // mapFamily F x = y} ≃ {x : ∀ i, State (F i) // Compatible F x ∧ ∀ i, φ.toFun (F i) (x i) = y.1 i}`;
+  `mem_range_mapFamily_iff` (simultaneous fine lift); existence and
+  uniqueness separately: `nonempty_fiber_mapFamily_iff`,
+  `isEmpty_fiber_mapFamily_iff`, `subsingleton_fiber_mapFamily_iff`,
+  `nonempty_unique_fiber_mapFamily_iff`; `mapFamily_eq_iff`,
+  `mapFamily_eq_mapFamily_iff`.
+- Quotient: `observedFamily F := Quotient (Setoid.ker (mapFamily F))`,
+  `observed_rel_family_iff` (agreement of all observed components),
+  `observed_rel_family_iff_mapFamily_eq`, `observedFamily_mk_eq_iff`;
+  `observedMapFamily := Setoid.kerLift _` with `observedMapFamily_mk`,
+  `observedMapFamily_comp_mk`, `observedMapFamily_injective`,
+  `range_observedMapFamily`; `image F := Set.range (mapFamily F)` (`I_F`),
+  `mem_image_iff`, `image_eq_range_observedMapFamily`;
+  `observedFamilyEquivImage : observedFamily F ≃ image F` with computation on
+  `Quotient.mk` and round trips `observedFamilyEquivImage_symm_apply_apply`,
+  `observedFamilyEquivImage_apply_symm_apply`.
+- `subsingleton_fiber_observedMapFamily` and, separately,
+  `nonempty_fiber_mapFamily_iff_nonempty_fiber_observedMapFamily`.
+- Naturality along `m : FamilyMap F E`: raw square `restrict_mapFamily`,
+  `restrict_comp_mapFamily`; quotient level `restrictObserved m : observedFamily F → observedFamily E` defined on classes
+  (`ker_mapFamily_restrict` is the well-definedness), `restrictObserved_mk`,
+  square `observedMapFamily_restrictObserved`,
+  `observedMapFamily_comp_restrictObserved`; image level
+  `mapsTo_restrict_image`, `image_restrict_subset` (this is
+  `restrict_(F,E)(I_F) ⊆ I_E`; no equality or surjectivity claimed),
+  `restrictImage m : image F → image E` with squares
+  `restrictImage_observedFamilyEquivImage`,
+  `restrictImage_comp_observedFamilyEquivImage`; identity and composition at
+  every level: `restrictObserved_id`, `restrictObserved_comp`,
+  `restrictImage_id`, `restrictImage_comp`.
+- Fiber tracking: `fiberRestrict m y : {x // mapFamily F x = y} → {x' // mapFamily E x' = restrict m y}` acting by `restrict m` on the same
+  states (`coe_fiberRestrict`, `fiberRestrict_id_coe`, `fiberRestrict_comp_coe`).
 
 ## M2.3 — Binary recovery and two finite calibration cases
 
-Identify the binary compatible-family types with the accepted pullbacks and
-prove that the family raw comparison agrees with M1's `Function.Pullback.map`
-under those equivalences. Transport the observed quotient, attained image,
-and fine-lift interpretation coherently. Recover M1's intersection criterion
-through this identification rather than leaving the binary and family APIs
-as independent theories.
+`Amalgam/System/Binary.lean`, for `hl : b ≤ l`, `hr : b ≤ r`, and
+`hb : ∀ ⦃c⦄, c ≤ l → c ≤ r → c ≤ b` (b is a greatest common coarser context;
+no lattice assumed):
 
-Certify the two required finite cases through the family construction:
+- `compatible_pair_iff`, `binaryEquiv : CompatibleFamily ![l, r] ≃ Function.Pullback (res hl) (res hr)` with round trips
+  `binaryEquiv_symm_apply_apply`, `binaryEquiv_apply_symm_apply`;
+  `isGreatest_lowerBounds_pair_iff`, `res_eq_res_of_res_eq_res`.
+- `binaryEquiv_mapFamily`, `binaryEquiv_comp_mapFamily`: the family raw
+  comparison is `Function.Pullback.map (φ.naturality hl) (φ.naturality hr)`
+  under `binaryEquiv`.
+- Transport: `fiberMapFamilyBinaryEquiv` (fine-lift fibers),
+  `mem_range_mapFamily_iff_mem_range_map`, `image_range_mapFamily` (attained
+  image), `observedBinaryEquiv : observedFamily ![l, r] ≃ Observed …` with
+  `observedMap_observedBinaryEquiv`, `observedMap_comp_observedBinaryEquiv`,
+  `kerLift_observedBinaryEquiv_symm`, and round trips
+  `observedBinaryEquiv_symm_apply_apply`, `observedBinaryEquiv_apply_symm_apply`; M1's criterion recovered:
+  `mem_range_mapFamily_iff_inter_nonempty`, `surjective_kerLift_mapFamily_iff`,
+  `bijective_kerLift_mapFamily_iff`, `bijective_kerLift_mapFamily_iff_forall`.
+- `compatible_triple_iff` for `![L, M, R]` under `B` greatest common coarser
+  of `L, M`, `D` of `M, R`, and no common coarser context of `L, R`.
 
-1. Two distinct fine compatible families map to one coarse family and yield
-   one observed class. Show that the raw fiber has exactly those two elements
-   and the quotient fiber is a singleton, without adding a general counting
-   package.
-2. The Section 12 witness on `L → B ← M → D ← R`: singleton local state
-   types, two-point overlaps, singleton coarse objects, and fine restriction
-   values `(0,0,0,1)` versus `(0,1,0,0)` in the declared arrow order.
-   Both full-family images are empty, while the `LM` and `MR` images
-   differ as stated in the proposal. All observations commute and are
-   surjective. Include the local families and their restriction maps in the
-   admissible datum.
+`Amalgam/Models/Span.lean` (case 1): preorder `Context` with `B_le_L`,
+`B_le_R`, `le_B_of_le_L_of_le_R`; `fine` (states `Bool` at `L`, `Unit`
+elsewhere), `coarse` (all `Unit`), `φ : fine.Hom coarse`; `LR := ![L, R]`;
+`uniqueCoarseFamily`, `y₀`; `x₀ ≠ x₁` (`x₀_ne_x₁`), `eq_x₀_or_eq_x₁`,
+`mapFamily_x₀`, `mapFamily_x₁`, `mapFamily_eq_y₀`; raw fiber
+`fiberEquiv : {x // φ.mapFamily LR x = y₀} ≃ Bool` with
+`fiberEquiv_symm_apply_apply`, `fiberEquiv_apply_symm_apply`; quotient fiber
+`nonempty_observedFiber`, `subsingleton_observedFiber`, `uniqueObservedFiber`;
+`observed_x₀_eq_observed_x₁`, `uniqueObservedFamily` (exactly one observed
+class); pullback agreement `map_binaryEquiv_x₀_eq`,
+`y₀_mem_image_of_inter_nonempty`. No counting package.
 
-**Evidence:** named equivalences/naturality theorems for binary recovery and
-named finite data and theorems for both cases. The second case must visibly
-give strict image restriction inclusion and distinguish full-family from
-all-family content. It does not yet refute any M3 datum, which remains
-unselected; no smallest-shape claim is requested.
+`Amalgam/Models/Zigzag.lean` (case 2, Section 12): preorder `Context` with
+`B_le_L`, `B_le_M`, `D_le_M`, `D_le_R`, `le_B_of_le_L_of_le_M`,
+`le_D_of_le_M_of_le_R`, `not_le_L_of_le_R`; `sys lb mb md rd` with states
+`Unit` at `L, M, R` and `Bool` at `B, D`, restriction values in the arrow order
+`L→B, M→B, M→D, R→D`; `sysA = sys false false false true`,
+`sysB = sys false true false false`; `coarse` (all `Unit`,
+`uniqueCoarseFamily`); `φA`, `φB` with `surjective_φA`, `surjective_φB`;
+declared families `LM`, `MR`, `LMR` and operations `toLM`, `toMR`;
+`compatible_LM_iff`, `compatible_MR_iff`, `compatible_LMR_iff`;
+`nonempty_LM_A`, `isEmpty_MR_A`, `isEmpty_LMR_A`, `isEmpty_LM_B`,
+`nonempty_MR_B`, `isEmpty_LMR_B`; images `image_LM_A = univ`,
+`image_MR_A = ∅`, `image_LMR_A = ∅`, `image_LM_B = ∅`, `image_MR_B = univ`,
+`image_LMR_B = ∅`; strict inclusion `ssubset_restrict_image_LMR_A`,
+`ssubset_restrict_image_LMR_B`, `not_surjective_restrictImage_A`,
+`not_surjective_restrictImage_B`; `image_LMR_eq` while `image_LM_ne`,
+`image_MR_ne`. No smallest-shape claim; no M3 datum refuted.
 
-# Verification and submission
+## Root exports, README, Status
 
-Place the system interface and family results downstream of the generic core;
-finite witnesses belong in Models. Reuse generic quotient and fiber results
-when statements coincide. Keep explicit root exports and concise module
-documentation. Update the README to compiled claims and mirror new claims
-with explicitly typed Status examples at their stated generality.
+`Amalgam.lean` imports the twelve modules. README gained "Restriction systems
+and compatible families" with the subsection "Two calibration cases";
+`Amalgam/Status.lean` mirrors every sentence under the same headings at
+independent universes for generic claims and on the two models for the
+cases. Dependency direction: `System` imports `Core` and mathlib; `Models`
+import `System`; only the root imports `Status`.
 
-Run `nix fmt`, `lake build`, and `nix flake check`. Audit closing
-declarations and witnesses for axioms; no `sorry` or new project axiom is
-accepted. Inspect the naturality and binary transport statements, not only
-their names. The cumulative M0–M1 evidence must continue to build.
+# Verification
 
-Work from this file and complete M2. Commit the candidate and rewrite
-`REVIEW.md` as `READY FOR REVIEW`, `Turn: reviewer`, with the exact
-committed candidate and evidence for M2.1–M2.3. Merely replying in chat is
-not a submission. The next reviewer must judge the whole family construction
-and both calibration cases before opening M3.
+- `nix fmt`: no changes. `nix develop -c lake build`: success, zero
+  warnings. `nix flake check`: all checks passed. `rg sorry Amalgam`: none.
+- Axioms: a Lean script collected the axioms of every constant
+  of the six M2 modules (337 constants including generated projections):
+  119 use none, 63 `propext`, 65 `Quot.sound`, 77 `propext, Quot.sound`,
+  13 `propext, Classical.choice, Quot.sound`. Nothing else appears; no
+  `sorryAx`. The choice users are `observedFamilyEquivImage` and its five
+  laws (`Setoid.quotientKerEquivRange`), `restrictImage_observedFamilyEquivImage`
+  and its function-level form, `kerLift_observedBinaryEquiv_symm`,
+  `image_range_mapFamily`, and the four set-level Zigzag statements
+  `ssubset_restrict_image_LMR_A/B`, `image_LM_ne`, `image_MR_ne`. Every
+  criterion, naturality, and fiber iff is choice-free.
 
-# M1 acceptance evidence
+An independent audit of `a20bb87b` against this contract passed every
+drawer. Its additions are in `150b9e27`: `uniqueObservedFamily` in the span
+model, the two round-trip laws of `observedBinaryEquiv`, and docstring
+corrections in `Binary.lean` and `Presentation.lean`; the orchestrator added
+the matching Status examples. Two name collisions between the concurrently
+written modules (`Hom.fiberRestrict`, `Hom.mem_range_mapFamily_iff`) were
+resolved before the witnesses were built: one definition kept in
+`Comparison.lean`, the binary transport lemma renamed to
+`mem_range_mapFamily_iff_mem_range_map`. The working copy is clean after the
+commit.
 
-The corrected prose names `observedEquiv` as the equivalence whose forward
-function is `observedMap` and `.symm` as the inverse. Coarse compatibility
-is `p' u = q' v`; equality after `b` is explained only after supplying fine
-representatives. The public description now records the shared existence
-and potentially different multiplicity of raw and quotient fibers.
+# Request to the reviewer
 
-The new typed Status example proves their pointwise shared inhabitedness at
-six independent carrier universes with no added hypotheses. An independent
-audit of that exact proof used only `propext` and `Quot.sound`. No M1
-library declaration statement or proof changed from the prior inspected
-candidate. The reviewer reran the full build (713 jobs, no warnings) and
-repository checks successfully. Prior criterion, inverse, witness, and
-100-declaration axiom audit evidence remains in version history.
+Judge the whole family construction: the quotient relation, the four-level
+naturality and the inclusion `image_restrict_subset`, the binary transport
+statements, and both calibration cases on the production path, together
+with the cumulative M0–M1 evidence. Decide whether M2 is complete. If
+accepted, rewrite this file as `READY FOR WORK`, `Turn: worker`, with the M3
+objective, and add the M2 built-status paragraph to the proposal per
+Section 23.
+
+# Prior acceptance evidence
+
+M1 was accepted at `d7f2ed62` (submission `5caccd00`); M0 at `6a33636f`;
+the founding proposal at `7159fd31`. Details remain in version history.
