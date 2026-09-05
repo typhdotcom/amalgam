@@ -1,159 +1,141 @@
-State: RETURNED
-Turn: worker
-Candidate: PROPOSAL.md and README.md at 31212e94
+State: READY FOR REVIEW
+Turn: reviewer
+Candidate: PROPOSAL.md and README.md at 7159fd31
 
-# Objective and verdict
+# Objective and submission
 
-Review the founding proposal before Lean implementation. The intended program
-determines when reducing local descriptions preserves joint compatibility,
-then classifies what supplied local data determines about attainable content
-on one fixed shape. Return the proposal for the corrections below. This round
-revises the research contract; it does not implement M0 or settle M3.
+Review the revised founding proposal before Lean implementation. Candidate
+`7159fd31` revises the mathematical contract in response to R1–R4 from review
+`60f38e6d`. The README is unchanged and still accurately describes a proposal
+with Nix tooling and no Lean implementation. This submission requests review;
+it does not declare the proposal accepted or any milestone implemented.
 
-The binary intersection criterion and its prescribed finite failure witness
-are mathematically sound. The later contract needs a consistent observable
-target and a precise distinction between fine lifts and observed classes.
+The maps-first foundation, binary lifting criterion, separation of local
+lifting from extension to a supplied global realization, and bounded M0–M4
+program remain. M3 still selects the precise shape and supplied local datum.
+Counts and the Descent bridge remain conditional supporting work.
 
-# Accepted foundation
+# R1 — Target covers every admissible family
 
-- Preserve the maps-first foundation and the binary comparison in Sections
-  3–4 and 10. Preserve the distinction between local lifting and extension to
-  a separately supplied global realization.
-- Preserve equality of declared observable content as the initial target,
-  separately from coherent presentation equivalence (Sections 5, 7, 12).
-- Preserve the bounded M0–M4 program and its allowance for negative closure.
-  Shape selection and the precise supplied datum remain research work at M3;
-  this review does not select them or require a stronger presentation target.
-- Counts and the Descent bridge remain conditional supporting work. No Lean
-  implementation exists, and the current README accurately says so.
+**Candidate:** [Section 12](PROPOSAL.md#12-coherent-reconstruction),
+[M2–M4](PROPOSAL.md#26-initial-milestones), and
+[completion criteria](PROPOSAL.md#31-stopping-and-completion).
 
-# Current drawers
+The target is the collection `I_F = image(k_F) = image(k_bar_F)` for every
+declared admissible family, with restrictions inherited from the fixed coarse
+datum. Naturality gives `restrict_(F,E)(I_F) ⊆ I_E`; equality needs a further
+theorem. Over the fixed coarse datum, equality of the images also fixes these
+restricted maps.
 
-## R1 — Align full-family reconstruction with all admissible observations
+M3 must list the proper-family images fixed by its input and those requiring
+reconstruction. The full-family image remains the distinguished joint question.
+A theorem reconstructing only that image closes the target only with a theorem
+that it and the supplied datum determine all remaining admissible images and
+their restriction maps. M4 and the closure criteria retain this same target.
+No blanket extension assumption was added.
 
-**Mismatch.** Section 12 defines observable-content equivalence by all declared
-observations and their joint constraints, but M3's closing test names only the
-image of the full-family comparison. That image does not in general determine
-images for admissible subfamilies. Naturality supplies restriction maps, not
-surjectivity of those maps. M4 explicitly forbids silently assuming that local
-assignments extend globally.
+**Evidence:** Section 12 records the prospective witness on
+`L → B ← M → D ← R`, with singleton local types, two-point overlaps, and
+singleton coarse objects. A disposable enumeration checked all 16 possible
+four-tuples of fine restriction values. For a tuple `(a, b, c, d)`, the image
+sizes are `(|I_LM|, |I_MR|, |I_LMR|) = (1[a=b], 1[c=d], 1[a=b and c=d])`.
+The prescribed rows give:
 
-**Counterexample.** Use the fixed shape `L → B ← M → D ← R`. Each local type
-`L`, `M`, `R` is a singleton; each overlap `B`, `D` is `{0,1}`. All coarse
-objects are singletons and all reductions are the unique surjections, so all
-reduction squares commute. List the four fine restriction values in the order
-`L→B`, `M→B`, `M→D`, `R→D`:
+```text
+A: (0, 0, 0, 1) → (1, 0, 0)
+B: (0, 1, 0, 0) → (0, 1, 0)
+```
 
-| System | Restriction values | Attainable LM | Attainable MR | Attainable LMR |
-| --- | --- | --- | --- | --- |
-| A | `(0,0,0,1)` | singleton | empty | empty |
-| B | `(0,1,0,0)` | empty | singleton | empty |
+The example separates full-family content from all admissible content. It
+makes no completeness claim about M3's still-unspecified input. Future Lean
+certification is assigned to M2.
 
-These systems agree on full-family content but disagree on admissible binary
-content. This refutes the general implication from equality of full images to
-equality of all admissible images; it does not purport to refute completeness
-of the still-unspecified M3 input datum.
+# R2 — Fine lifts and observed classes have separate maps
 
-**Required end state.** Make the target the collection of attainable images
-`I_F` for every declared admissible family `F`, with its restriction maps; keep
-the full-family image as the distinguished joint question. State explicitly
-which proper-family images the supplied M3 datum already fixes and which must
-be reconstructed. A full-image-only closing theorem suffices for that target
-only with a theorem that it, together with the supplied datum, determines the
-remaining admissible images. Align Sections 12, 26, and the closure criteria.
-Do not add a blanket extension assumption to eliminate the counterexample.
+**Candidate:** [Section 12](PROPOSAL.md#12-coherent-reconstruction) and
+[M2](PROPOSAL.md#m2--the-comparison-for-finite-families).
 
-**Closing evidence.** The revised contract distinguishes restriction inclusion
-`restrict(I_F) ⊆ I_E` from equality, records the example above as a prospective
-finite witness, and gives one consistent target in M3 and M4. Future Lean
-certification belongs to the relevant implementation milestone.
+M2 names both `k_F : P_F → P'_F` and `k_bar_F : Q_F → P'_F`. The raw map's
+fibers are fine compatible lifts. The quotient map is injective, identifies
+`Q_F` with `I_F`, and has subsingleton fibers. Naturality is required for both
+maps under the declared family restrictions. The image target does not require
+recovering fine multiplicity.
 
-## R2 — Carry both family comparison maps into M2
+**Evidence:** M2 retains the two-lifts/one-class calibration case. A disposable
+check of the constant map `{0, 1} → {0}` found two elements in its raw fiber and
+one quotient class over the same outcome. This is a sanity check; the
+calibration theorem remains part of the future Lean milestone.
 
-**Mismatch.** M1 separately characterizes fibers of the raw comparison `k`
-and the injection from its quotient `Q`. M2 instead asks for the image and
-fibers of the comparison *from observed classes*. Those quotient fibers are
-automatically subsingletons. They cannot record how many fine compatible
-families lift an observation, a distinction Section 10 explicitly preserves.
+# R3 — Hypotheses and cardinality boundary corrected
 
-For a constant map from two fine lifts to one coarse family, the raw fiber has
-two elements and the quotient fiber has one. Identifying the latter does not
-characterize the former.
+**Candidate:** [Section 8](PROPOSAL.md#8-finite-profiles-are-derived-observables),
+[Section 10](PROPOSAL.md#10-compatibility-is-more-than-a-product), and
+[M1–M2](PROPOSAL.md#26-initial-milestones).
 
-**Required end state.** Name both `k_F : P_F → P'_F` and the induced injection
-`Q_F → P'_F` in M2. Assign the fine-lift fiber characterization to `k_F`, the
-attainable-content identification to the injection, and naturality to both.
-The image-only reconstruction target does not require recovering multiplicity,
-but its supporting statements must not conflate these two fibers.
+The binary constructions, fiber descriptions, and image criterion now assume
+arbitrary types and commuting maps. Objectwise surjective reductions are a
+specialization; finite carriers are used for the prescribed witnesses. M2
+also distinguishes finite indexing families from arbitrary state carriers.
+This agrees with placing reduction in `Core` without finiteness imports.
 
-**Closing evidence.** M2's statement says which map each theorem concerns and
-retains the two-lifts/one-class distinction as a calibration case.
+Section 8 distinguishes natural-number profiles and finite sums from general
+cardinal-valued profiles. It explains the classical existence classification
+over a fixed base, the need for a common universe or cardinal lifts, and the
+absence of a computable inverse supplied merely by cardinal equality. The
+warning about lost information now concerns additional fiber structure or a
+coarser statistic, rather than infinitude alone. No infinite-cardinal milestone
+was added.
 
-## R3 — Correct the role of finiteness
+**Evidence:** Checked the published mathlib statement of
+[`Cardinal.eq`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/SetTheory/Cardinal/Defs.html#Cardinal.eq):
+cardinal equality of arbitrary types is equivalent to existence of a type
+equivalence. Choosing such equivalences fiberwise and assembling them over the
+fixed base gives the stated classical classification. The proposal cites that
+source and distinguishes this mathematical boundary from implemented results.
 
-**Mismatch.** Section 10 and M1 impose finite carriers on a theorem that uses
-only maps, equality, images, and a quotient. This conflicts with the weakest
-hypotheses policy and the proposed placement of reduction in `Core`, which
-must not import finiteness. Commutation alone gives the comparison, its image
-criterion, its fiber description, and the quotient injection. Objectwise
-surjectivity defines the intended reduction scenario; it is not needed to
-prove those constructions and equivalences.
+# R4 — Plain-text mathematical notation and consistent names
 
-Section 8 also says reconstruction by fiber cardinality is special to finite
-sets and groups infinite fibers with structured fibers as a source of further
-loss. For ordinary types in classical set theory, the cardinal-valued profile
-still classifies maps over a fixed base: equal cardinalities give equivalences
-of corresponding fibers, and choice assembles them over the base. Mathlib's
-[`Cardinal.eq`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/SetTheory/Cardinal/Defs.html#Cardinal.eq)
-states the underlying equivalence for arbitrary types. This does not produce
-a computable inverse or preserve additional structure.
+**Candidate:** the notation convention near the proposal's start, all formulas
+throughout the document, and [Section 22](PROPOSAL.md#22-mathlib-quality-naming-and-documentation).
 
-**Required end state.** State the binary core results for arbitrary types and
-commuting maps, then specialize to surjective reductions and finite witnesses.
-Keep finite enumeration and natural-number counting where consumed. Correct
-Section 8 to distinguish natural-number profiles, general cardinal profiles
-with classical choice, and invariants that forget additional fiber structure.
-This correction does not add an infinite-cardinal formalization milestone.
-
-**Closing evidence.** The proposal's theorem hypotheses and dependency rules
-agree. Its warning about profile loss identifies the actual forgotten
-structure or restricted statistic instead of infinitude alone.
-
-## R4 — Make the mathematical contract readable and internally consistent
-
-**Mismatch.** Display blocks use `\[` delimiters with doubled TeX commands
-such as `\\operatorname`, and inline expressions appear as ordinary
-parentheses. The configured Markdown formatter has only the front-matter
-plugin, so it does not protect mathematical syntax. For example, the formula
-at Section 3 is not written as a conventional Markdown math block with normal
-TeX commands. Formatting checks currently do not establish that formulas
-render correctly. Separately, Section 22 calls the package `Amalgam`, while M0
-correctly distinguishes the Lake package `amalgam` from the root library
+The proposal uses the permitted plain-text alternative: Unicode mathematical
+symbols and readable names in CommonMark inline code and fenced `text` blocks.
+All 32 former display-math blocks were converted, including the original row
+structure of the Section 1 array and Section 3 commuting square. Parenthesized
+inline math was converted too. The full proposal contains no backslashes or
+remaining TeX command escapes. No formatter or renderer plugin is needed.
+Section 22 now matches M0: Lake package `amalgam`, root library and namespace
 `Amalgam`.
 
-**Required end state.** Use a documented Markdown math convention supported
-by the intended renderer and protect it through formatting, or use readable
-plain-text formulas consistently. Preserve real TeX row separators while
-repairing command escaping. Align Section 22 with M0's package/library names.
+**Evidence:** Rendered the entire candidate with markdown-it-py's CommonMark
+renderer. An HTML-parser check verified that all 180 code spans and blocks
+retained their source text, including all 36 `text` fences. Rendered excerpts
+from Sections 1 and 3 in headless Chromium and visually inspected inline
+expressions, displayed maps, the commuting square, and the four-row array.
+All were legible with their intended rows and symbols.
 
-**Closing evidence.** Inspect representative rendered inline expressions,
-displayed maps, the commuting square, and the array in Section 1. Run the
-formatter twice and verify that the corrected formulas remain intact. Inspect
-the full document for the same escaping pattern, not only those examples.
+The disposable inspection artifacts are `/tmp/amalgam-review/proposal.html`,
+`/tmp/amalgam-review/notation.html`, and `/tmp/amalgam-review/notation.png`.
+They are verification artifacts, not project dependencies or formal proofs.
 
-# Verification and next submission
+Two consecutive `nix fmt` runs left the proposal byte-for-byte unchanged.
+Its SHA-256 after each run was:
 
-This review inspected the full proposal, README, and Nix configuration. A
-disposable exhaustive enumeration of the singleton local assignments produced
-the R1 table. The cardinality boundary was checked against mathlib's cardinal
-definition and `Cardinal.eq`. No Lean theorem or build is claimed: no Lean
-project exists here yet. Repository check results are recorded with this
-review's commit and user-facing report.
+```text
+43dc0ab30372cde3f9134073ca68bf507e3fd9b11d5a050991a068c5a4dfbe6c
+```
 
-The worker must revise the proposal for all four drawers, keep the README
-accurate, inspect the mathematical rendering, and run `nix fmt` and
-`nix flake check`. Rewrite this file as `READY FOR REVIEW`, `Turn: reviewer`,
-identifying the exact committed candidate and evidence addressing every
-drawer. Merely replying in chat is not a submission. The next reviewer should
-read the revised contract as a whole and check that all-family content,
-full-family content, fine lifts, and observed classes remain distinct.
+# Verification and reviewer handoff
+
+For candidate `7159fd31`, `nix flake check` passed all seven checks:
+formatting, statix, deadnix, gitleaks, shellcheck, actionlint, and markers.
+The finite enumerations and rendering inspection above are evidence for this
+proposal revision, not Lean theorem certification. No `lake build` is claimed:
+there is no Lean project yet.
+
+The reviewer should read the revised contract as a whole and decide whether
+R1–R4 are closed. In particular, check that all-family content, full-family
+content, fine lifts, and observed classes remain distinct from Sections 10–12
+through M2–M4 and closure. The next decision is acceptance of this research
+contract or a precise remaining gap; this submission does not implement M0 or
+select M3's research datum.
