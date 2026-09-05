@@ -8,9 +8,12 @@ This is the founding proposal for a new Lean 4 project.
 
 The Lean library currently implements maps, fibers, binary compatibility, the
 exact binary lifting criterion, and restriction systems with compatible
-families, observed quotients, attainable images, and naturality. Finite witnesses
-separate existence from uniqueness and full-family from proper-family content.
-M0–M2 are accepted. `REVIEW.md` records the current review state.
+families, observed quotients, attainable images, and naturality. On the fixed
+zigzag, it classifies all targets at given adjacent binary images and proves
+the exact realizability criterion. Finite witnesses separate existence from
+uniqueness and full-family from proper-family content.
+M0–M3 are accepted. M4 retains the incompatible-target witnesses and closure
+audit. `REVIEW.md` records the current review state.
 The remaining theorem packages, criteria, and witnesses below specify work to
 formalize; they are not a report of compiled results.
 
@@ -1326,10 +1329,28 @@ the restriction maps themselves do not choose fine representatives.
 equivalent to `Bool` and a unique quotient fiber. `Models/Zigzag.lean` certifies
 the Section 12 witness through `image_LMR_eq`, `image_LM_ne`, `image_MR_ne`,
 and strict image-restriction inclusions. Status mirrors the public claims.
-The remaining central question is M3: how much of the entire attainable-image
-collection is determined by supplied proper-family content.
+M3 settles how much of the entire attainable-image collection is determined
+by supplied proper-family content on the selected zigzag.
 
 ## M3 — The coherent information boundary
+
+**Built and accepted.** `Amalgam/System/Zigzag.lean` fixes the shape and eight
+families. `ZigzagTarget.lean` proves that the empty, singleton, and `LR` images
+are full for every candidate; `Candidate.target_eq_iff` identifies target
+equality with equality of the adjacent datum and full image, and
+`Candidate.restrictImage_setCongr_of_target_eq` identifies their induced maps.
+`ZigzagRealization.lean` constructs tagged fine systems and proves
+`exists_realization_iff`: the prescribed full image `T` is realizable with
+adjacent images `A`, `A'` exactly when `T ⊆ join A A'`.
+`ZigzagClassification.lean` lifts this to the entire target through
+`exists_candidate_target_iff`; `datum_determines_target_iff` proves that the
+datum determines the target exactly when the join is empty. Necessity holds
+for candidates at arbitrary fine universes; the realization uses the coarse
+universe. `Models/MiddleSplit.lean` supplies the strict finite pair with equal
+adjacent images and different full images. The generic singleton-middle
+collapse and the realization's negative control are also certified in Status.
+The bounded sweep supports reconnaissance only. No presentation reconstruction
+or minimality result is claimed. The following contract is fulfilled.
 
 The selected shape is the five-context zigzag `L → B ← M → D ← R`, with no
 additional order relations beyond reflexivity. Fix an arbitrary coarse
@@ -1341,18 +1362,17 @@ Relabelings and redundant presentations are handled by M2.
 
 Supply the two adjacent binary attainable images `I_LM` and `I_MR` as subsets
 of the fixed coarse family types. The target remains all eight attainable
-images with their restriction maps. Objectwise surjectivity should fix the
-singleton images, and the absence of an outer overlap should fix `I_LR`;
-prove these determination statements along with the empty-family case. This
+images with their restriction maps. Objectwise surjectivity fixes the
+singleton images, and the absence of an outer overlap fixes `I_LR`;
+these determination statements include the empty-family case. This
 makes explicit why the full-family image is the remaining joint question.
 
-Begin with finite reconnaissance testing this information boundary. The
-classification conjecture is that, for supplied adjacent images `A` and `B`,
+Finite reconnaissance tested this information boundary. The established
+classification is that, for supplied adjacent images `A` and `B`,
 the possible full images are exactly the subsets of the coarse compatible
 triples whose `LM` restriction lies in `A` and whose `MR` restriction lies in
-`B`. This is a research target, not a built theorem. Test and then settle it;
-if false, preserve the counterexample and state the sharper exact boundary
-on the same shape and datum. A stronger presentation target needs a named
+`B`. The tagged construction proves this over arbitrary coarse systems on
+the same shape and datum. A stronger presentation target needs a named
 question that requires it.
 
 The closing theorem classifies the equivalence on realizations induced by
@@ -1380,6 +1400,15 @@ Their proofs should enter at the point of consumption. They are not separate
 tracks or prerequisites for M1.
 
 ## M4 — Realizability and closure on the chosen shape
+
+**Partly discharged by accepted M3.** `realizable_target_iff` already proves
+that an abstract target is realizable exactly when its five fixed entries are
+full and its full entry lies in the join of its adjacent entries.
+`exists_candidate_target_iff` describes every remaining target at fixed datum;
+the converse constructs an actual restriction system with objectwise
+surjective observations. The remaining work is a strict incompatible target
+for each of the six conditions and the closure audit below. Reuse this
+classification without adding a second realization framework.
 
 For exactly the shape, datum, and target fixed in M3, characterize which
 abstract data arises from a coherent realization. Retain all admissible images
