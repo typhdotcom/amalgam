@@ -1911,6 +1911,15 @@ example (S : RestrictionSystem.{0, uV} Context) [Subsingleton (S.State Context.M
     Nonempty (S.CompatibleFamily Zigzag.LMR) :=
   Zigzag.nonempty_LMR_of_subsingleton_middle S hLM hMR
 
+/-- The negative control for the realization without the inclusion: over the all-singleton
+coarse system with `A = A' = ∅` and `T = Set.univ`, the packaged candidate's datum is not
+`(∅, ∅)`, because its full image `Set.univ` must lie in the join of its actual binary images. -/
+example : (Zigzag.realizeCandidate (S' := coarse) ∅ ∅ Set.univ).datum ≠ (∅, ∅) := fun h =>
+  Set.notMem_empty _
+    ((Zigzag.mem_join_iff y₀).1
+      (Zigzag.subset_join_of_candidate h (Zigzag.realizeCandidate_image_LMR ∅ ∅ Set.univ)
+        (Set.mem_univ y₀))).1
+
 end MiddleSplitWitness
 
 /-! ### Classification at fixed datum -/

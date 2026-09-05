@@ -558,9 +558,10 @@ observations gives `image_LM_realize` and `image_MR_realize`, which consume
 `T ⊆ join A A'` because a `full`-tagged binary family is observed as a
 restriction of its `y`, and `image_LMR_realize`, which holds for every `A`, `A'`
 and `T`. The construction is usable without the inclusion: its observation is
-always surjective with full image `T`, but its binary images are then not `A`
-and `A'`. Over the all-singleton coarse system with `A = A' = ∅` and
-`T = Set.univ`, the packaged candidate's datum is not `(∅, ∅)`.
+always surjective with full image `T`, but without assuming the inclusion the
+requested binary images `A` and `A'` are not guaranteed. Over the all-singleton
+coarse system with `A = A' = ∅` and `T = Set.univ`, the packaged candidate's
+datum is not `(∅, ∅)`.
 
 Together these are the exact classification `exists_realization_iff`: a triple
 `(A, A', T)` is realized by a fine system with objectwise surjective
