@@ -1,141 +1,125 @@
-State: READY FOR REVIEW
-Turn: reviewer
-Candidate: PROPOSAL.md and README.md at 7159fd31
+State: READY FOR WORK
+Turn: worker
+Candidate: —; accepted proposal baseline 7159fd31, submission adb9a2f9
 
-# Objective and submission
+# Verdict and active objective
 
-Review the revised founding proposal before Lean implementation. Candidate
-`7159fd31` revises the mathematical contract in response to R1–R4 from review
-`60f38e6d`. The README is unchanged and still accurately describes a proposal
-with Nix tooling and no Lean implementation. This submission requests review;
-it does not declare the proposal accepted or any milestone implemented.
+The founding proposal at `7159fd31` is accepted. R1–R4 are closed without
+remaining proposal corrections. This accepts the research contract, not any
+Lean implementation or unproved research result. The current objective is
+**M0 — Maps, fibers, and binary compatibility**, as specified in
+[Section 26](PROPOSAL.md#26-initial-milestones).
 
-The maps-first foundation, binary lifting criterion, separation of local
-lifting from extension to a supplied global realization, and bounded M0–M4
-program remain. M3 still selects the precise shape and supplied local datum.
-Counts and the Descent bridge remain conditional supporting work.
+M0 must let a user supply a commuting square of ordinary maps, form its
+compatible local pairs, and characterize exactly when those pairs have no
+global extension, at least one extension, at most one extension, or exactly
+one extension. Its central theorem package identifies comparison fibers with
+global extensions and relates their pointwise existence and uniqueness to
+surjectivity, injectivity, and bijectivity of the comparison map.
 
-# R1 — Target covers every admissible family
+# Accepted foundation
 
-**Candidate:** [Section 12](PROPOSAL.md#12-coherent-reconstruction),
-[M2–M4](PROPOSAL.md#26-initial-milestones), and
-[completion criteria](PROPOSAL.md#31-stopping-and-completion).
+[PROPOSAL.md](PROPOSAL.md) owns the mathematical contract and roadmap.
 
-The target is the collection `I_F = image(k_F) = image(k_bar_F)` for every
-declared admissible family, with restrictions inherited from the fixed coarse
-datum. Naturality gives `restrict_(F,E)(I_F) ⊆ I_E`; equality needs a further
-theorem. Over the fixed coarse datum, equality of the images also fixes these
-restricted maps.
+- Ordinary types and maps precede counts and systems of contexts. The core
+  statements use arbitrary carriers; finite carriers supply witnesses.
+- A local span and a separately supplied global realization are different
+  data. Compatibility does not imply extension to that realization.
+- The eventual reconstruction target is the collection of attainable images
+  for all declared admissible families, with their induced restriction maps.
+  Full-family content alone needs a determination theorem to recover the rest.
+- Raw comparison fibers record fine lifts; quotient comparison fibers record
+  observed classes. The latter do not recover fine multiplicity.
+- Binary reduction theorems require commutation, with surjective reductions
+  as a specialization. Cardinal-valued profiles classify unstructured fibers
+  classically; additional structure requires additional invariants.
+- Counts, a context hierarchy, quotient reduction, and the Descent bridge are
+  outside M0. Their later milestones remain as written. Do not select M3's
+  shape or input datum in this round.
+- The Lake package is `amalgam`; the root library and namespace are `Amalgam`.
+  Use an Apache-2.0 license and a pinned mathlib/toolchain combination.
 
-M3 must list the proper-family images fixed by its input and those requiring
-reconstruction. The full-family image remains the distinguished joint question.
-A theorem reconstructing only that image closes the target only with a theorem
-that it and the supplied datum determine all remaining admissible images and
-their restriction maps. M4 and the closure criteria retain this same target.
-No blanket extension assumption was added.
+# Current work and closing evidence
 
-**Evidence:** Section 12 records the prospective witness on
-`L → B ← M → D ← R`, with singleton local types, two-point overlaps, and
-singleton coarse objects. A disposable enumeration checked all 16 possible
-four-tuples of fine restriction values. For a tuple `(a, b, c, d)`, the image
-sizes are `(|I_LM|, |I_MR|, |I_LMR|) = (1[a=b], 1[c=d], 1[a=b and c=d])`.
-The prescribed rows give:
+## M0.1 — A reproducible Lean library with an accurate public surface
 
-```text
-A: (0, 0, 0, 1) → (1, 0, 0)
-B: (0, 1, 0, 0) → (0, 1, 0)
-```
+Initialize the Lake package, toolchain, mathlib dependency and manifest,
+license, root aggregator, and development tooling needed to build it. Inspect
+the pinned mathlib API before introducing a local fiber or compatibility
+wrapper; justify wrappers by the theorem statements they improve.
 
-The example separates full-family content from all admissible content. It
-makes no completeness claim about M3's still-unspecified input. Future Lean
-certification is assigned to M2.
+Create `Amalgam/Status.lean` immediately. The root aggregator imports it and
+the intended public modules; library modules do not import Status. Keep the
+README about implemented mathematics and give every load-bearing mathematical
+README claim an explicitly typed Status example.
 
-# R2 — Fine lifts and observed classes have separate maps
+**Evidence:** a reproducible `lake build`, pinned dependency files, an
+explicit root import surface, and a README-to-Status claim map. The build must
+not require a previous project or private dependency.
 
-**Candidate:** [Section 12](PROPOSAL.md#12-coherent-reconstruction) and
-[M2](PROPOSAL.md#m2--the-comparison-for-finite-families).
+## M0.2 — Fibers and exact extension criteria
 
-M2 names both `k_F : P_F → P'_F` and `k_bar_F : Q_F → P'_F`. The raw map's
-fibers are fine compatible lifts. The quotient map is injective, identifies
-`Q_F` with `I_F`, and has subsingleton fibers. Naturality is required for both
-maps under the declared family restrictions. The image target does not require
-recovering fine multiplicity.
+For ordinary maps, provide source decomposition as a dependent sum of fibers,
+transport under source and target equivalences, and exact pointwise/global
+criteria for injectivity, surjectivity, and bijectivity. Reuse standard results
+where they already express the required mathematics.
 
-**Evidence:** M2 retains the two-lifts/one-class calibration case. A disposable
-check of the constant map `{0, 1} → {0}` found two elements in its raw fiber and
-one quotient class over the same outcome. This is a sanity check; the
-calibration theorem remains part of the future Lean milestone.
+For a binary span `L → B ← R` and a commuting global square, define compatible
+pairs and the induced comparison. Prove its projection laws and identify its
+fiber over a compatible pair with the global states restricting to that pair.
+Give the exact existence and uniqueness equivalences from Sections 3–4.
+Include transport under coherent equivalences of the supplied diagram and
+reduction to a product for trivial overlap. State inverse laws for the
+equivalences constructed here.
 
-# R3 — Hypotheses and cardinality boundary corrected
+**Evidence:** named declarations with their exact hypotheses and typed Status
+examples at the advertised generality. Empty types and empty fibers must
+remain allowed: subsingleton fibers express uniqueness when an extension
+exists, while unique existence additionally requires nonemptiness. No counts,
+lattice assumptions, or global coverage assumptions belong in these criteria.
 
-**Candidate:** [Section 8](PROPOSAL.md#8-finite-profiles-are-derived-observables),
-[Section 10](PROPOSAL.md#10-compatibility-is-more-than-a-product), and
-[M1–M2](PROPOSAL.md#26-initial-milestones).
+## M0.3 — Four certified comparison behaviors
 
-The binary constructions, fiber descriptions, and image criterion now assume
-arbitrary types and commuting maps. Objectwise surjective reductions are a
-specialization; finite carriers are used for the prescribed witnesses. M2
-also distinguishes finite indexing families from arbitrary state carriers.
-This agrees with placing reduction in `Core` without finiteness imports.
+Provide explicit finite commuting squares whose induced comparison maps are:
+bijective; injective but nonsurjective; surjective but noninjective; and neither.
+Each witness must use the actual compatibility and comparison API, with proofs
+of both the positive and negative properties claimed. Computation alone is
+not a Lean submission, and a witness about an unrelated bare function does
+not certify the comparison construction.
 
-Section 8 distinguishes natural-number profiles and finite sums from general
-cardinal-valued profiles. It explains the classical existence classification
-over a fixed base, the need for a common universe or cardinal lifts, and the
-absence of a computable inverse supplied merely by cardinal equality. The
-warning about lost information now concerns additional fiber structure or a
-coarser statistic, rather than infinitude alone. No infinite-cardinal milestone
-was added.
+**Evidence:** theorem names and concrete witness definitions, including an
+unreached compatible pair for failures of existence and distinct global states
+with equal comparison values for failures of uniqueness. The four cases must
+be visible through Status at their claimed strength.
 
-**Evidence:** Checked the published mathlib statement of
-[`Cardinal.eq`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/SetTheory/Cardinal/Defs.html#Cardinal.eq):
-cardinal equality of arbitrary types is equivalent to existence of a type
-equivalence. Choosing such equivalences fiberwise and assembling them over the
-fixed base gives the stated classical classification. The proposal cites that
-source and distinguishes this mathematical boundary from implemented results.
+# Verification and submission
 
-# R4 — Plain-text mathematical notation and consistent names
+Before submitting M0, run `nix fmt`, `lake build`, and `nix flake check`.
+Inspect the closing declarations and their axioms: no `sorry` or new project
+axiom is accepted; ordinary classical principles must be visible. Check
+dependency direction, root exports, README claims, and their Status examples.
+Record exact modules, theorem names, assumptions, witnesses, and command
+results. Commit the implementation and leave a clean working copy.
 
-**Candidate:** the notation convention near the proposal's start, all formulas
-throughout the document, and [Section 22](PROPOSAL.md#22-mathlib-quality-naming-and-documentation).
+Work from this file and perform the current M0 round. Rewrite `REVIEW.md` as
+`READY FOR REVIEW`, `Turn: reviewer`, with the exact committed candidate and
+evidence for M0.1–M0.3. Merely replying in chat is not a submission. The next
+reviewer must inspect the mathematical declarations and public API, not only
+the build report, and decide whether M0 is complete before advancing to M1.
 
-The proposal uses the permitted plain-text alternative: Unicode mathematical
-symbols and readable names in CommonMark inline code and fenced `text` blocks.
-All 32 former display-math blocks were converted, including the original row
-structure of the Section 1 array and Section 3 commuting square. Parenthesized
-inline math was converted too. The full proposal contains no backslashes or
-remaining TeX command escapes. No formatter or renderer plugin is needed.
-Section 22 now matches M0: Lake package `amalgam`, root library and namespace
-`Amalgam`.
+# Proposal acceptance evidence
 
-**Evidence:** Rendered the entire candidate with markdown-it-py's CommonMark
-renderer. An HTML-parser check verified that all 180 code spans and blocks
-retained their source text, including all 36 `text` fences. Rendered excerpts
-from Sections 1 and 3 in headless Chromium and visually inspected inline
-expressions, displayed maps, the commuting square, and the four-row array.
-All were legible with their intended rows and symbols.
+The reviewer read the revised contract across Sections 8, 10–12, M1–M4, and
+closure, as well as the remaining proposal and README. The accepted proposal's
+SHA-256 is
+`43dc0ab30372cde3f9134073ca68bf507e3fd9b11d5a050991a068c5a4dfbe6c`.
+An independent finite enumeration reproduced the Section 12 witness rows
+`(1,0,0)` and `(0,1,0)` and checked all 16 restriction-value tuples. The
+two-fine-lifts/one-observed-class calibration also agrees with the text.
 
-The disposable inspection artifacts are `/tmp/amalgam-review/proposal.html`,
-`/tmp/amalgam-review/notation.html`, and `/tmp/amalgam-review/notation.png`.
-They are verification artifacts, not project dependencies or formal proofs.
-
-Two consecutive `nix fmt` runs left the proposal byte-for-byte unchanged.
-Its SHA-256 after each run was:
-
-```text
-43dc0ab30372cde3f9134073ca68bf507e3fd9b11d5a050991a068c5a4dfbe6c
-```
-
-# Verification and reviewer handoff
-
-For candidate `7159fd31`, `nix flake check` passed all seven checks:
-formatting, statix, deadnix, gitleaks, shellcheck, actionlint, and markers.
-The finite enumerations and rendering inspection above are evidence for this
-proposal revision, not Lean theorem certification. No `lake build` is claimed:
-there is no Lean project yet.
-
-The reviewer should read the revised contract as a whole and decide whether
-R1–R4 are closed. In particular, check that all-family content, full-family
-content, fine lifts, and observed classes remain distinct from Sections 10–12
-through M2–M4 and closure. The next decision is acceptance of this research
-contract or a precise remaining gap; this submission does not implement M0 or
-select M3's research datum.
+All 180 code spans and blocks in the supplied rendered HTML matched the
+current proposal source. The reviewer visually inspected the rendered inline
+notation, maps, commuting square, and four-row array. The proposal contains
+no remaining TeX escapes. Repository checks passed for the submitted tree;
+no Lean build or formal certification is claimed at proposal acceptance.
+Round-specific correction details remain in version history.
