@@ -15,8 +15,9 @@ coarse` is the unique map at every context. Over `![L, R]` the coarse compatible
 singleton `y₀`, while the fine compatible families are exactly `x₀` and `x₁`, distinguished by
 their left state (`fineEquiv`). Both map to `y₀`, so the raw fiber over `y₀` is equivalent to
 `Bool` (`fiberEquiv`, an explicit equivalence with both round trips), while the quotient fiber
-over `y₀` is a singleton (`uniqueObservedFiber`) and the observed classes of `x₀` and `x₁` agree
-(`observed_x₀_eq_observed_x₁`). The pullback picture of M1 agrees through `binaryEquiv`
+over `y₀` is a singleton (`uniqueObservedFiber`), the observed classes of `x₀` and `x₁` agree
+(`observed_x₀_eq_observed_x₁`), and there is exactly one observed class
+(`uniqueObservedFamily`). The pullback picture of M1 agrees through `binaryEquiv`
 (`map_binaryEquiv_x₀_eq`, `y₀_mem_image_of_inter_nonempty`).
 
 No counting package is introduced; the two-element description of the fiber is the explicit
@@ -195,6 +196,12 @@ theorem fiberEquiv_apply_symm_apply (b : Bool) : fiberEquiv (fiberEquiv.symm b) 
 theorem observed_x₀_eq_observed_x₁ :
     (Quotient.mk _ x₀ : φ.observedFamily LR) = Quotient.mk _ x₁ :=
   (φ.observedFamily_mk_eq_iff x₀ x₁).2 fun _ => rfl
+
+/-- There is exactly one observed class over `![L, R]`, the class of `x₀`: the injection
+`observedMapFamily` lands in the singleton of coarse families. -/
+instance uniqueObservedFamily : Unique (φ.observedFamily LR) where
+  default := Quotient.mk _ x₀
+  uniq _ := φ.observedMapFamily_injective (Subsingleton.elim _ _)
 
 /-- The quotient fiber over `y₀` is inhabited, by shared inhabitedness with the raw fiber. -/
 theorem nonempty_observedFiber : Nonempty {q // φ.observedMapFamily LR q = y₀} :=

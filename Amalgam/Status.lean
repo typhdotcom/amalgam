@@ -3,6 +3,8 @@ import Amalgam.Core.Fiber
 import Amalgam.Core.Reduction
 import Amalgam.Models.Lifting
 import Amalgam.Models.Overlap
+import Amalgam.Models.Span
+import Amalgam.Models.Zigzag
 import Amalgam.System.Binary
 import Amalgam.System.Comparison
 import Amalgam.System.Presentation
@@ -1152,6 +1154,16 @@ example (φ : S.Hom S') :
       Function.Pullback.Observed (φ.naturality hl) (φ.naturality hr) :=
   φ.observedBinaryEquiv hl hr hb
 
+/-- Round trip: the correspondence of quotients after its inverse. -/
+example (φ : S.Hom S') (q : Quotient (Setoid.ker (φ.mapFamily ![l, r]))) :
+    (φ.observedBinaryEquiv hl hr hb).symm (φ.observedBinaryEquiv hl hr hb q) = q :=
+  φ.observedBinaryEquiv_symm_apply_apply hl hr hb q
+
+/-- Round trip: the inverse of the correspondence of quotients after the correspondence. -/
+example (φ : S.Hom S') (t : Function.Pullback.Observed (φ.naturality hl) (φ.naturality hr)) :
+    φ.observedBinaryEquiv hl hr hb ((φ.observedBinaryEquiv hl hr hb).symm t) = t :=
+  φ.observedBinaryEquiv_apply_symm_apply hl hr hb t
+
 /-- The correspondence commutes with the two quotient injections. -/
 example (φ : S.Hom S') (q : Quotient (Setoid.ker (φ.mapFamily ![l, r]))) :
     Function.Pullback.observedMap (φ.naturality hl) (φ.naturality hr)
@@ -1182,6 +1194,208 @@ example (x : ∀ i, S.State (![L, M, R] i)) :
   S.compatible_triple_iff hBL hBM hDM hDR hB hD hLR x
 
 end SharedOverlap
+
+/-! ### Two calibration cases -/
+
+section SpanCalibration
+
+open Amalgam.Models.Span
+
+/-- `B` is coarser than `L` and than `R`, and is the greatest common coarser context. -/
+example : Context.B ≤ Context.L := Context.B_le_L
+
+example : Context.B ≤ Context.R := Context.B_le_R
+
+example : ∀ ⦃c : Context⦄, c ≤ Context.L → c ≤ Context.R → c ≤ Context.B :=
+  Context.le_B_of_le_L_of_le_R
+
+/-- The fine system has two states at `L` and one state at `B` and at `R`. -/
+example : fine.State Context.L = Bool := rfl
+
+example : fine.State Context.B = Unit := rfl
+
+example : fine.State Context.R = Unit := rfl
+
+/-- The coarse system has one state at every context. -/
+example (c : Context) : coarse.State c = Unit := rfl
+
+/-- The observation is the unique map at every context. -/
+example : fine.Hom coarse := φ
+
+/-- The coarse compatible families over `![L, R]` are a singleton, whose element is `y₀`. -/
+example : Unique (coarse.CompatibleFamily LR) := uniqueCoarseFamily LR
+
+example : coarse.CompatibleFamily LR := y₀
+
+/-- The fine compatible families over `![L, R]` are read by their left state. -/
+example : fine.CompatibleFamily LR ≃ Bool := fineEquiv
+
+/-- They are exactly `x₀` and `x₁`, which differ. -/
+example (x : fine.CompatibleFamily LR) : x = x₀ ∨ x = x₁ := eq_x₀_or_eq_x₁ x
+
+example : (x₀ : fine.CompatibleFamily LR) ≠ x₁ := x₀_ne_x₁
+
+/-- Both are observed as `y₀`. -/
+example : φ.mapFamily LR x₀ = y₀ := mapFamily_x₀
+
+example : φ.mapFamily LR x₁ = y₀ := mapFamily_x₁
+
+/-- The raw fiber over `y₀` is equivalent to `Bool`, with both round trips; this explicit
+equivalence is the whole two-element description, with no counting package. -/
+example : {x : fine.CompatibleFamily LR // φ.mapFamily LR x = y₀} ≃ Bool := fiberEquiv
+
+example (x : {x : fine.CompatibleFamily LR // φ.mapFamily LR x = y₀}) :
+    fiberEquiv.symm (fiberEquiv x) = x :=
+  fiberEquiv_symm_apply_apply x
+
+example (b : Bool) : fiberEquiv (fiberEquiv.symm b) = b := fiberEquiv_apply_symm_apply b
+
+/-- The quotient fiber over `y₀` is a singleton, from inhabitedness and the subsingleton
+property separately. -/
+example : Nonempty {q : φ.observedFamily LR // φ.observedMapFamily LR q = y₀} :=
+  nonempty_observedFiber
+
+example : Subsingleton {q : φ.observedFamily LR // φ.observedMapFamily LR q = y₀} :=
+  subsingleton_observedFiber
+
+example : Unique {q : φ.observedFamily LR // φ.observedMapFamily LR q = y₀} :=
+  uniqueObservedFiber
+
+/-- There is exactly one observed class over the binary family. -/
+example : Unique (φ.observedFamily LR) := uniqueObservedFamily
+
+/-- The observed class of `x₀` is the observed class of `x₁`. -/
+example :
+    (Quotient.mk (Setoid.ker (φ.mapFamily LR)) x₀ : φ.observedFamily LR) =
+      Quotient.mk (Setoid.ker (φ.mapFamily LR)) x₁ :=
+  observed_x₀_eq_observed_x₁
+
+/-- Under `binaryEquiv` the reduction comparison sends the pairs of `x₀` and `x₁` to one coarse
+pair. -/
+example :
+    Function.Pullback.map (φ.naturality Context.B_le_L) (φ.naturality Context.B_le_R)
+        (fine.binaryEquiv Context.B_le_L Context.B_le_R Context.le_B_of_le_L_of_le_R x₀) =
+      Function.Pullback.map (φ.naturality Context.B_le_L) (φ.naturality Context.B_le_R)
+        (fine.binaryEquiv Context.B_le_L Context.B_le_R Context.le_B_of_le_L_of_le_R x₁) :=
+  map_binaryEquiv_x₀_eq
+
+/-- `y₀` is attained, through the intersection criterion. -/
+example : y₀ ∈ φ.image LR := y₀_mem_image_of_inter_nonempty
+
+end SpanCalibration
+
+section ZigzagCalibration
+
+open Amalgam.Models.Zigzag
+
+/-- The four generating inequalities of the shared-overlap shape. -/
+example : Context.B ≤ Context.L := Context.B_le_L
+
+example : Context.B ≤ Context.M := Context.B_le_M
+
+example : Context.D ≤ Context.M := Context.D_le_M
+
+example : Context.D ≤ Context.R := Context.D_le_R
+
+/-- `B` is greatest among the common coarser contexts of `L` and `M`, `D` among those of `M`
+and `R`, and `L` and `R` have no common coarser context. -/
+example : ∀ ⦃c : Context⦄, c ≤ Context.L → c ≤ Context.M → c ≤ Context.B :=
+  Context.le_B_of_le_L_of_le_M
+
+example : ∀ ⦃c : Context⦄, c ≤ Context.M → c ≤ Context.R → c ≤ Context.D :=
+  Context.le_D_of_le_M_of_le_R
+
+example : ∀ ⦃c : Context⦄, c ≤ Context.L → c ≤ Context.R → False := Context.not_le_L_of_le_R
+
+/-- Singleton state types at `L`, `M` and `R`, two-point state types at `B` and `D`. -/
+example : State Context.L = Unit := rfl
+
+example : State Context.B = Bool := rfl
+
+example : State Context.M = Unit := rfl
+
+example : State Context.D = Bool := rfl
+
+example : State Context.R = Unit := rfl
+
+/-- The coarse system has a singleton state type at every context. -/
+example (c : Context) : coarse.State c = Unit := rfl
+
+/-- The two fine systems are the restriction values `(0, 0, 0, 1)` and `(0, 1, 0, 0)` in the
+arrow order `L→B, M→B, M→D, R→D`. -/
+example : sysA = sys false false false true := rfl
+
+example : sysB = sys false true false false := rfl
+
+/-- Both observations are surjective at every context. -/
+example : ∀ c : Context, Function.Surjective (φA.toFun c) := surjective_φA
+
+example : ∀ c : Context, Function.Surjective (φB.toFun c) := surjective_φB
+
+/-- The declared restriction operations forget one view of the full family. -/
+example : FamilyMap LMR LM := toLM
+
+example : FamilyMap LMR MR := toMR
+
+/-- Compatibility over each declared family is equations between restriction values. -/
+example (lb mb md rd : Bool) (x : ∀ i : Fin 2, State (LM i)) :
+    (sys lb mb md rd).Compatible LM x ↔ lb = mb :=
+  compatible_LM_iff lb mb md rd x
+
+example (lb mb md rd : Bool) (x : ∀ i : Fin 2, State (MR i)) :
+    (sys lb mb md rd).Compatible MR x ↔ md = rd :=
+  compatible_MR_iff lb mb md rd x
+
+example (lb mb md rd : Bool) (x : ∀ i : Fin 3, State (LMR i)) :
+    (sys lb mb md rd).Compatible LMR x ↔ lb = mb ∧ md = rd :=
+  compatible_LMR_iff lb mb md rd x
+
+/-- System A has a compatible family over `LM` and none over `MR` or `LMR`. -/
+example : Nonempty (sysA.CompatibleFamily LM) := nonempty_LM_A
+
+example : IsEmpty (sysA.CompatibleFamily MR) := isEmpty_MR_A
+
+example : IsEmpty (sysA.CompatibleFamily LMR) := isEmpty_LMR_A
+
+/-- System B has a compatible family over `MR` and none over `LM` or `LMR`. -/
+example : Nonempty (sysB.CompatibleFamily MR) := nonempty_MR_B
+
+example : IsEmpty (sysB.CompatibleFamily LM) := isEmpty_LM_B
+
+example : IsEmpty (sysB.CompatibleFamily LMR) := isEmpty_LMR_B
+
+/-- The table of attainable images, where `Set.univ` is the singleton of coarse families. -/
+example : φA.image LM = (Set.univ : Set (coarse.CompatibleFamily LM)) := image_LM_A
+
+example : φA.image MR = (∅ : Set (coarse.CompatibleFamily MR)) := image_MR_A
+
+example : φA.image LMR = (∅ : Set (coarse.CompatibleFamily LMR)) := image_LMR_A
+
+example : φB.image LM = (∅ : Set (coarse.CompatibleFamily LM)) := image_LM_B
+
+example : φB.image MR = (Set.univ : Set (coarse.CompatibleFamily MR)) := image_MR_B
+
+example : φB.image LMR = (∅ : Set (coarse.CompatibleFamily LMR)) := image_LMR_B
+
+/-- The inclusion supplied by naturality is strict in both systems. -/
+example : coarse.restrict toLM '' φA.image LMR ⊂ φA.image LM := ssubset_restrict_image_LMR_A
+
+example : coarse.restrict toMR '' φB.image LMR ⊂ φB.image MR := ssubset_restrict_image_LMR_B
+
+/-- Neither induced map on attainable images is surjective. -/
+example : ¬Function.Surjective (φA.restrictImage toLM) := not_surjective_restrictImage_A
+
+example : ¬Function.Surjective (φB.restrictImage toMR) := not_surjective_restrictImage_B
+
+/-- Equal full-family images, different `LM` and `MR` images: full-family content does not
+determine all-family content. -/
+example : φA.image LMR = φB.image LMR := image_LMR_eq
+
+example : φA.image LM ≠ φB.image LM := image_LM_ne
+
+example : φA.image MR ≠ φB.image MR := image_MR_ne
+
+end ZigzagCalibration
 
 /-! ## Four comparison behaviors -/
 

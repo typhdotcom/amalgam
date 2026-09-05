@@ -18,7 +18,8 @@ Under this identification the raw family comparison `Hom.mapFamily` of a morphis
 observed comparison `Function.Pullback.map (φ.naturality hl) (φ.naturality hr)` for the
 observations `φ.toFun l`, `φ.toFun b`, `φ.toFun r` (`Hom.binaryEquiv_mapFamily`). The fine-lift
 fibers, the attained image, and the observed quotient transport accordingly
-(`Hom.fiberMapFamilyBinaryEquiv`, `Hom.mem_range_mapFamily_iff`, `Hom.observedBinaryEquiv`), and
+(`Hom.fiberMapFamilyBinaryEquiv`, `Hom.mem_range_mapFamily_iff_mem_range_map`,
+`Hom.image_range_mapFamily`, `Hom.observedBinaryEquiv`), and
 M1's intersection criterion is recovered for families
 (`Hom.mem_range_mapFamily_iff_inter_nonempty`, `Hom.bijective_kerLift_mapFamily_iff_forall`).
 
@@ -209,6 +210,17 @@ def observedBinaryEquiv :
     (φ.observedBinaryEquiv hl hr hb).symm (Quotient.mk _ s) =
       Quotient.mk _ ((S.binaryEquiv hl hr hb).symm s) :=
   rfl
+
+/-- Round trip: `observedBinaryEquiv.symm` after `observedBinaryEquiv`. -/
+theorem observedBinaryEquiv_symm_apply_apply (q : Quotient (Setoid.ker (φ.mapFamily ![l, r]))) :
+    (φ.observedBinaryEquiv hl hr hb).symm (φ.observedBinaryEquiv hl hr hb q) = q :=
+  (φ.observedBinaryEquiv hl hr hb).symm_apply_apply q
+
+/-- Round trip: `observedBinaryEquiv` after `observedBinaryEquiv.symm`. -/
+theorem observedBinaryEquiv_apply_symm_apply
+    (t : Function.Pullback.Observed (φ.naturality hl) (φ.naturality hr)) :
+    φ.observedBinaryEquiv hl hr hb ((φ.observedBinaryEquiv hl hr hb).symm t) = t :=
+  (φ.observedBinaryEquiv hl hr hb).apply_symm_apply t
 
 /-- The commuting square of the quotient injections: M1's `observedMap` after
 `observedBinaryEquiv` is `binaryEquiv` after the family injection `Setoid.kerLift`. -/

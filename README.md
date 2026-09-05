@@ -363,6 +363,74 @@ hypotheses: `B` is greatest among the common coarser contexts of `L` and `M`,
 `D` is greatest among those of `M` and `R`, and `L` and `R` have no common
 coarser context.
 
+### Two calibration cases
+
+`Amalgam/Models/Span.lean` carries the first case on the three-point span
+preorder, where `B ≤ L` and `B ≤ R` and `B` is the greatest common coarser
+context of `L` and `R` (`B_le_L`, `B_le_R`, `le_B_of_le_L_of_le_R`). The fine
+system `fine` has state type `Bool` at `L` and `Unit` at `B` and at `R`, the
+coarse system `coarse` has `Unit` at every context, and the observation
+`φ : fine.Hom coarse` is the unique map at every context. Over `![L, R]` the
+coarse compatible families are a singleton (`uniqueCoarseFamily`) whose element
+is `y₀`, while the fine compatible families are read by their left state
+(`fineEquiv`) and are exactly `x₀` and `x₁` (`eq_x₀_or_eq_x₁`), which differ
+(`x₀_ne_x₁`). Both are observed as `y₀` (`mapFamily_x₀`, `mapFamily_x₁`).
+
+The raw fiber over `y₀` is therefore equivalent to `Bool` (`fiberEquiv`), an
+explicit equivalence with both round trips (`fiberEquiv_symm_apply_apply`,
+`fiberEquiv_apply_symm_apply`); no counting package is used, and that
+equivalence is the whole two-element description. The quotient fiber over `y₀`
+is a singleton (`uniqueObservedFiber`), assembled from the separate facts that
+it is inhabited (`nonempty_observedFiber`) and a subsingleton
+(`subsingleton_observedFiber`), and the observed class of `x₀` is the observed
+class of `x₁` (`observed_x₀_eq_observed_x₁`). Binary recovery agrees: under
+`binaryEquiv` the reduction comparison `Function.Pullback.map` sends the pairs
+of `x₀` and `x₁` to one coarse pair (`map_binaryEquiv_x₀_eq`), and `y₀` is
+attained through the intersection criterion
+(`y₀_mem_image_of_inter_nonempty`).
+
+`Amalgam/Models/Zigzag.lean` carries the Section 12 witness on
+`L → B ← M → D ← R`. The five-point preorder has `B ≤ L`, `B ≤ M`, `D ≤ M` and
+`D ≤ R` (`B_le_L`, `B_le_M`, `D_le_M`, `D_le_R`), with `B` greatest among the
+common coarser contexts of `L` and `M`, `D` greatest among those of `M` and
+`R`, and no common coarser context of `L` and `R`
+(`le_B_of_le_L_of_le_M`, `le_D_of_le_M_of_le_R`, `not_le_L_of_le_R`), which are
+the three hypotheses `compatible_triple_iff` consumes. Every fine system
+`sys lb mb md rd` has singleton state types at `L`, `M` and `R` and two-point
+state types at `B` and `D`, and is determined by its four restriction values in
+the arrow order `L→B, M→B, M→D, R→D`; the two fine systems of the witness are
+`sysA` with values `(0, 0, 0, 1)` and `sysB` with values `(0, 1, 0, 0)`. The
+coarse system has a singleton state type at every context, and the observations
+`φA` and `φB` are the unique maps, which commute with restriction on the nose
+and are surjective at every context (`surjective_φA`, `surjective_φB`). The
+declared families are `LM`, `MR` and `LMR`, with the declared restriction
+operations `toLM : FamilyMap LMR LM` and `toMR : FamilyMap LMR MR` forgetting
+one view.
+
+Compatibility over each family reduces to equations between restriction values
+(`compatible_LM_iff`, `compatible_MR_iff`, `compatible_LMR_iff`). So system A
+has a compatible family over `LM` and none over `MR` or `LMR`
+(`nonempty_LM_A`, `isEmpty_MR_A`, `isEmpty_LMR_A`), and system B has one over
+`MR` and none over `LM` or `LMR` (`nonempty_MR_B`, `isEmpty_LM_B`,
+`isEmpty_LMR_B`), which is the table of attainable images.
+
+| Attainable image | System A, values `(0, 0, 0, 1)` | System B, values `(0, 1, 0, 0)` |
+| --- | --- | --- |
+| `I_LM` | `Set.univ` (`image_LM_A`) | `∅` (`image_LM_B`) |
+| `I_MR` | `∅` (`image_MR_A`) | `Set.univ` (`image_MR_B`) |
+| `I_LMR` | `∅` (`image_LMR_A`) | `∅` (`image_LMR_B`) |
+
+Here `Set.univ` is the singleton of coarse families. The inclusion supplied by
+naturality is therefore strict in both systems,
+`restrict toLM '' I_LMR ⊂ I_LM` for A (`ssubset_restrict_image_LMR_A`) and
+`restrict toMR '' I_LMR ⊂ I_MR` for B (`ssubset_restrict_image_LMR_B`), and
+neither induced map on attainable images is surjective
+(`not_surjective_restrictImage_A`, `not_surjective_restrictImage_B`). The two
+systems have equal full-family images (`image_LMR_eq`) while their `LM` and
+`MR` images differ (`image_LM_ne`, `image_MR_ne`), so full-family content does
+not determine all-family content. No smallest-shape claim is made, and no M3
+datum is refuted.
+
 ## Four comparison behaviors
 
 `Amalgam/Models/Overlap.lean` gives four explicit finite commuting squares over
@@ -394,7 +462,8 @@ Every mathematical claim above is mirrored by a typed `example` in
 `Amalgam/Status.lean`, at the generality claimed: arbitrary types, arbitrary
 preorders of contexts, and arbitrary index types in arbitrary independent
 universes for the generic statements, and the concrete finite models
-for the four comparison behaviors and the surjective reduction. The root
+for the four comparison behaviors, the surjective reduction, and the two
+calibration cases. The root
 `Amalgam` aggregator imports the manifest, so a full build checks it; no library
 module imports it.
 
