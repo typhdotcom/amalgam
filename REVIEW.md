@@ -1,129 +1,120 @@
-State: RETURNED
-Turn: worker
-Candidate: d33ec042; submission a40daa94; accepted proposal baseline 7159fd31
+State: READY FOR REVIEW
+Turn: reviewer
+Candidate: 6a33636f; previous candidate d33ec042; accepted proposal baseline 7159fd31
 
-# Objective and verdict
+# Submission
 
-Complete **M0 — Maps, fibers, and binary compatibility**. The submitted
-mathematics establishes the closing fiber identification, pointwise/global
-existence and uniqueness criteria, coherent transport, trivial-overlap
-reduction, and the four finite comparison behaviors. No false closing theorem
-or missing comparison behavior was found.
-
-Return the candidate for the bounded consolidation and tooling work below.
-M0 is not accepted yet; do not start M1 or add an accepted M0 built-status
-paragraph. The proposal's opening status has been truth-corrected to acknowledge
-the implementation now present.
+Both drawers of the returned round are closed at `6a33636f`. The M0
+mathematics, public names, statement strength, Status coverage, and the four
+witnesses are unchanged; only proof bodies, one definition body, imports, the
+task runner, and the README build section changed. No M1 work and no accepted
+built-status paragraph were added.
 
 # Accepted foundation and resolved decisions
 
 [PROPOSAL.md](PROPOSAL.md) remains the research contract.
 
-- Preserve arbitrary carriers, independent universes, empty fibers, and the
-  absence of finiteness or coverage hypotheses in the core criteria.
-- Preserve mathlib's `Function.Pullback` and the fiber subtype
-  `{x // f x = y}`; no replacement wrapper or bundled square is requested.
-- Preserve the public comparison criteria, their projection and computation
-  laws, and the concrete witnesses over the common nontrivial overlap.
+- Arbitrary carriers, independent universes, empty fibers, and the absence of
+  finiteness or coverage hypotheses in the core criteria are preserved.
+- Mathlib's `Function.Pullback` and the fiber subtype `{x // f x = y}` remain
+  the only representations; no wrapper or bundled square exists.
 - The later target remains all admissible attainable images with their
   restriction maps, distinct from fine multiplicity and presentation
   equivalence. M1–M4 retain their accepted scope.
-- **License resolved:** leave the standard Apache LICENSE appendix and its
-  example placeholders unchanged. They are the template for a notice copied
-  into a work, not an unfinished project-specific copyright declaration.
-  This is not a returned issue and requires no user decision.
-- **Cache task resolved:** add `nu tasks.nu cache` invoking
-  `lake exe cache get`, with a help entry, following the existing descent
-  convention. This routine addition is authorized; do not ask again.
+- License: the Apache appendix placeholders are left unchanged, as resolved.
+- Cache task: added as resolved; no dependency pin changed.
 
-# Current drawers
+# Closing evidence
 
-## R1 — Make the comparison API consume the generic fiber API
+## R1 — The comparison API consumes the generic fiber API
 
-**Mismatch.** `Core/Comparison.lean` imports no `Core/Fiber.lean` and
-independently reproves results already supplied there:
+`Amalgam/Core/Comparison.lean` now begins with `import Amalgam.Core.Fiber`
+(the `Mathlib.Logic.Equiv.Basic` and `Mathlib.Logic.Unique` imports moved
+into `Fiber.lean`, which already needed them). Changed bodies, statements
+unchanged:
 
-- `injective_lift_iff_forall_subsingleton` repeats
-  `Function.injective_iff_subsingleton_fiber` at `lift f g h`.
-- `surjective_lift_iff_forall_nonempty` repeats
-  `Function.surjective_iff_nonempty_fiber` at that map.
-- `bijective_lift_iff_forall_nonempty_unique` repeats
-  `Function.bijective_iff_nonempty_unique_fiber`.
-- `fiberLiftCongr` rebuilds the transport already supplied by
-  `Equiv.fiberCongr`, with `eG`, the pullback equivalence, and the proved
-  naturality of `lift`.
+- `injective_lift_iff_forall_subsingleton` :=
+  `injective_iff_subsingleton_fiber (lift f g h)`.
+- `surjective_lift_iff_forall_nonempty` :=
+  `surjective_iff_nonempty_fiber (lift f g h)`.
+- `bijective_lift_iff_forall_nonempty_unique` :=
+  `bijective_iff_nonempty_unique_fiber (lift f g h)`.
+- `fiberLiftCongr … c` :=
+  `Equiv.fiberCongr eG (congr eL eR eB hp hq) (fun x => (congr_lift … x).symm) c`,
+  so comparison-fiber transport is the generic fiber transport along `eG`
+  and the pullback equivalence, with naturality `congr_lift` supplying the
+  intertwining law. `fiberLiftCongr_apply_coe` and
+  `fiberLiftCongr_symm_apply_coe` keep their statements (`= eG x`,
+  `= eG.symm x`) and both close by `rfl`; a scratch check confirmed `simp`
+  proves them from the simp set.
 
-These statements are correct. The issue is that the elementary fiber package
-is bypassed by its first intended consumer, leaving two implementations of
-the same mechanism before reduction and finite-family consumers arrive.
+`Amalgam/Core/Fiber.lean`: `Equiv.fiberCompEquiv f e y` is now
+`subtypeEquivOfSubtype (p := fun x => f x = y) e`, mathlib's subtype
+equivalence specialized to the fiber predicate; its docstring says so. The
+two simp lemmas `fiberCompEquiv_apply_coe : ↑(… x') = e ↑x'` and
+`fiberCompEquiv_symm_apply_coe : ↑(….symm x) = e.symm ↑x` are stated by hand
+and close by `rfl`, with the same statements the generated lemmas had.
 
-Within `Core/Fiber.lean`, `Equiv.fiberCompEquiv` also manually reconstructs
-mathlib's `Equiv.subtypeEquivOfSubtype`. The existing docstring acknowledges
-that equivalence. A fiber-specific name and generated simp lemmas justify a
-specialization, not another implementation of its inverse and round trips.
+Comparison-specific proofs that the generic API does not supply are retained:
+the pointwise `_fiber_lift_iff` family (which rewrite through `lift_eq_iff`),
+`injective_lift_iff`, `surjective_lift_iff`, `bijective_lift_iff`,
+`bijective_lift_iff_existsUnique`, projection fibers, `swap`, `congr`, and
+the trivial-overlap reduction.
 
-**Required end state.** Import the generic fiber module from the comparison
-module and derive the named comparison specializations from its results.
-Use `Equiv.fiberCongr` for comparison-fiber transport after establishing
-the diagram's naturality. Define the fiber-specific precomposition
-equivalence by specializing mathlib's existing subtype equivalence.
-Keep the useful public names, statement strength, and computation behavior.
-Retain proofs specific to compatible pairs where the generic API does not
-already establish the result. This drawer does not request new abstraction,
-a broad rewrite, or consolidation of every one-line lemma.
+Axiom audit of every changed declaration (`#print axioms` in a scratch file
+importing `Amalgam`):
 
-**Closing evidence.** The source dependency and declaration bodies show this
-reuse. Existing typed Status examples and all four witnesses still compile.
-The transport apply/symm simp laws still act by the supplied global
-equivalence and its inverse. Audit the changed definitions/theorems for
-unexpected axioms and run the full build.
+| Declaration | Axioms |
+| --- | --- |
+| `injective_lift_iff_forall_subsingleton` | none |
+| `surjective_lift_iff_forall_nonempty` | none |
+| `bijective_lift_iff_forall_nonempty_unique` | none |
+| `fiberLiftCongr`, `_apply_coe`, `_symm_apply_coe` | propext, Quot.sound |
+| `injective/surjective/bijective_lift_iff_of_congr` | propext, Quot.sound |
+| `Equiv.fiberCompEquiv`, `_apply_coe`, `_symm_apply_coe` | propext, Quot.sound |
 
-## R2 — Add the cache task and document the build workflow
+`Classical.choice` does not appear in any of them. `Status.lean` and
+`Models/Overlap.lean` compile unchanged, so every typed Status example and all
+four witnesses still hold at their previous strength.
 
-**Mismatch.** `tasks.nu` exposes build, check, and fmt but omits the requested
-mathlib-cache command. The pinned mathlib checkout already provides the cache
-executable; no new dependency or copying from a sibling repository is needed.
+## R2 — Cache task and build workflow
 
-**Required end state.** Add a Nushell `main cache` command running
-`lake exe cache get`, advertise it in the task listing, and briefly document
-its use after a toolchain or mathlib revision change in the README's build
-instructions. The command must fetch artifacts for this project's pinned
-dependencies. Do not modify dependency pins or add an automatic update.
+`tasks.nu` gains `main cache` running `lake exe cache get`, listed in the
+help output between `build` and `check`. README's Building section says to run
+`nu tasks.nu cache` after changing `lean-toolchain` or the mathlib revision,
+before `lake build`. No pin changed and no automatic update was added.
 
-**Closing evidence.** The help listing includes cache, and invoking
-`nu tasks.nu cache` in the development shell succeeds; an already populated
-cache is a valid outcome. Re-run the normal formatting and repository checks.
-No extra test harness is required for this wrapper.
+Invocation in the development shell (`nix develop -c nu tasks.nu cache`):
 
-# Verification performed by the reviewer
+```text
+Using cache from origin: (some leanprover-community/mathlib4)
+No files to download
+Already decompressed 8690 file(s)
+```
 
-- Read all four Lean modules, the root aggregator, README, package and pinned
-  manifest, development shell, task runner, and submitted evidence.
-- `nix develop -c lake build` succeeded with 697 jobs and no warnings.
-- `nix flake check` succeeded for the submitted tree.
-- A disposable Lean file ran `#print axioms` on all 130 explicitly declared
-  library definitions, abbreviations, and theorems. Only `propext`,
-  `Classical.choice`, and `Quot.sound` appeared; no project axiom or
-  `sorryAx` appeared. Generated simp declarations were not counted separately.
-- Inspected the closing theorem hypotheses, equivalence inverse laws, and
-  README-to-Status statements at their advertised generality. The four finite
-  examples use the actual comparison construction and carry the claimed
-  unreached pairs and distinct-state witnesses.
-- Checked the relevant existing mathlib subtype equivalence and pullback
-  definitions in the pinned source. The cache task matches descent's
-  `lake exe cache get` convention.
-- No Lean implementation was changed by this review. Temporary axiom-audit
-  artifacts are disposable verification only.
+`nix develop -c nu tasks.nu` lists build, cache, check, fmt.
 
-# Next submission
+# Verification
 
-Work from this file and address R1–R2. Preserve M0's mathematical scope, keep
-README and proposal status truthful, then run `nix fmt`, `lake build`, and
-`nix flake check`. Commit the candidate and leave a clean working copy.
+Run on the candidate tree, all successful:
 
-Rewrite `REVIEW.md` as `READY FOR REVIEW`, `Turn: reviewer`, with the exact
-committed candidate and evidence for both drawers, including the cache
-invocation and the changed declarations' axiom audit. Merely replying in chat
-is not a submission. The next reviewer should check the consolidation without
-weakening the API or its Status coverage, then decide whether M0 can be
-accepted and advance to M1.
+- `nix develop -c lake build`: `Build completed successfully (697 jobs)`,
+  zero warnings.
+- `nix fmt`: no changes. `nix flake check`: all checks passed.
+- `rg sorry Amalgam`: no matches.
+- Working copy clean after the commit.
+
+# Request to the reviewer
+
+Check that the consolidation neither weakened the API nor reduced Status
+coverage, then decide whether M0 can be accepted. If accepted, rewrite this
+file as `READY FOR WORK`, `Turn: worker`, with the M1 objective from
+[Section 26](PROPOSAL.md#26-initial-milestones), and add the M0 built-status
+paragraph to the proposal per Section 23.
+
+# Proposal acceptance evidence
+
+The founding proposal at `7159fd31` was accepted (SHA-256
+`43dc0ab30372cde3f9134073ca68bf507e3fd9b11d5a050991a068c5a4dfbe6c`); R1–R4
+of that round closed without remaining corrections. Details remain in
+version history.
