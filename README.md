@@ -4,8 +4,10 @@ Amalgam is a Lean 4 library studying what partial observations and their
 admissible comparisons determine about possible global realizations. It
 currently covers the fibers of an ordinary map, the compatible pairs of a
 binary span, the comparison map that a commuting square induces from its
-global states to those pairs, and the reduction of compatible pairs across an
-observed overlap. Everything is stated for arbitrary types: carriers
+global states to those pairs, the reduction of compatible pairs across an
+observed overlap, and restriction systems over a preorder of contexts with
+their compatible families, family comparison, and binary recovery. Everything
+is stated for arbitrary types: carriers
 and fibers may be empty, and no finiteness, decidability, or coverage hypothesis
 appears in any criterion. [PROPOSAL.md](PROPOSAL.md) defines the mathematical
 scope, roadmap, and completion criteria.
@@ -185,6 +187,182 @@ no fine lift, the raw comparison is not surjective, and the induced comparison
 is not bijective. Surjectivity of all three observations therefore does not
 imply the criterion. No minimality is claimed for this witness.
 
+## Restriction systems and compatible families
+
+`Amalgam/System/Restriction.lean` fixes the datum. Contexts form a preorder
+`C`, and `c ≤ d` reads as "`c` is coarser than `d`". A `RestrictionSystem`
+assigns a state type `State c` to every context together with a restriction map
+`res h : State d → State c` for every `h : c ≤ d`, subject to the identity and
+composition laws `res_refl` and `res_trans`. For a family of contexts
+`F : ι → C`, a compatible family is one state per index agreeing after
+restriction to every common coarser context; `CompatibleFamily F` is the
+subtype of assignments satisfying `Compatible F`. Finiteness of the index type
+is never assumed and no decidability enters. The index type may be empty, in
+which case there is exactly one compatible family (`uniqueOfIsEmpty`), and the
+state types may be empty.
+
+The declared restriction operations are the `FamilyMap`s: a reindexing
+`index : κ → ι` together with an inequality `E k ≤ F (index k)` at every target
+index. One datum covers both forgetting local views, by a reindexing that
+misses indices, and restricting a view along a supplied context inequality.
+`restrict m` acts on a compatible family by actual restriction of the supplied
+states, `(restrict m x) k = res (m.le k) (x (m.index k))`; a map between
+underlying products is not an operation. Restriction along the identity
+operation is the identity (`restrict_id`, consuming `res_refl`), and
+restriction along a composite is the composite of the restrictions
+(`restrict_comp`, consuming `res_trans`).
+
+A morphism `S.Hom S'` of restriction systems over the same contexts is an
+observation `toFun c : S.State c → S'.State c` at every context commuting with
+restriction. It carries compatible families to compatible families, and the raw
+comparison `Hom.mapFamily F` observes each component. It is natural in the
+family: `restrict_mapFamily` says that observing then restricting is
+restricting then observing.
+
+### Presentation invariance
+
+`Amalgam/System/Presentation.lean` proves that presentations of the same shape
+have equivalent compatible-family types. Everything rests on `restrict_endo`: a
+declared operation from a family to itself is the identity on compatible
+families, since compatibility already identifies each restricted state with the
+state it is compared to. Hence declared operations in opposite directions
+compose to the identity (`restrict_restrict`, consuming `restrict_comp` and so
+`res_trans`), and two families with declared operations both ways have
+equivalent compatible-family types (`restrictEquiv`).
+
+Relabeling is the case of an equivalence of index types. For `e : κ ≃ ι`,
+`relabel e` identifies the compatible families over `F` with those over
+`F ∘ e`, reading the original family at `e k`, and both round trips hold
+(`relabel_symm_relabel`, `relabel_relabel_symm`).
+
+Redundancy is the case of added views. Given `σ : κ → ι` and
+`h : ∀ k, G k ≤ F (σ k)`, so that every added view is obtained by restricting
+an included context, `redundancyEquiv σ h` identifies the compatible families
+over `Sum.elim F G` with those over `F`. Forgetting the added views is the
+forward map and extending by `res (h k)` is the inverse. The added
+compatibility conditions are discharged by `res_trans`, the extend-then-forget
+round trip `forget_extend` by `res_refl`, and the forget-then-extend round trip
+`extend_forget` by compatibility of the extended family together with
+`res_refl`. Forgetting redundant views is therefore bijective
+(`bijective_restrict_inl`). Adding a single view `c ≤ F i₀` (`addViewEquiv`)
+and repeating an included view (`duplicateEquiv`) are the cases of a
+one-element added index type.
+
+The fiber of `restrict m` over a compatible family `z` is the type of
+compatible families over the finer presentation whose declared restrictions are
+the components of `z` (`restrictFiberEquiv`), the extension choices of `z`
+along `m`. Under the redundancy hypothesis those choices form a subsingleton
+(`subsingleton_fiber_restrict_inl`).
+
+Two shapes are used below. A binary overlap is the family `![l, r]` over a
+preorder carrying a context `b` with `b ≤ l` and `b ≤ r`, and
+`compatible_fin_two_iff` reduces compatibility over `Fin 2` to the single cross
+condition between the two views. The shared-overlap shape `L → B ← M → D ← R`
+is the family `![L, M, R]` with `B ≤ L`, `B ≤ M`, `D ≤ M` and `D ≤ R`, whose
+subfamilies are reached by the forgetful operations `FamilyMap.reindex`.
+
+### Family comparison
+
+`Amalgam/System/Comparison.lean` fixes a morphism `φ : S.Hom S'` and studies
+the raw comparison `k_F = φ.mapFamily F` of each declared family.
+
+`fiberMapFamilyEquiv` identifies the fiber of `k_F` over a coarse compatible
+family `y` with the fine assignments that are compatible and satisfy every
+component observation equation. The image criterion `mem_range_mapFamily_iff`
+is therefore existence of such a simultaneous fine lift. Existence and
+uniqueness stay separate: the fiber is nonempty exactly under the criterion,
+empty exactly when it fails, a subsingleton exactly when any two fine families
+observed as `y` coincide, and has a unique element exactly under unique
+existence (`nonempty_fiber_mapFamily_iff`, `isEmpty_fiber_mapFamily_iff`,
+`subsingleton_fiber_mapFamily_iff`, `nonempty_unique_fiber_mapFamily_iff`).
+
+Two fine families are identified when all their observed components agree. That
+relation is the kernel of the raw comparison (`observed_rel_family_iff`),
+equivalently equality under it (`observed_rel_family_iff_mapFamily_eq`), and
+`Hom.observedFamily F` is the quotient `Q_F` by it. The induced injection
+`k_bar_F` is `Hom.observedMapFamily F`, the raw comparison on any
+representative (`observedMapFamily_mk`). It is injective
+(`observedMapFamily_injective`) and has the same image as the raw comparison
+(`range_observedMapFamily`). The attainable image `I_F` is `Hom.image F`, whose
+membership is the same criterion (`mem_image_iff`), and
+`observedFamilyEquivImage` identifies `Q_F` with `I_F`, computing to the raw
+comparison on a representative and satisfying both round trips.
+
+Every fiber of the induced comparison is a subsingleton
+(`subsingleton_fiber_observedMapFamily`), whether or not the coarse family is
+attained, so a coarse family carries either no observed class or exactly one.
+Raw and quotient fibers are nonempty together
+(`nonempty_fiber_mapFamily_iff_nonempty_fiber_observedMapFamily`), because the
+two comparisons have the same image. What the quotient discards is
+multiplicity: it collapses all fine lifts of an attained family into one
+observed class, which is no uniqueness statement about those lifts.
+
+A declared family restriction `m : FamilyMap F E` acts at four levels. On fine
+and coarse families it is `S.restrict m` and `S'.restrict m`, and the raw
+square commutes: `restrict_comp_mapFamily` states
+`S'.restrict m ∘ k_F = k_E ∘ S.restrict m`. On observed classes it is
+`restrictObserved m`, well defined on classes and not on chosen fine
+representatives, because equal observations restrict to equal observations
+(`ker_mapFamily_restrict`); it computes as `S.restrict m` on a representative
+(`restrictObserved_mk`) and its square with the induced comparisons commutes
+(`observedMapFamily_restrictObserved`). On attainable images it is
+`restrictImage m`, obtained from `mapsTo_restrict_image`, and
+`restrictImage_observedFamilyEquivImage` is the square in which
+`observedFamilyEquivImage` intertwines it with `restrictObserved m`. Identity
+and composition are preserved at both levels: `restrictObserved_id`,
+`restrictObserved_comp`, `restrictImage_id`, `restrictImage_comp`.
+
+Naturality gives an inclusion of attainable images and nothing more
+(`image_restrict_subset`):
+
+```text
+restrict_(F,E)(I_F) ⊆ I_E.
+```
+
+Equality of the restricted image with `I_E`, and surjectivity of
+`restrictImage m`, are not claimed: a compatible family over `E` need not
+extend to one over `F`.
+
+Fine lifts are tracked along `m` by `fiberRestrict m y`, which sends a fine
+lift of `y` to a fine lift of `S'.restrict m y` by restricting the same
+supplied local states (`coe_fiberRestrict`), never by choosing an independent
+lift.
+
+### Binary recovery
+
+`Amalgam/System/Binary.lean` identifies the binary case with the compatible
+pairs and the reduction comparison above. Fix contexts `l` and `r` and a common
+coarser context `b`, with `hl : b ≤ l`, `hr : b ≤ r` and
+`hb : ∀ c, c ≤ l → c ≤ r → c ≤ b`. The three hypotheses say exactly that `b` is
+greatest among the common coarser contexts of `l` and `r`
+(`isGreatest_lowerBounds_pair_iff`); no lattice structure and no uniqueness of
+`b` is assumed. Under `hb` agreement at every common coarser context reduces to
+agreement at `b` (`compatible_pair_iff`), so `binaryEquiv` identifies the
+compatible families over `![l, r]` with the compatible pairs
+`Function.Pullback (res hl) (res hr)`, with both round trips.
+
+Under that identification the family raw comparison is
+`Function.Pullback.map` for the observations at `l`, `b` and `r`
+(`binaryEquiv_mapFamily`). Fine-lift fibers correspond
+(`fiberMapFamilyBinaryEquiv`), a coarse family is attained exactly when its
+pair is (`mem_range_mapFamily_iff_mem_range_map`), the two attained images
+agree as sets under `binaryEquiv` (`image_range_mapFamily`), and the observed
+quotients correspond (`observedBinaryEquiv`) compatibly with the two injections
+(`observedMap_observedBinaryEquiv`).
+
+The intersection criterion is recovered for binary families:
+`mem_range_mapFamily_iff_inter_nonempty` says a coarse family `y` is attained
+exactly when the fine overlap values at `b` reached from states at `l` observed
+as `y 0` meet those reached from states at `r` observed as `y 1`, and
+`bijective_kerLift_mapFamily_iff_forall` says the family injection is bijective
+exactly when that holds at every coarse compatible family.
+
+For the shared-overlap shape, `compatible_triple_iff` reduces compatibility of
+a family over `![L, M, R]` to the two overlap equations, under three
+hypotheses: `B` is greatest among the common coarser contexts of `L` and `M`,
+`D` is greatest among those of `M` and `R`, and `L` and `R` have no common
+coarser context.
+
 ## Four comparison behaviors
 
 `Amalgam/Models/Overlap.lean` gives four explicit finite commuting squares over
@@ -213,8 +391,9 @@ construction rather than an unrelated finite function.
 ## Status manifest
 
 Every mathematical claim above is mirrored by a typed `example` in
-`Amalgam/Status.lean`, at the generality claimed: arbitrary types in arbitrary
-independent universes for the generic statements, and the concrete finite models
+`Amalgam/Status.lean`, at the generality claimed: arbitrary types, arbitrary
+preorders of contexts, and arbitrary index types in arbitrary independent
+universes for the generic statements, and the concrete finite models
 for the four comparison behaviors and the surjective reduction. The root
 `Amalgam` aggregator imports the manifest, so a full build checks it; no library
 module imports it.

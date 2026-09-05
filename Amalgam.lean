@@ -3,4 +3,10 @@ import Amalgam.Core.Fiber
 import Amalgam.Core.Reduction
 import Amalgam.Models.Lifting
 import Amalgam.Models.Overlap
+import Amalgam.Models.Span
+import Amalgam.Models.Zigzag
 import Amalgam.Status
+import Amalgam.System.Binary
+import Amalgam.System.Comparison
+import Amalgam.System.Presentation
+import Amalgam.System.Restriction

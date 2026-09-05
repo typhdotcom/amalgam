@@ -3,6 +3,10 @@ import Amalgam.Core.Fiber
 import Amalgam.Core.Reduction
 import Amalgam.Models.Lifting
 import Amalgam.Models.Overlap
+import Amalgam.System.Binary
+import Amalgam.System.Comparison
+import Amalgam.System.Presentation
+import Amalgam.System.Restriction
 
 /-!
 # Status manifest
@@ -19,7 +23,7 @@ compiles with every build.
 The section headings match the README headings.
 -/
 
-universe uX uY uZ uX' uY' uL' uR' uG' uB' uLf uRf uBf uLc uRc uBc
+universe uX uY uZ uX' uY' uL' uR' uG' uB' uLf uRf uBf uLc uRc uBc uC uS uS' uI uK uM
 
 namespace Amalgam.Status
 
@@ -689,6 +693,495 @@ example : ¬Function.Surjective (Function.Pullback.map ha hc) := not_surjective_
 example : ¬Function.Bijective (Function.Pullback.observedMap ha hc) := not_bijective_observedMap
 
 end Lifting
+
+/-! ## Restriction systems and compatible families -/
+
+section RestrictionDatum
+
+variable {C : Type uC} [Preorder C] {S : RestrictionSystem.{uC, uS} C}
+  {S' : RestrictionSystem.{uC, uS'} C} {ι : Type uI} {κ : Type uK} {μ : Type uM}
+  {F : ι → C} {E : κ → C} {D : μ → C} {G : κ → C}
+
+/-- A state at `d` restricts along `h : c ≤ d` to a state at the coarser context `c`. -/
+example {c d : C} (h : c ≤ d) : S.State d → S.State c :=
+  S.res h
+
+/-- Restriction along a reflexivity proof is the identity. -/
+example {c : C} (h : c ≤ c) (x : S.State c) : S.res h x = x :=
+  S.res_refl h x
+
+/-- Restriction composes along transitivity. -/
+example {c d e : C} (h₁ : c ≤ d) (h₂ : d ≤ e) (x : S.State e) :
+    S.res h₁ (S.res h₂ x) = S.res (h₁.trans h₂) x :=
+  S.res_trans h₁ h₂ x
+
+/-- Compatibility is agreement after restriction to every common coarser context. -/
+example (x : ∀ i, S.State (F i)) :
+    S.Compatible F x ↔
+      ∀ ⦃c : C⦄ ⦃i j : ι⦄ (hi : c ≤ F i) (hj : c ≤ F j), S.res hi (x i) = S.res hj (x j) :=
+  Iff.rfl
+
+/-- A compatible family is one state per index satisfying compatibility. -/
+example : S.CompatibleFamily F = {x : ∀ i, S.State (F i) // S.Compatible F x} :=
+  rfl
+
+/-- Over an empty index type there is exactly one compatible family. -/
+example [IsEmpty ι] : Unique (S.CompatibleFamily F) :=
+  S.uniqueOfIsEmpty
+
+/-- A declared restriction operation names an index of the finer family and supplies a context
+inequality at every target index. -/
+example (m : FamilyMap F E) (k : κ) : E k ≤ F (m.index k) :=
+  m.le k
+
+/-- A declared operation acts on compatible families. -/
+example (m : FamilyMap F E) : S.CompatibleFamily F → S.CompatibleFamily E :=
+  S.restrict m
+
+/-- Its action is actual restriction of the supplied states. -/
+example (m : FamilyMap F E) (x : S.CompatibleFamily F) (k : κ) :
+    (S.restrict m x).1 k = S.res (m.le k) (x.1 (m.index k)) :=
+  S.restrict_apply m x k
+
+/-- Restriction along the identity operation is the identity, by `res_refl`. -/
+example (x : S.CompatibleFamily F) : S.restrict (FamilyMap.id F) x = x :=
+  S.restrict_id x
+
+/-- Restriction along a composite is the composite of restrictions, by `res_trans`. -/
+example (n : FamilyMap E D) (m : FamilyMap F E) (x : S.CompatibleFamily F) :
+    S.restrict (n.comp m) x = S.restrict n (S.restrict m x) :=
+  S.restrict_comp n m x
+
+/-- A morphism of restriction systems observes at every context, commuting with restriction. -/
+example (φ : S.Hom S') {c d : C} (h : c ≤ d) (x : S.State d) :
+    S'.res h (φ.toFun d x) = φ.toFun c (S.res h x) :=
+  φ.naturality h x
+
+/-- The raw comparison of a family. -/
+example (φ : S.Hom S') : S.CompatibleFamily F → S'.CompatibleFamily F :=
+  φ.mapFamily F
+
+/-- It observes each component. -/
+example (φ : S.Hom S') (x : S.CompatibleFamily F) (i : ι) :
+    (φ.mapFamily F x).1 i = φ.toFun (F i) (x.1 i) :=
+  φ.mapFamily_apply F x i
+
+/-- Naturality of the raw comparison in the family: observing then restricting is restricting
+then observing. -/
+example (φ : S.Hom S') (m : FamilyMap F E) (x : S.CompatibleFamily F) :
+    S'.restrict m (φ.mapFamily F x) = φ.mapFamily E (S.restrict m x) :=
+  φ.restrict_mapFamily m x
+
+/-! ### Presentation invariance -/
+
+/-- A declared operation from a family to itself is the identity on compatible families. -/
+example (m : FamilyMap F F) (x : S.CompatibleFamily F) : S.restrict m x = x :=
+  S.restrict_endo m x
+
+/-- Declared operations in opposite directions compose to the identity. -/
+example (m : FamilyMap F E) (n : FamilyMap E F) (x : S.CompatibleFamily F) :
+    S.restrict n (S.restrict m x) = x :=
+  S.restrict_restrict m n x
+
+/-- Two families with declared operations both ways have equivalent compatible-family types. -/
+example (m : FamilyMap F E) (n : FamilyMap E F) : S.CompatibleFamily F ≃ S.CompatibleFamily E :=
+  S.restrictEquiv m n
+
+/-- Relabeling along an equivalence of index types. -/
+example (e : κ ≃ ι) : S.CompatibleFamily F ≃ S.CompatibleFamily (F ∘ e) :=
+  S.relabel e
+
+/-- The relabeled family reads the original at `e k`. -/
+example (e : κ ≃ ι) (x : S.CompatibleFamily F) (k : κ) : (S.relabel e x).1 k = x.1 (e k) :=
+  S.relabel_apply_coe e x k
+
+/-- Round trip: relabeling then unrelabeling. -/
+example (e : κ ≃ ι) (x : S.CompatibleFamily F) : (S.relabel e).symm (S.relabel e x) = x :=
+  S.relabel_symm_relabel e x
+
+/-- Round trip: unrelabeling then relabeling. -/
+example (e : κ ≃ ι) (y : S.CompatibleFamily (F ∘ e)) : S.relabel e ((S.relabel e).symm y) = y :=
+  S.relabel_relabel_symm e y
+
+/-- The redundancy law: adding views each obtained by restricting an included context changes
+nothing. -/
+example (σ : κ → ι) (h : ∀ k, G k ≤ F (σ k)) :
+    S.CompatibleFamily (Sum.elim F G) ≃ S.CompatibleFamily F :=
+  S.redundancyEquiv σ h
+
+/-- Forgetting the added views keeps the included components, by `res_refl`. -/
+example (σ : κ → ι) (h : ∀ k, G k ≤ F (σ k)) (x : S.CompatibleFamily (Sum.elim F G)) (i : ι) :
+    (S.redundancyEquiv σ h x).1 i = x.1 (Sum.inl i) :=
+  S.redundancyEquiv_apply_coe σ h x i
+
+/-- Extending keeps the included components, by `res_refl`. -/
+example (σ : κ → ι) (h : ∀ k, G k ≤ F (σ k)) (y : S.CompatibleFamily F) (i : ι) :
+    ((S.redundancyEquiv σ h).symm y).1 (Sum.inl i) = y.1 i :=
+  S.redundancyEquiv_symm_apply_coe_inl σ h y i
+
+/-- Extending fills the added components by restriction. -/
+example (σ : κ → ι) (h : ∀ k, G k ≤ F (σ k)) (y : S.CompatibleFamily F) (k : κ) :
+    ((S.redundancyEquiv σ h).symm y).1 (Sum.inr k) = S.res (h k) (y.1 (σ k)) :=
+  S.redundancyEquiv_symm_apply_coe_inr σ h y k
+
+/-- Round trip: extending then forgetting. -/
+example (σ : κ → ι) (h : ∀ k, G k ≤ F (σ k)) (y : S.CompatibleFamily F) :
+    S.restrict (FamilyMap.inl F G) (S.restrict (FamilyMap.extend σ h) y) = y :=
+  S.forget_extend σ h y
+
+/-- Round trip: forgetting then extending. -/
+example (σ : κ → ι) (h : ∀ k, G k ≤ F (σ k)) (x : S.CompatibleFamily (Sum.elim F G)) :
+    S.restrict (FamilyMap.extend σ h) (S.restrict (FamilyMap.inl F G) x) = x :=
+  S.extend_forget σ h x
+
+/-- Forgetting redundant views is bijective. -/
+example (σ : κ → ι) (h : ∀ k, G k ≤ F (σ k)) :
+    Function.Bijective (S.restrict (FamilyMap.inl F G)) :=
+  S.bijective_restrict_inl σ h
+
+/-- Adding a single view obtained by restricting an included context changes nothing. -/
+example (c : C) (i₀ : ι) (hc : c ≤ F i₀) :
+    S.CompatibleFamily (Sum.elim F fun _ : Unit => c) ≃ S.CompatibleFamily F :=
+  S.addViewEquiv c i₀ hc
+
+/-- Repeating an included view changes nothing. -/
+example (i₀ : ι) :
+    S.CompatibleFamily (Sum.elim F fun _ : Unit => F i₀) ≃ S.CompatibleFamily F :=
+  S.duplicateEquiv i₀
+
+/-- The fiber of a family restriction is the extension choices along it. -/
+example (m : FamilyMap F E) (z : S.CompatibleFamily E) :
+    {x // S.restrict m x = z} ≃
+      {x : S.CompatibleFamily F // ∀ k, S.res (m.le k) (x.1 (m.index k)) = z.1 k} :=
+  S.restrictFiberEquiv m z
+
+/-- Under the redundancy hypothesis those extension choices form a subsingleton. -/
+example (σ : κ → ι) (h : ∀ k, G k ≤ F (σ k)) (z : S.CompatibleFamily F) :
+    Subsingleton {x // S.restrict (FamilyMap.inl F G) x = z} :=
+  S.subsingleton_fiber_restrict_inl σ h z
+
+/-- A subfamily is reached by a forgetful reindexing. -/
+example (e : κ → ι) : FamilyMap F (F ∘ e) :=
+  FamilyMap.reindex F e
+
+/-- Over `Fin 2` compatibility is the single cross condition between the two views. -/
+example (F₂ : Fin 2 → C) (x : ∀ i, S.State (F₂ i)) :
+    S.Compatible F₂ x ↔
+      ∀ ⦃c : C⦄ (hl : c ≤ F₂ 0) (hr : c ≤ F₂ 1), S.res hl (x 0) = S.res hr (x 1) :=
+  S.compatible_fin_two_iff F₂ x
+
+/-! ### Family comparison -/
+
+section FamilyComparison
+
+variable (φ : S.Hom S')
+
+/-- The fiber of the raw comparison over a coarse family is the fine assignments satisfying
+compatibility and every component observation equation. -/
+example (y : S'.CompatibleFamily F) :
+    {x // φ.mapFamily F x = y} ≃
+      {x : ∀ i, S.State (F i) // S.Compatible F x ∧ ∀ i, φ.toFun (F i) (x i) = y.1 i} :=
+  φ.fiberMapFamilyEquiv y
+
+/-- The image criterion: a coarse family is attained exactly when a simultaneous fine lift
+exists. -/
+example (y : S'.CompatibleFamily F) :
+    y ∈ Set.range (φ.mapFamily F) ↔
+      ∃ x : ∀ i, S.State (F i), S.Compatible F x ∧ ∀ i, φ.toFun (F i) (x i) = y.1 i :=
+  φ.mem_range_mapFamily_iff y
+
+/-- A fine lift exists exactly under the criterion. -/
+example (y : S'.CompatibleFamily F) :
+    Nonempty {x // φ.mapFamily F x = y} ↔
+      ∃ x : ∀ i, S.State (F i), S.Compatible F x ∧ ∀ i, φ.toFun (F i) (x i) = y.1 i :=
+  φ.nonempty_fiber_mapFamily_iff y
+
+/-- There is no fine lift exactly when the criterion fails. -/
+example (y : S'.CompatibleFamily F) :
+    IsEmpty {x // φ.mapFamily F x = y} ↔
+      ¬∃ x : ∀ i, S.State (F i), S.Compatible F x ∧ ∀ i, φ.toFun (F i) (x i) = y.1 i :=
+  φ.isEmpty_fiber_mapFamily_iff y
+
+/-- Uniqueness of fine lifts, independently of their existence. -/
+example (y : S'.CompatibleFamily F) :
+    Subsingleton {x // φ.mapFamily F x = y} ↔
+      ∀ x x' : S.CompatibleFamily F, (∀ i, φ.toFun (F i) (x.1 i) = y.1 i) →
+        (∀ i, φ.toFun (F i) (x'.1 i) = y.1 i) → x = x' :=
+  φ.subsingleton_fiber_mapFamily_iff y
+
+/-- Unique existence of a fine lift. -/
+example (y : S'.CompatibleFamily F) :
+    Nonempty (Unique {x // φ.mapFamily F x = y}) ↔
+      ∃! x : S.CompatibleFamily F, ∀ i, φ.toFun (F i) (x.1 i) = y.1 i :=
+  φ.nonempty_unique_fiber_mapFamily_iff y
+
+/-- Observed equality of fine families is agreement of all observed components. -/
+example (x x' : S.CompatibleFamily F) :
+    Setoid.ker (φ.mapFamily F) x x' ↔ ∀ i, φ.toFun (F i) (x.1 i) = φ.toFun (F i) (x'.1 i) :=
+  φ.observed_rel_family_iff x x'
+
+/-- Observed equality is equality under the raw comparison. -/
+example (x x' : S.CompatibleFamily F) :
+    Setoid.ker (φ.mapFamily F) x x' ↔ φ.mapFamily F x = φ.mapFamily F x' :=
+  φ.observed_rel_family_iff_mapFamily_eq x x'
+
+/-- Fine compatible families pass to the observed quotient. -/
+example : S.CompatibleFamily F → φ.observedFamily F :=
+  Quotient.mk (Setoid.ker (φ.mapFamily F))
+
+/-- Two fine families have the same observed class exactly when all observed components
+agree. -/
+example (x x' : S.CompatibleFamily F) :
+    (Quotient.mk (Setoid.ker (φ.mapFamily F)) x : φ.observedFamily F) =
+        Quotient.mk (Setoid.ker (φ.mapFamily F)) x' ↔
+      ∀ i, φ.toFun (F i) (x.1 i) = φ.toFun (F i) (x'.1 i) :=
+  φ.observedFamily_mk_eq_iff x x'
+
+/-- The comparison induced on the observed quotient. -/
+example : φ.observedFamily F → S'.CompatibleFamily F :=
+  φ.observedMapFamily F
+
+/-- Factorization: the induced comparison on a class is the raw comparison on a
+representative. -/
+example (x : S.CompatibleFamily F) :
+    φ.observedMapFamily F (Quotient.mk (Setoid.ker (φ.mapFamily F)) x) = φ.mapFamily F x :=
+  φ.observedMapFamily_mk x
+
+/-- The induced comparison is injective. -/
+example : Function.Injective (φ.observedMapFamily F) :=
+  φ.observedMapFamily_injective
+
+/-- The induced comparison and the raw comparison have the same image. -/
+example : Set.range (φ.observedMapFamily F) = Set.range (φ.mapFamily F) :=
+  φ.range_observedMapFamily
+
+/-- The attainable image. -/
+example : Set (S'.CompatibleFamily F) :=
+  φ.image F
+
+/-- Membership in the attainable image is the image criterion. -/
+example (y : S'.CompatibleFamily F) :
+    y ∈ φ.image F ↔
+      ∃ x : ∀ i, S.State (F i), S.Compatible F x ∧ ∀ i, φ.toFun (F i) (x i) = y.1 i :=
+  φ.mem_image_iff y
+
+/-- The observed quotient is the attainable image. -/
+noncomputable example : φ.observedFamily F ≃ φ.image F :=
+  φ.observedFamilyEquivImage F
+
+/-- The identification on a class is the raw comparison on a representative. -/
+example (x : S.CompatibleFamily F) :
+    (φ.observedFamilyEquivImage F (Quotient.mk (Setoid.ker (φ.mapFamily F)) x) :
+        S'.CompatibleFamily F) = φ.mapFamily F x :=
+  φ.coe_observedFamilyEquivImage_mk x
+
+/-- The identification is the induced comparison on underlying coarse families. -/
+example (q : φ.observedFamily F) :
+    (φ.observedFamilyEquivImage F q : S'.CompatibleFamily F) = φ.observedMapFamily F q :=
+  φ.coe_observedFamilyEquivImage q
+
+/-- Round trip: the inverse identification after the identification. -/
+example (q : φ.observedFamily F) :
+    (φ.observedFamilyEquivImage F).symm (φ.observedFamilyEquivImage F q) = q :=
+  φ.observedFamilyEquivImage_symm_apply_apply q
+
+/-- Round trip: the identification after the inverse identification. -/
+example (y : φ.image F) :
+    φ.observedFamilyEquivImage F ((φ.observedFamilyEquivImage F).symm y) = y :=
+  φ.observedFamilyEquivImage_apply_symm_apply y
+
+/-- Every fiber of the induced comparison is a subsingleton, attained or not. -/
+example (y : S'.CompatibleFamily F) : Subsingleton {q // φ.observedMapFamily F q = y} :=
+  φ.subsingleton_fiber_observedMapFamily y
+
+/-- Raw and quotient fibers are nonempty together; the quotient discards multiplicity only. -/
+example (y : S'.CompatibleFamily F) :
+    Nonempty {x // φ.mapFamily F x = y} ↔ Nonempty {q // φ.observedMapFamily F q = y} :=
+  φ.nonempty_fiber_mapFamily_iff_nonempty_fiber_observedMapFamily y
+
+/-- The raw commuting square along a declared family restriction. -/
+example (m : FamilyMap F E) : S'.restrict m ∘ φ.mapFamily F = φ.mapFamily E ∘ S.restrict m :=
+  φ.restrict_comp_mapFamily m
+
+/-- Restriction of observed classes. -/
+example (m : FamilyMap F E) : φ.observedFamily F → φ.observedFamily E :=
+  φ.restrictObserved m
+
+/-- Equal observations restrict to equal observations, which is what makes restriction of
+observed classes well defined. -/
+example (m : FamilyMap F E) (x x' : S.CompatibleFamily F) (h : Setoid.ker (φ.mapFamily F) x x') :
+    Setoid.ker (φ.mapFamily E) (S.restrict m x) (S.restrict m x') :=
+  φ.ker_mapFamily_restrict m h
+
+/-- It is well defined on observed classes, computing as `S.restrict m` on a representative. -/
+example (m : FamilyMap F E) (x : S.CompatibleFamily F) :
+    φ.restrictObserved m (Quotient.mk (Setoid.ker (φ.mapFamily F)) x) =
+      Quotient.mk (Setoid.ker (φ.mapFamily E)) (S.restrict m x) :=
+  φ.restrictObserved_mk m x
+
+/-- The quotient commuting square. -/
+example (m : FamilyMap F E) (q : φ.observedFamily F) :
+    φ.observedMapFamily E (φ.restrictObserved m q) = S'.restrict m (φ.observedMapFamily F q) :=
+  φ.observedMapFamily_restrictObserved m q
+
+/-- Restriction sends the attainable image over `F` into the attainable image over `E`. -/
+example (m : FamilyMap F E) : Set.MapsTo (S'.restrict m) (φ.image F) (φ.image E) :=
+  φ.mapsTo_restrict_image m
+
+/-- `restrict_(F,E)(I_F) ⊆ I_E`; naturality gives inclusion only. -/
+example (m : FamilyMap F E) : S'.restrict m '' φ.image F ⊆ φ.image E :=
+  φ.image_restrict_subset m
+
+/-- The map induced by restriction on attainable images. -/
+example (m : FamilyMap F E) : φ.image F → φ.image E :=
+  φ.restrictImage m
+
+/-- It is restriction on underlying coarse families. -/
+example (m : FamilyMap F E) (y : φ.image F) :
+    (φ.restrictImage m y : S'.CompatibleFamily E) = S'.restrict m y.1 :=
+  φ.coe_restrictImage m y
+
+/-- The image commuting square. -/
+example (m : FamilyMap F E) (q : φ.observedFamily F) :
+    φ.restrictImage m (φ.observedFamilyEquivImage F q) =
+      φ.observedFamilyEquivImage E (φ.restrictObserved m q) :=
+  φ.restrictImage_observedFamilyEquivImage m q
+
+/-- Restriction of observed classes along the identity operation is the identity. -/
+example (q : φ.observedFamily F) : φ.restrictObserved (FamilyMap.id F) q = q :=
+  φ.restrictObserved_id q
+
+/-- Restriction of observed classes along a composite is the composite of restrictions. -/
+example (n : FamilyMap E D) (m : FamilyMap F E) (q : φ.observedFamily F) :
+    φ.restrictObserved (n.comp m) q = φ.restrictObserved n (φ.restrictObserved m q) :=
+  φ.restrictObserved_comp n m q
+
+/-- Restriction of attainable images along the identity operation is the identity. -/
+example (y : φ.image F) : φ.restrictImage (FamilyMap.id F) y = y :=
+  φ.restrictImage_id y
+
+/-- Restriction of attainable images along a composite is the composite of restrictions. -/
+example (n : FamilyMap E D) (m : FamilyMap F E) (y : φ.image F) :
+    φ.restrictImage (n.comp m) y = φ.restrictImage n (φ.restrictImage m y) :=
+  φ.restrictImage_comp n m y
+
+/-- Restriction sends the raw fiber over `y` into the raw fiber over the restriction of `y`. -/
+example (m : FamilyMap F E) (y : S'.CompatibleFamily F) :
+    {x // φ.mapFamily F x = y} → {x' // φ.mapFamily E x' = S'.restrict m y} :=
+  φ.fiberRestrict m y
+
+/-- It restricts the same supplied local states, choosing no independent lift. -/
+example (m : FamilyMap F E) (y : S'.CompatibleFamily F) (x : {x // φ.mapFamily F x = y}) :
+    (φ.fiberRestrict m y x : S.CompatibleFamily E) = S.restrict m x.1 :=
+  φ.coe_fiberRestrict m y x
+
+end FamilyComparison
+
+end RestrictionDatum
+
+/-! ### Binary recovery -/
+
+section BinaryRecovery
+
+variable {C : Type uC} [Preorder C] {S : RestrictionSystem.{uC, uS} C}
+  {S' : RestrictionSystem.{uC, uS'} C} {l r b : C} (hl : b ≤ l) (hr : b ≤ r)
+  (hb : ∀ ⦃c : C⦄, c ≤ l → c ≤ r → c ≤ b)
+
+/-- The three overlap hypotheses say exactly that `b` is greatest among the common coarser
+contexts of `l` and `r`. -/
+example :
+    IsGreatest (lowerBounds {l, r}) b ↔
+      (b ≤ l ∧ b ≤ r) ∧ ∀ ⦃c : C⦄, c ≤ l → c ≤ r → c ≤ b :=
+  RestrictionSystem.isGreatest_lowerBounds_pair_iff
+
+/-- A binary family is compatible exactly when its two states agree at `b`. -/
+example (x : ∀ i, S.State (![l, r] i)) :
+    S.Compatible ![l, r] x ↔ S.res hl (x 0) = S.res hr (x 1) :=
+  S.compatible_pair_iff hl hr hb x
+
+/-- Binary compatible families are the compatible pairs of the span at `b`. -/
+example : S.CompatibleFamily ![l, r] ≃ Function.Pullback (S.res hl) (S.res hr) :=
+  S.binaryEquiv hl hr hb
+
+/-- Round trip: the family of the pair of a compatible family. -/
+example (x : S.CompatibleFamily ![l, r]) :
+    (S.binaryEquiv hl hr hb).symm (S.binaryEquiv hl hr hb x) = x :=
+  S.binaryEquiv_symm_apply_apply hl hr hb x
+
+/-- Round trip: the pair of the family of a compatible pair. -/
+example (s : Function.Pullback (S.res hl) (S.res hr)) :
+    S.binaryEquiv hl hr hb ((S.binaryEquiv hl hr hb).symm s) = s :=
+  S.binaryEquiv_apply_symm_apply hl hr hb s
+
+/-- The family raw comparison is the reduction comparison of the observations at `l`, `b`
+and `r`. -/
+example (φ : S.Hom S') (x : S.CompatibleFamily ![l, r]) :
+    S'.binaryEquiv hl hr hb (φ.mapFamily ![l, r] x) =
+      Function.Pullback.map (φ.naturality hl) (φ.naturality hr) (S.binaryEquiv hl hr hb x) :=
+  φ.binaryEquiv_mapFamily hl hr hb x
+
+/-- Fine-lift fibers correspond. -/
+example (φ : S.Hom S') (y : S'.CompatibleFamily ![l, r]) :
+    {x // φ.mapFamily ![l, r] x = y} ≃
+      {s // Function.Pullback.map (φ.naturality hl) (φ.naturality hr) s =
+        S'.binaryEquiv hl hr hb y} :=
+  φ.fiberMapFamilyBinaryEquiv hl hr hb y
+
+/-- A coarse binary family is attained exactly when its pair is. -/
+example (φ : S.Hom S') (y : S'.CompatibleFamily ![l, r]) :
+    y ∈ Set.range (φ.mapFamily ![l, r]) ↔
+      S'.binaryEquiv hl hr hb y ∈
+        Set.range (Function.Pullback.map (φ.naturality hl) (φ.naturality hr)) :=
+  φ.mem_range_mapFamily_iff_mem_range_map hl hr hb y
+
+/-- The two attained images agree as sets under `binaryEquiv`. -/
+example (φ : S.Hom S') :
+    S'.binaryEquiv hl hr hb '' Set.range (φ.mapFamily ![l, r]) =
+      Set.range (Function.Pullback.map (φ.naturality hl) (φ.naturality hr)) :=
+  φ.image_range_mapFamily hl hr hb
+
+/-- The intersection criterion, recovered for binary families. -/
+example (φ : S.Hom S') (y : S'.CompatibleFamily ![l, r]) :
+    y ∈ Set.range (φ.mapFamily ![l, r]) ↔
+      (S.res hl '' (φ.toFun l ⁻¹' {y.1 0}) ∩ S.res hr '' (φ.toFun r ⁻¹' {y.1 1})).Nonempty :=
+  φ.mem_range_mapFamily_iff_inter_nonempty hl hr hb y
+
+/-- The observed quotients correspond. -/
+example (φ : S.Hom S') :
+    Quotient (Setoid.ker (φ.mapFamily ![l, r])) ≃
+      Function.Pullback.Observed (φ.naturality hl) (φ.naturality hr) :=
+  φ.observedBinaryEquiv hl hr hb
+
+/-- The correspondence commutes with the two quotient injections. -/
+example (φ : S.Hom S') (q : Quotient (Setoid.ker (φ.mapFamily ![l, r]))) :
+    Function.Pullback.observedMap (φ.naturality hl) (φ.naturality hr)
+        (φ.observedBinaryEquiv hl hr hb q) =
+      S'.binaryEquiv hl hr hb (Setoid.kerLift (φ.mapFamily ![l, r]) q) :=
+  φ.observedMap_observedBinaryEquiv hl hr hb q
+
+/-- The exact lifting criterion for binary families. -/
+example (φ : S.Hom S') :
+    Function.Bijective (Setoid.kerLift (φ.mapFamily ![l, r])) ↔
+      ∀ y : S'.CompatibleFamily ![l, r],
+        (S.res hl '' (φ.toFun l ⁻¹' {y.1 0}) ∩ S.res hr '' (φ.toFun r ⁻¹' {y.1 1})).Nonempty :=
+  φ.bijective_kerLift_mapFamily_iff_forall hl hr hb
+
+end BinaryRecovery
+
+section SharedOverlap
+
+variable {C : Type uC} [Preorder C] {S : RestrictionSystem.{uC, uS} C} {L M R B D : C}
+  (hBL : B ≤ L) (hBM : B ≤ M) (hDM : D ≤ M) (hDR : D ≤ R)
+  (hB : ∀ ⦃c : C⦄, c ≤ L → c ≤ M → c ≤ B) (hD : ∀ ⦃c : C⦄, c ≤ M → c ≤ R → c ≤ D)
+  (hLR : ∀ ⦃c : C⦄, c ≤ L → c ≤ R → False)
+
+/-- On the shared-overlap shape compatibility is the two overlap equations. -/
+example (x : ∀ i, S.State (![L, M, R] i)) :
+    S.Compatible ![L, M, R] x ↔
+      S.res hBL (x 0) = S.res hBM (x 1) ∧ S.res hDM (x 1) = S.res hDR (x 2) :=
+  S.compatible_triple_iff hBL hBM hDM hDR hB hD hLR x
+
+end SharedOverlap
 
 /-! ## Four comparison behaviors -/
 
