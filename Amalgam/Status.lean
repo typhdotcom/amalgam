@@ -1,5 +1,7 @@
 import Amalgam.Core.Comparison
 import Amalgam.Core.Fiber
+import Amalgam.Core.Reduction
+import Amalgam.Models.Lifting
 import Amalgam.Models.Overlap
 
 /-!
@@ -17,7 +19,7 @@ compiles with every build.
 The section headings match the README headings.
 -/
 
-universe uX uY uZ uX' uY' uL' uR' uG' uB'
+universe uX uY uZ uX' uY' uL' uR' uG' uB' uLf uRf uBf uLc uRc uBc
 
 namespace Amalgam.Status
 
@@ -310,6 +312,351 @@ example (f : G → L) (g : G → R) (h : ∀ x, p (f x) = q (g x)) :
   Function.Pullback.bijective_lift_iff_of_subsingleton h
 
 end TrivialOverlap
+
+/-! ## Reduction across an overlap -/
+
+section Reduction
+
+variable {L : Type uLf} {R : Type uRf} {B : Type uBf} {p : L → B} {q : R → B}
+  {L' : Type uLc} {R' : Type uRc} {B' : Type uBc} {p' : L' → B'} {q' : R' → B'}
+  {a : L → L'} {b : B → B'} {c : R → R'}
+  (ha : ∀ l, p' (a l) = b (p l)) (hc : ∀ r, q' (c r) = b (q r))
+
+/-! ### The observed comparison -/
+
+/-- Commutation alone induces the comparison of compatible pairs. -/
+example : p.Pullback q → p'.Pullback q' :=
+  Function.Pullback.map ha hc
+
+/-- The left observed component of a mapped pair. -/
+example (s : p.Pullback q) : (Function.Pullback.map ha hc s).fst = a s.fst :=
+  Function.Pullback.fst_map ha hc s
+
+/-- The right observed component of a mapped pair. -/
+example (s : p.Pullback q) : (Function.Pullback.map ha hc s).snd = c s.snd :=
+  Function.Pullback.snd_map ha hc s
+
+/-- A fine pair lies over a coarse pair exactly when both observed components match. -/
+example (s : p.Pullback q) (t : p'.Pullback q') :
+    Function.Pullback.map ha hc s = t ↔ a s.fst = t.fst ∧ c s.snd = t.snd :=
+  Function.Pullback.map_eq_iff ha hc
+
+/-- Two fine pairs are observed alike exactly when both observed components agree. -/
+example (s s' : p.Pullback q) :
+    Function.Pullback.map ha hc s = Function.Pullback.map ha hc s' ↔
+      a s.fst = a s'.fst ∧ c s.snd = c s'.snd :=
+  Function.Pullback.map_eq_map_iff ha hc
+
+/-- The comparison is mathlib's `Function.mapPullback`. -/
+example :
+    Function.Pullback.map ha hc = Function.mapPullback a b c (funext ha) (funext hc) :=
+  Function.Pullback.map_eq_mapPullback ha hc
+
+/-! ### The observed quotient -/
+
+/-- Observed equality of fine pairs is agreement of both observed components. -/
+example (s s' : p.Pullback q) :
+    Setoid.ker (Function.Pullback.map ha hc) s s' ↔
+      a s.fst = a s'.fst ∧ c s.snd = c s'.snd :=
+  Function.Pullback.observed_rel_iff ha hc s s'
+
+/-- Observed equality is equality under the comparison. -/
+example (s s' : p.Pullback q) :
+    Setoid.ker (Function.Pullback.map ha hc) s s' ↔
+      Function.Pullback.map ha hc s = Function.Pullback.map ha hc s' :=
+  Function.Pullback.observed_rel_iff_map_eq ha hc s s'
+
+/-- Fine compatible pairs pass to the observed quotient. -/
+example : p.Pullback q → Function.Pullback.Observed ha hc :=
+  Quotient.mk (Setoid.ker (Function.Pullback.map ha hc))
+
+/-- Two fine pairs have the same observed class exactly when both observed components agree. -/
+example (s s' : p.Pullback q) :
+    (Quotient.mk (Setoid.ker (Function.Pullback.map ha hc)) s :
+        Function.Pullback.Observed ha hc) =
+      Quotient.mk (Setoid.ker (Function.Pullback.map ha hc)) s' ↔
+      a s.fst = a s'.fst ∧ c s.snd = c s'.snd :=
+  Function.Pullback.observed_mk_eq_iff ha hc s s'
+
+/-- The comparison induced on the observed quotient. -/
+example : Function.Pullback.Observed ha hc → p'.Pullback q' :=
+  Function.Pullback.observedMap ha hc
+
+/-- The induced comparison on a class is the comparison on a representative. -/
+example (s : p.Pullback q) :
+    Function.Pullback.observedMap ha hc
+        (Quotient.mk (Setoid.ker (Function.Pullback.map ha hc)) s) =
+      Function.Pullback.map ha hc s :=
+  Function.Pullback.observedMap_mk ha hc s
+
+/-- The induced comparison is injective. -/
+example : Function.Injective (Function.Pullback.observedMap ha hc) :=
+  Function.Pullback.observedMap_injective ha hc
+
+/-- The induced comparison and the raw comparison have the same image. -/
+example :
+    Set.range (Function.Pullback.observedMap ha hc) = Set.range (Function.Pullback.map ha hc) :=
+  Function.Pullback.range_observedMap ha hc
+
+/-- The observed quotient is the common image of the two comparisons. -/
+noncomputable example :
+    Function.Pullback.Observed ha hc ≃ Set.range (Function.Pullback.map ha hc) :=
+  Function.Pullback.observedEquivRange ha hc
+
+/-- The identification on a class is the comparison on a representative. -/
+example (s : p.Pullback q) :
+    (Function.Pullback.observedEquivRange ha hc
+        (Quotient.mk (Setoid.ker (Function.Pullback.map ha hc)) s) : p'.Pullback q') =
+      Function.Pullback.map ha hc s :=
+  Function.Pullback.coe_observedEquivRange_mk ha hc s
+
+/-- Round trip: the inverse identification after the identification. -/
+example (x : Function.Pullback.Observed ha hc) :
+    (Function.Pullback.observedEquivRange ha hc).symm
+        (Function.Pullback.observedEquivRange ha hc x) = x :=
+  Function.Pullback.observedEquivRange_symm_apply_apply ha hc x
+
+/-- Round trip: the identification after the inverse identification. -/
+example (t : Set.range (Function.Pullback.map ha hc)) :
+    Function.Pullback.observedEquivRange ha hc
+        ((Function.Pullback.observedEquivRange ha hc).symm t) = t :=
+  Function.Pullback.observedEquivRange_apply_symm_apply ha hc t
+
+/-- Every fiber of the induced comparison is a subsingleton: an observed class is unique. -/
+example (t : p'.Pullback q') :
+    Subsingleton {x // Function.Pullback.observedMap ha hc x = t} :=
+  Function.Pullback.subsingleton_fiber_observedMap ha hc t
+
+/-! ### The exact lifting criterion -/
+
+/-- A coarse compatible pair is attained exactly when the fine overlap values reached from the
+two sides above it have a common element. -/
+example (t : p'.Pullback q') :
+    t ∈ Set.range (Function.Pullback.map ha hc) ↔
+      (p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty :=
+  Function.Pullback.mem_range_map_iff ha hc t
+
+/-- The same criterion for the induced comparison. -/
+example (t : p'.Pullback q') :
+    t ∈ Set.range (Function.Pullback.observedMap ha hc) ↔
+      (p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty :=
+  Function.Pullback.mem_range_observedMap_iff ha hc t
+
+/-- The criterion as an actual common fine overlap value. -/
+example (t : p'.Pullback q') :
+    t ∈ Set.range (Function.Pullback.map ha hc) ↔
+      ∃ β : B, (∃ l : L, a l = t.fst ∧ p l = β) ∧ ∃ r : R, c r = t.snd ∧ q r = β :=
+  Function.Pullback.mem_range_map_iff_exists_overlap ha hc t
+
+/-! ### Fine lifts of a coarse pair -/
+
+/-- The fiber of the raw comparison over a coarse pair is the fine compatible pairs observed as
+it. -/
+example (t : p'.Pullback q') :
+    {s // Function.Pullback.map ha hc s = t} ≃
+      {s : p.Pullback q // a s.fst = t.fst ∧ c s.snd = t.snd} :=
+  Function.Pullback.fiberMapEquiv ha hc t
+
+/-- That fiber is the compatible pairs of fine lifts of the two coarse components. -/
+example (t : p'.Pullback q') :
+    {s // Function.Pullback.map ha hc s = t} ≃
+      Function.Pullback (fun l : {l // a l = t.fst} => p l.1)
+        fun r : {r // c r = t.snd} => q r.1 :=
+  Function.Pullback.fiberMapEquivPullback ha hc t
+
+/-- Existence of a fine lift is the lifting criterion at that coarse pair. -/
+example (t : p'.Pullback q') :
+    Nonempty {s // Function.Pullback.map ha hc s = t} ↔
+      (p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty :=
+  Function.Pullback.nonempty_fiber_map_iff ha hc t
+
+/-- Absence of a fine lift is failure of the lifting criterion at that coarse pair. -/
+example (t : p'.Pullback q') :
+    IsEmpty {s // Function.Pullback.map ha hc s = t} ↔
+      ¬(p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty :=
+  Function.Pullback.isEmpty_fiber_map_iff ha hc t
+
+/-- Uniqueness of fine lifts, independently of their existence. -/
+example (t : p'.Pullback q') :
+    Subsingleton {s // Function.Pullback.map ha hc s = t} ↔
+      ∀ s s' : p.Pullback q, a s.fst = t.fst ∧ c s.snd = t.snd →
+        a s'.fst = t.fst ∧ c s'.snd = t.snd → s = s' :=
+  Function.Pullback.subsingleton_fiber_map_iff ha hc t
+
+/-- Unique existence of a fine lift. -/
+example (t : p'.Pullback q') :
+    Nonempty (Unique {s // Function.Pullback.map ha hc s = t}) ↔
+      ∃! s : p.Pullback q, a s.fst = t.fst ∧ c s.snd = t.snd :=
+  Function.Pullback.nonempty_unique_fiber_map_iff ha hc t
+
+/-! ### The closing criterion and the inverse -/
+
+/-- The raw comparison is surjective exactly under the criterion everywhere. -/
+example :
+    Function.Surjective (Function.Pullback.map ha hc) ↔
+      ∀ t : p'.Pullback q', (p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty :=
+  Function.Pullback.surjective_map_iff ha hc
+
+/-- The two comparisons are surjective together. -/
+example :
+    Function.Surjective (Function.Pullback.observedMap ha hc) ↔
+      Function.Surjective (Function.Pullback.map ha hc) :=
+  Function.Pullback.surjective_observedMap_iff_surjective_map ha hc
+
+/-- The observed quotient is all coarse compatible pairs exactly under the criterion
+everywhere. -/
+example :
+    Function.Bijective (Function.Pullback.observedMap ha hc) ↔
+      ∀ t : p'.Pullback q', (p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty :=
+  Function.Pullback.bijective_observedMap_iff ha hc
+
+/-- A two-sided inverse of the induced comparison exists exactly under the criterion. -/
+example :
+    (∃ i : p'.Pullback q' → Function.Pullback.Observed ha hc,
+        Function.LeftInverse i (Function.Pullback.observedMap ha hc) ∧
+          Function.RightInverse i (Function.Pullback.observedMap ha hc)) ↔
+      ∀ t : p'.Pullback q', (p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty :=
+  Function.Pullback.exists_inverse_observedMap_iff ha hc
+
+/-- A right inverse forces the criterion everywhere. -/
+example (i : p'.Pullback q' → Function.Pullback.Observed ha hc)
+    (hi : ∀ t, Function.Pullback.observedMap ha hc (i t) = t) (t : p'.Pullback q') :
+    (p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty :=
+  Function.Pullback.inter_nonempty_of_rightInverse ha hc i hi t
+
+section Inverse
+
+variable (h : ∀ t : p'.Pullback q', (p '' (a ⁻¹' {t.fst}) ∩ q '' (c ⁻¹' {t.snd})).Nonempty)
+
+/-- Under the criterion the observed quotient is equivalent to all coarse compatible pairs. The
+inverse is obtained by classical choice. -/
+noncomputable example : Function.Pullback.Observed ha hc ≃ p'.Pullback q' :=
+  Function.Pullback.observedEquiv ha hc h
+
+/-- The forward direction of that equivalence is the induced comparison. -/
+example (x : Function.Pullback.Observed ha hc) :
+    Function.Pullback.observedEquiv ha hc h x = Function.Pullback.observedMap ha hc x :=
+  Function.Pullback.observedEquiv_apply ha hc h x
+
+/-- Round trip: the induced comparison after the inverse. -/
+example (t : p'.Pullback q') :
+    Function.Pullback.observedMap ha hc ((Function.Pullback.observedEquiv ha hc h).symm t) = t :=
+  Function.Pullback.observedMap_observedEquiv_symm ha hc h t
+
+/-- Round trip: the inverse after the induced comparison. -/
+example (x : Function.Pullback.Observed ha hc) :
+    (Function.Pullback.observedEquiv ha hc h).symm
+        (Function.Pullback.observedMap ha hc x) = x :=
+  Function.Pullback.observedEquiv_symm_observedMap ha hc h x
+
+/-- The inverse is the only right inverse. -/
+example (i : p'.Pullback q' → Function.Pullback.Observed ha hc)
+    (hi : ∀ t, Function.Pullback.observedMap ha hc (i t) = t) :
+    i = (Function.Pullback.observedEquiv ha hc h).symm :=
+  Function.Pullback.eq_observedEquiv_symm_of_rightInverse ha hc h i hi
+
+/-- The inverse is the only left inverse. -/
+example (i : p'.Pullback q' → Function.Pullback.Observed ha hc)
+    (hi : ∀ x, i (Function.Pullback.observedMap ha hc x) = x) :
+    i = (Function.Pullback.observedEquiv ha hc h).symm :=
+  Function.Pullback.eq_observedEquiv_symm_of_leftInverse ha hc h i hi
+
+end Inverse
+
+/-! ### Injective overlap observation -/
+
+/-- With an injective overlap observation the criterion is componentwise. -/
+example (hb : Function.Injective b) (t : p'.Pullback q') :
+    t ∈ Set.range (Function.Pullback.map ha hc) ↔
+      t.fst ∈ Set.range a ∧ t.snd ∈ Set.range c :=
+  Function.Pullback.mem_range_map_iff_of_injective ha hc hb t
+
+/-- Sufficient special case: injective overlap observation and surjective local observations. -/
+example (hb : Function.Injective b) (hsa : Function.Surjective a)
+    (hsc : Function.Surjective c) :
+    Function.Bijective (Function.Pullback.observedMap ha hc) :=
+  Function.Pullback.bijective_observedMap_of_injective ha hc hb hsa hsc
+
+/-! ### Restriction of observations to their images -/
+
+/-- The coarse left leg restricts to the images of the observations. -/
+example : Set.range a → Set.range b :=
+  Function.Pullback.rangeRestrict ha
+
+/-- The restricted square commutes pointwise. -/
+example (l : L) :
+    Function.Pullback.rangeRestrict ha (Set.rangeFactorization a l) =
+      Set.rangeFactorization b (p l) :=
+  Function.Pullback.rangeFactorization_comm ha l
+
+/-- The restricted observations are surjective. -/
+example : Function.Surjective (Set.rangeFactorization a) :=
+  Set.rangeFactorization_surjective
+
+/-- The restricted system attains a restricted coarse pair exactly when the original system
+attains its underlying coarse pair. -/
+example (t : (Function.Pullback.rangeRestrict ha).Pullback
+    (Function.Pullback.rangeRestrict hc)) :
+    t ∈ Set.range (Function.Pullback.mapRangeFactorization ha hc) ↔
+      Function.Pullback.rangeInclusion ha hc t ∈ Set.range (Function.Pullback.map ha hc) :=
+  Function.Pullback.mem_range_mapRangeFactorization_iff ha hc t
+
+end Reduction
+
+/-! ### A surjective reduction that loses compatibility -/
+
+section Lifting
+
+open Amalgam.Models.Lifting
+
+/-- The two fine local views restrict to distinct overlap values. -/
+example : p () = false ∧ q () = true := ⟨rfl, rfl⟩
+
+/-- The two squares commute. -/
+example : ∀ l, p' (a l) = b (p l) := ha
+
+example : ∀ r, q' (c r) = b (q r) := hc
+
+/-- All three observation maps are surjective, so this is a reduction onto the coarse span. -/
+example : Function.Surjective a := surjective_a
+
+example : Function.Surjective b := surjective_b
+
+example : Function.Surjective c := surjective_c
+
+/-- No fine pair is compatible. -/
+example : IsEmpty (p.Pullback q) := isEmpty_pullback
+
+/-- The coarse compatible pairs are a singleton. -/
+example : Unique (p'.Pullback q') := uniqueCoarsePullback
+
+/-- Its unique pair. -/
+example : p'.Pullback q' := t₀
+
+/-- The unique coarse pair is compatible. -/
+example : p' t₀.fst = q' t₀.snd := Function.Pullback.comm t₀
+
+/-- The lifting criterion fails there: the fine overlap values reached from the two sides are
+disjoint. -/
+example : ¬(p '' (a ⁻¹' {t₀.fst}) ∩ q '' (c ⁻¹' {t₀.snd})).Nonempty := not_lifts_t₀
+
+/-- The unique coarse pair is attained by neither comparison. -/
+example : t₀ ∉ Set.range (Function.Pullback.map ha hc) := t₀_notMem_range_map
+
+example : t₀ ∉ Set.range (Function.Pullback.observedMap ha hc) := t₀_notMem_range_observedMap
+
+/-- It has no fine lift. -/
+example : IsEmpty {s // Function.Pullback.map ha hc s = t₀} := isEmpty_fiber_t₀
+
+/-- The observed quotient is empty. -/
+example : IsEmpty (Function.Pullback.Observed ha hc) := isEmpty_observed
+
+/-- Existence fails, so surjective observations do not suffice. -/
+example : ¬Function.Surjective (Function.Pullback.map ha hc) := not_surjective_map
+
+example : ¬Function.Bijective (Function.Pullback.observedMap ha hc) := not_bijective_observedMap
+
+end Lifting
 
 /-! ## Four comparison behaviors -/
 
