@@ -6,9 +6,10 @@
 
 This is the founding proposal for a new Lean 4 project.
 
-The Lean implementation has not started. The theorem packages, criteria, and
-witnesses below specify work to formalize; they are not a report of compiled
-results.
+The Lean library currently implements maps, fibers, binary compatibility, and
+four finite comparison behaviors. `REVIEW.md` records the current review state.
+The remaining theorem packages, criteria, and witnesses below specify work to
+formalize; they are not a report of compiled results.
 
 The project begins from a clean repository and a clean mathematical context.
 Earlier repositories are evidence and possible theorem donors, not inherited
