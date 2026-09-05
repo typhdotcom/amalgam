@@ -2,6 +2,7 @@ import Amalgam.Core.Comparison
 import Amalgam.Core.Fiber
 import Amalgam.Core.Reduction
 import Amalgam.Models.Lifting
+import Amalgam.Models.MiddleSplit
 import Amalgam.Models.Overlap
 import Amalgam.Models.Span
 import Amalgam.Models.Zigzag
@@ -9,6 +10,9 @@ import Amalgam.System.Binary
 import Amalgam.System.Comparison
 import Amalgam.System.Presentation
 import Amalgam.System.Restriction
+import Amalgam.System.Zigzag
+import Amalgam.System.ZigzagRealization
+import Amalgam.System.ZigzagTarget
 
 /-!
 # Status manifest
@@ -26,6 +30,7 @@ The section headings match the README headings.
 -/
 
 universe uX uY uZ uX' uY' uL' uR' uG' uB' uLf uRf uBf uLc uRc uBc uC uS uS' uI uK uM
+universe uV uV₁ uV₂ uW
 
 namespace Amalgam.Status
 
@@ -1401,6 +1406,472 @@ example : φA.image LM ≠ φB.image LM := image_LM_ne
 example : φA.image MR ≠ φB.image MR := image_MR_ne
 
 end ZigzagCalibration
+
+/-! ## The zigzag information boundary -/
+
+section InformationBoundary
+
+open Zigzag
+
+/-! ### Shape and admissible datum
+
+The order facts of the shared five-point shape are the `Zigzag.Context` lemmas already mirrored
+in the calibration section above; they are not restated here. -/
+
+/-- The eight declared admissible families, presented on `Fin n` in the order `L, M, R`. -/
+example : Fin 0 → Context := Zigzag.empty
+
+example : Fin 1 → Context := Zigzag.single Context.L
+
+example : Fin 1 → Context := Zigzag.single Context.M
+
+example : Fin 1 → Context := Zigzag.single Context.R
+
+example : Fin 2 → Context := Zigzag.LM
+
+example : Fin 2 → Context := Zigzag.LR
+
+example : Fin 2 → Context := Zigzag.MR
+
+example : Fin 3 → Context := Zigzag.LMR
+
+/-- They are the subfamilies of the local views `L`, `M`, `R`. -/
+example : Zigzag.LM = ![Context.L, Context.M] := rfl
+
+example : Zigzag.LR = ![Context.L, Context.R] := rfl
+
+example : Zigzag.MR = ![Context.M, Context.R] := rfl
+
+example : Zigzag.LMR = ![Context.L, Context.M, Context.R] := rfl
+
+/-- The declared operations are the forgetful restrictions along inclusions, from the full family
+to each pair and each single view. -/
+example : FamilyMap Zigzag.LMR Zigzag.LM := Zigzag.toLM
+
+example : FamilyMap Zigzag.LMR Zigzag.MR := Zigzag.toMR
+
+example : FamilyMap Zigzag.LMR Zigzag.LR := Zigzag.toLR
+
+example : FamilyMap Zigzag.LMR (Zigzag.single Context.L) := Zigzag.LMR.toL
+
+example : FamilyMap Zigzag.LMR (Zigzag.single Context.M) := Zigzag.LMR.toM
+
+example : FamilyMap Zigzag.LMR (Zigzag.single Context.R) := Zigzag.LMR.toR
+
+/-- From each pair to its two views. -/
+example : FamilyMap Zigzag.LM (Zigzag.single Context.L) := Zigzag.LM.toL
+
+example : FamilyMap Zigzag.LM (Zigzag.single Context.M) := Zigzag.LM.toM
+
+example : FamilyMap Zigzag.LR (Zigzag.single Context.L) := Zigzag.LR.toL
+
+example : FamilyMap Zigzag.LR (Zigzag.single Context.R) := Zigzag.LR.toR
+
+example : FamilyMap Zigzag.MR (Zigzag.single Context.M) := Zigzag.MR.toM
+
+example : FamilyMap Zigzag.MR (Zigzag.single Context.R) := Zigzag.MR.toR
+
+/-- From every family to the empty family. -/
+example : FamilyMap Zigzag.LMR Zigzag.empty := Zigzag.toEmpty Zigzag.LMR
+
+example : FamilyMap (Zigzag.single Context.L) Zigzag.empty :=
+  Zigzag.toEmpty (Zigzag.single Context.L)
+
+/-! ### Candidates, the supplied datum, and the target -/
+
+section TargetSection
+
+variable {S' : RestrictionSystem.{0, uW} Context}
+
+/-- A family over a single view is always compatible. -/
+example (S : RestrictionSystem.{0, uV} Context) (c : Context)
+    (x : ∀ i : Fin 1, S.State (Zigzag.single c i)) : S.Compatible (Zigzag.single c) x :=
+  Zigzag.compatible_single S c x
+
+/-- A family over the two outer views is always compatible: `L` and `R` have no common coarser
+context. -/
+example (S : RestrictionSystem.{0, uV} Context) (x : ∀ i : Fin 2, S.State (Zigzag.LR i)) :
+    S.Compatible Zigzag.LR x :=
+  Zigzag.compatible_LR S x
+
+/-- Every morphism has the full coarse image on the empty family. -/
+example {S : RestrictionSystem.{0, uV} Context} (φ : S.Hom S') :
+    φ.image Zigzag.empty = (Set.univ : Set (S'.CompatibleFamily Zigzag.empty)) :=
+  Zigzag.image_empty φ
+
+/-- On a single view, once the observation there is surjective. -/
+example {S : RestrictionSystem.{0, uV} Context} (φ : S.Hom S') (c : Context)
+    (h : Function.Surjective (φ.toFun c)) :
+    φ.image (Zigzag.single c) = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single c))) :=
+  Zigzag.image_single φ c h
+
+/-- On the two outer views, once the observations at `L` and `R` are surjective. -/
+example {S : RestrictionSystem.{0, uV} Context} (φ : S.Hom S')
+    (hL : Function.Surjective (φ.toFun Context.L))
+    (hR : Function.Surjective (φ.toFun Context.R)) :
+    φ.image Zigzag.LR = (Set.univ : Set (S'.CompatibleFamily Zigzag.LR)) :=
+  Zigzag.image_LR φ hL hR
+
+/-- A candidate realization is a fine restriction system with an objectwise surjective
+observation, in a universe independent of the coarse one. -/
+example (c : Zigzag.Candidate.{uV, uW} S') : RestrictionSystem.{0, uV} Context := c.S
+
+example (c : Zigzag.Candidate.{uV, uW} S') : c.S.Hom S' := c.φ
+
+example (c : Zigzag.Candidate.{uV, uW} S') (d : Context) : Function.Surjective (c.φ.toFun d) :=
+  c.surjective d
+
+/-- The supplied datum is the ordered pair `(I_LM, I_MR)` of attainable images. -/
+example (c : Zigzag.Candidate.{uV, uW} S') :
+    (c.datum : Set (S'.CompatibleFamily Zigzag.LM) × Set (S'.CompatibleFamily Zigzag.MR)) =
+      (c.φ.image Zigzag.LM, c.φ.image Zigzag.MR) :=
+  rfl
+
+/-- The target collects the attainable image of every declared family. -/
+example (c : Zigzag.Candidate.{uV, uW} S') : Zigzag.Target S' := c.target
+
+example (c : Zigzag.Candidate.{uV, uW} S') (f : Zigzag.Family) :
+    c.target.image f = c.φ.image f.fam :=
+  c.target_image f
+
+/-- The target equivalence is equality of all eight subsets, equivalently agreement at every
+declared family label. -/
+example (t t' : Zigzag.Target S') : t = t' ↔ ∀ f : Zigzag.Family, t.image f = t'.image f :=
+  Zigzag.Target.ext_iff_image
+
+/-- Five entries are the same for every candidate: the empty family, each single view, and the
+two outer views. -/
+example (c : Zigzag.Candidate.{uV, uW} S') :
+    c.target.empty = (Set.univ : Set (S'.CompatibleFamily Zigzag.empty)) :=
+  c.target_empty
+
+example (c : Zigzag.Candidate.{uV, uW} S') :
+    c.target.l = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.L))) :=
+  c.target_l
+
+example (c : Zigzag.Candidate.{uV, uW} S') :
+    c.target.m = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.M))) :=
+  c.target_m
+
+example (c : Zigzag.Candidate.{uV, uW} S') :
+    c.target.r = (Set.univ : Set (S'.CompatibleFamily (Zigzag.single Context.R))) :=
+  c.target_r
+
+example (c : Zigzag.Candidate.{uV, uW} S') :
+    c.target.lr = (Set.univ : Set (S'.CompatibleFamily Zigzag.LR)) :=
+  c.target_lr
+
+/-- The two remaining proper entries are exactly the supplied datum. -/
+example (c : Zigzag.Candidate.{uV, uW} S') :
+    c.target.lm = (c.datum.1 : Set (S'.CompatibleFamily Zigzag.LM)) :=
+  c.target_lm
+
+example (c : Zigzag.Candidate.{uV, uW} S') :
+    c.target.mr = (c.datum.2 : Set (S'.CompatibleFamily Zigzag.MR)) :=
+  c.target_mr
+
+example (c : Zigzag.Candidate.{uV, uW} S') :
+    c.target.lmr = (c.φ.image Zigzag.LMR : Set (S'.CompatibleFamily Zigzag.LMR)) :=
+  c.target_lmr
+
+/-- The closing equivalence: two candidates, with fine systems in independent universes, have the
+same target exactly when they have the same supplied datum and the same full image. -/
+example (c₁ : Zigzag.Candidate.{uV₁, uW} S') (c₂ : Zigzag.Candidate.{uV₂, uW} S') :
+    c₁.target = c₂.target ↔
+      c₁.datum = c₂.datum ∧ c₁.φ.image Zigzag.LMR = c₂.φ.image Zigzag.LMR :=
+  Zigzag.Candidate.target_eq_iff c₁ c₂
+
+/-- Equal targets give equal attainable images at every declared family label. -/
+example {c₁ : Zigzag.Candidate.{uV₁, uW} S'} {c₂ : Zigzag.Candidate.{uV₂, uW} S'}
+    (h : c₁.target = c₂.target) (f : Zigzag.Family) : c₁.φ.image f.fam = c₂.φ.image f.fam :=
+  Zigzag.Candidate.image_eq_of_target_eq h f
+
+/-- The induced image restriction maps of two morphisms into `S'` agree on underlying coarse
+families: both are the fixed coarse map `S'.restrict m`. -/
+example {ι : Type uI} {κ : Type uK} {F : ι → Context} {E : κ → Context} (m : FamilyMap F E)
+    {S₁ : RestrictionSystem.{0, uV₁} Context} {S₂ : RestrictionSystem.{0, uV₂} Context}
+    (φ₁ : S₁.Hom S') (φ₂ : S₂.Hom S') (y : S'.CompatibleFamily F) (h₁ : y ∈ φ₁.image F)
+    (h₂ : y ∈ φ₂.image F) :
+    (φ₁.restrictImage m ⟨y, h₁⟩ : S'.CompatibleFamily E) = φ₂.restrictImage m ⟨y, h₂⟩ :=
+  Zigzag.coe_restrictImage_eq m φ₁ φ₂ y h₁ h₂
+
+/-- Under equal images they commute with the identifications of those equalities. -/
+example {ι : Type uI} {κ : Type uK} {F : ι → Context} {E : κ → Context} (m : FamilyMap F E)
+    {S₁ : RestrictionSystem.{0, uV₁} Context} {S₂ : RestrictionSystem.{0, uV₂} Context}
+    {φ₁ : S₁.Hom S'} {φ₂ : S₂.Hom S'} (hF : φ₁.image F = φ₂.image F)
+    (hE : φ₁.image E = φ₂.image E) (y : φ₁.image F) :
+    Equiv.setCongr hE (φ₁.restrictImage m y) = φ₂.restrictImage m (Equiv.setCongr hF y) :=
+  Zigzag.restrictImage_setCongr m hF hE y
+
+/-- For candidates with equal targets, along every declared operation between declared
+families. -/
+example {c₁ : Zigzag.Candidate.{uV₁, uW} S'} {c₂ : Zigzag.Candidate.{uV₂, uW} S'}
+    (h : c₁.target = c₂.target) {f e : Zigzag.Family} (m : FamilyMap f.fam e.fam)
+    (y : c₁.φ.image f.fam) :
+    Equiv.setCongr (Zigzag.Candidate.image_eq_of_target_eq h e) (c₁.φ.restrictImage m y) =
+      c₂.φ.restrictImage m
+        (Equiv.setCongr (Zigzag.Candidate.image_eq_of_target_eq h f) y) :=
+  Zigzag.Candidate.restrictImage_setCongr_of_target_eq h m y
+
+end TargetSection
+
+/-! ### The coarse join, the necessary inclusion, and the realization -/
+
+section RealizationSection
+
+variable {S' : RestrictionSystem.{0, uW} Context} (A : Set (S'.CompatibleFamily Zigzag.LM))
+  (A' : Set (S'.CompatibleFamily Zigzag.MR)) (T : Set (S'.CompatibleFamily Zigzag.LMR))
+
+/-- The coarse join of two subsets of the coarse binary family types. -/
+example : Set (S'.CompatibleFamily Zigzag.LMR) := Zigzag.join A A'
+
+/-- Membership in the coarse join. -/
+example (y : S'.CompatibleFamily Zigzag.LMR) :
+    y ∈ Zigzag.join A A' ↔
+      S'.restrict Zigzag.toLM y ∈ A ∧ S'.restrict Zigzag.toMR y ∈ A' :=
+  Zigzag.mem_join_iff y
+
+/-- The necessary inclusion, by naturality of the family comparison. No surjectivity of the
+observation is used and the fine system may live in any universe. -/
+example {S : RestrictionSystem.{0, uV} Context} (φ : S.Hom S') :
+    φ.image Zigzag.LMR ⊆ Zigzag.join (φ.image Zigzag.LM) (φ.image Zigzag.MR) :=
+  Zigzag.image_LMR_subset_join φ
+
+/-- The same statement for named images. -/
+example {S : RestrictionSystem.{0, uV} Context} (φ : S.Hom S')
+    (hLM : φ.image Zigzag.LM = A) (hMR : φ.image Zigzag.MR = A')
+    (hLMR : φ.image Zigzag.LMR = T) : T ⊆ Zigzag.join A A' :=
+  Zigzag.subset_join_of_images φ hLM hMR hLMR
+
+/-- The realization of `(A, A', T)`: tagged fine states with tag-preserving restriction. -/
+example : RestrictionSystem.{0, uW} Context := Zigzag.realize A A' T
+
+example (c : Context) : (Zigzag.realize A A' T).State c = Zigzag.TaggedState A A' T c := rfl
+
+/-- A fine state is a coarse state carrying the witness it serves: the full family it lifts, one
+of the two binary families it lifts, or a copy of a coarse state at a finer context. -/
+example (y : T) (c : Context) : Zigzag.TaggedState A A' T c := Zigzag.TaggedState.full y
+
+example (a : A) (c : Context) (h : c ≤ Context.L ∨ c ≤ Context.M) :
+    Zigzag.TaggedState A A' T c :=
+  Zigzag.TaggedState.lm a h
+
+example (a' : A') (c : Context) (h : c ≤ Context.M ∨ c ≤ Context.R) :
+    Zigzag.TaggedState A A' T c :=
+  Zigzag.TaggedState.mr a' h
+
+example (p : Σ d : Context, S'.State d) (c : Context) (h : c ≤ p.1) :
+    Zigzag.TaggedState A A' T c :=
+  Zigzag.TaggedState.solo p h
+
+/-- Restriction of the realization preserves tags. -/
+example {c d : Context} (h : c ≤ d) (x : Zigzag.TaggedState A A' T d) :
+    (Zigzag.realize A A' T).res h x = Zigzag.TaggedState.res h x :=
+  rfl
+
+/-- The observation reads the coarse state that the tag dictates. -/
+example : (Zigzag.realize A A' T).Hom S' := Zigzag.realizeHom A A' T
+
+/-- The `solo` copies make the observation surjective at every context. -/
+example (c : Context) : Function.Surjective ((Zigzag.realizeHom A A' T).toFun c) :=
+  Zigzag.surjective_realizeHom A A' T c
+
+/-- An `L`-state and an `M`-state agree at `B` exactly when they carry the same `full` or `lm`
+tag. -/
+example (u : Zigzag.TaggedState A A' T Context.L) (v : Zigzag.TaggedState A A' T Context.M) :
+    Zigzag.TaggedState.res Context.B_le_L u = Zigzag.TaggedState.res Context.B_le_M v ↔
+      (∃ y : T, u = Zigzag.TaggedState.full y ∧ v = Zigzag.TaggedState.full y) ∨
+        ∃ a : A, u = Zigzag.TaggedState.lm a (Or.inl le_rfl) ∧
+          v = Zigzag.TaggedState.lm a (Or.inr le_rfl) :=
+  Zigzag.TaggedState.res_eq_res_LM_iff u v
+
+/-- An `M`-state and an `R`-state agree at `D` exactly when they carry the same `full` or `mr`
+tag. -/
+example (v : Zigzag.TaggedState A A' T Context.M) (w : Zigzag.TaggedState A A' T Context.R) :
+    Zigzag.TaggedState.res Context.D_le_M v = Zigzag.TaggedState.res Context.D_le_R w ↔
+      (∃ y : T, v = Zigzag.TaggedState.full y ∧ w = Zigzag.TaggedState.full y) ∨
+        ∃ a' : A', v = Zigzag.TaggedState.mr a' (Or.inl le_rfl) ∧
+          w = Zigzag.TaggedState.mr a' (Or.inr le_rfl) :=
+  Zigzag.TaggedState.res_eq_res_MR_iff v w
+
+/-- A compatible fine triple therefore carries one `full` tag. -/
+example (u : Zigzag.TaggedState A A' T Context.L) (v : Zigzag.TaggedState A A' T Context.M)
+    (w : Zigzag.TaggedState A A' T Context.R)
+    (h₁ : Zigzag.TaggedState.res Context.B_le_L u = Zigzag.TaggedState.res Context.B_le_M v)
+    (h₂ : Zigzag.TaggedState.res Context.D_le_M v = Zigzag.TaggedState.res Context.D_le_R w) :
+    ∃ y : T, u = Zigzag.TaggedState.full y ∧ v = Zigzag.TaggedState.full y ∧
+      w = Zigzag.TaggedState.full y :=
+  Zigzag.TaggedState.eq_full_of_res_eq u v w h₁ h₂
+
+/-- The two binary images of the realization are `A` and `A'`, under `T ⊆ join A A'`. -/
+example (hT : T ⊆ Zigzag.join A A') : (Zigzag.realizeHom A A' T).image Zigzag.LM = A :=
+  Zigzag.image_LM_realize hT
+
+example (hT : T ⊆ Zigzag.join A A') : (Zigzag.realizeHom A A' T).image Zigzag.MR = A' :=
+  Zigzag.image_MR_realize hT
+
+/-- The full image of the realization is `T`, for every `A`, `A'` and `T`. -/
+example : (Zigzag.realizeHom A A' T).image Zigzag.LMR = T :=
+  Zigzag.image_LMR_realize A A' T
+
+/-- The exact classification: `(A, A', T)` is realized by a fine system with objectwise
+surjective observations exactly when `T ⊆ join A A'`. -/
+example :
+    (∃ (S : RestrictionSystem.{0, uW} Context) (φ : S.Hom S'),
+        (∀ c : Context, Function.Surjective (φ.toFun c)) ∧
+          φ.image Zigzag.LM = A ∧ φ.image Zigzag.MR = A' ∧ φ.image Zigzag.LMR = T) ↔
+      T ⊆ Zigzag.join A A' :=
+  Zigzag.exists_realization_iff A A' T
+
+/-- The datum determines the realizable full image exactly when the join is empty. -/
+example :
+    (∀ T₁ T₂ : Set (S'.CompatibleFamily Zigzag.LMR),
+        T₁ ⊆ Zigzag.join A A' → T₂ ⊆ Zigzag.join A A' → T₁ = T₂) ↔
+      Zigzag.join A A' = ∅ :=
+  Zigzag.unique_full_image_iff A A'
+
+/-- Equivalently, any two candidates supplying the datum `(A, A')` have the same full image
+exactly when the join is empty: the datum records no agreement of fine middle states. -/
+example :
+    (∀ (S₁ S₂ : RestrictionSystem.{0, uW} Context) (φ₁ : S₁.Hom S') (φ₂ : S₂.Hom S'),
+        (∀ c : Context, Function.Surjective (φ₁.toFun c)) →
+          (∀ c : Context, Function.Surjective (φ₂.toFun c)) →
+            φ₁.image Zigzag.LM = A → φ₁.image Zigzag.MR = A' →
+              φ₂.image Zigzag.LM = A → φ₂.image Zigzag.MR = A' →
+                φ₁.image Zigzag.LMR = φ₂.image Zigzag.LMR) ↔
+      Zigzag.join A A' = ∅ :=
+  Zigzag.image_LMR_determined_iff A A'
+
+end RealizationSection
+
+/-! ### A strict finite witness and the finite sweep -/
+
+section MiddleSplitWitness
+
+open Amalgam.Models.MiddleSplit
+
+/-- The coarse system has one state at every context, so every coarse compatible-family type is a
+singleton. -/
+example (c : Context) : coarse.State c = Unit := rfl
+
+example {ι : Type uI} (F : ι → Context) : Unique (coarse.CompatibleFamily F) :=
+  uniqueCoarseFamily F
+
+/-- The fine system `split` has two middle states, two states at each overlap, and singletons at
+the outer views. -/
+example : split.State = Amalgam.Models.MiddleSplit.State := rfl
+
+example : Amalgam.Models.MiddleSplit.State Context.L = Unit := rfl
+
+example : Amalgam.Models.MiddleSplit.State Context.B = Bool := rfl
+
+example : Amalgam.Models.MiddleSplit.State Context.M = Bool := rfl
+
+example : Amalgam.Models.MiddleSplit.State Context.D = Bool := rfl
+
+example : Amalgam.Models.MiddleSplit.State Context.R = Unit := rfl
+
+/-- Its restriction values: `L→B ↦ false`, `M→B` and `M→D` the identity, `R→D ↦ true`. -/
+example (x : Amalgam.Models.MiddleSplit.State Context.L) :
+    split.res Context.B_le_L x = false :=
+  rfl
+
+example (x : Amalgam.Models.MiddleSplit.State Context.M) : split.res Context.B_le_M x = x := rfl
+
+example (x : Amalgam.Models.MiddleSplit.State Context.M) : split.res Context.D_le_M x = x := rfl
+
+example (x : Amalgam.Models.MiddleSplit.State Context.R) :
+    split.res Context.D_le_R x = true :=
+  rfl
+
+/-- The fine system `glue` has one state at every context, and every family of its states is
+compatible. -/
+example (c : Context) : glue.State c = Unit := rfl
+
+example {ι : Type uI} (F : ι → Context) (x : ∀ i, glue.State (F i)) : glue.Compatible F x :=
+  compatible_glue F x
+
+/-- Compatibility over `LM` forces the middle state `false`, over `MR` forces `true`, and over
+`LMR` forces both. -/
+example (x : ∀ i : Fin 2, Amalgam.Models.MiddleSplit.State (Zigzag.LM i)) :
+    split.Compatible Zigzag.LM x ↔ x 1 = false :=
+  compatible_LM_split_iff x
+
+example (x : ∀ i : Fin 2, Amalgam.Models.MiddleSplit.State (Zigzag.MR i)) :
+    split.Compatible Zigzag.MR x ↔ x 0 = true :=
+  compatible_MR_split_iff x
+
+example (x : ∀ i : Fin 3, Amalgam.Models.MiddleSplit.State (Zigzag.LMR i)) :
+    split.Compatible Zigzag.LMR x ↔ x 1 = false ∧ x 1 = true :=
+  compatible_LMR_split_iff x
+
+example (x : ∀ i : Fin 3, Amalgam.Models.MiddleSplit.State (Zigzag.LMR i)) :
+    ¬split.Compatible Zigzag.LMR x :=
+  not_compatible_LMR_split x
+
+/-- Both adjacent binary lifts exist and no lift of the full family does. -/
+example : Nonempty (split.CompatibleFamily Zigzag.LM) := nonempty_LM_split
+
+example : Nonempty (split.CompatibleFamily Zigzag.MR) := nonempty_MR_split
+
+example : IsEmpty (split.CompatibleFamily Zigzag.LMR) := isEmpty_LMR_split
+
+example : Nonempty (glue.CompatibleFamily Zigzag.LMR) := nonempty_LMR_glue
+
+/-- Both observations are surjective at every context. -/
+example : ∀ c : Context, Function.Surjective (φsplit.toFun c) := surjective_φsplit
+
+example : ∀ c : Context, Function.Surjective (φglue.toFun c) := surjective_φglue
+
+/-- The six attainable images, where `Set.univ` is the singleton of coarse families. -/
+example : φsplit.image Zigzag.LM = (Set.univ : Set (coarse.CompatibleFamily Zigzag.LM)) :=
+  image_LM_split
+
+example : φsplit.image Zigzag.MR = (Set.univ : Set (coarse.CompatibleFamily Zigzag.MR)) :=
+  image_MR_split
+
+example : φsplit.image Zigzag.LMR = (∅ : Set (coarse.CompatibleFamily Zigzag.LMR)) :=
+  image_LMR_split
+
+example : φglue.image Zigzag.LM = (Set.univ : Set (coarse.CompatibleFamily Zigzag.LM)) :=
+  image_LM_glue
+
+example : φglue.image Zigzag.MR = (Set.univ : Set (coarse.CompatibleFamily Zigzag.MR)) :=
+  image_MR_glue
+
+example : φglue.image Zigzag.LMR = (Set.univ : Set (coarse.CompatibleFamily Zigzag.LMR)) :=
+  image_LMR_glue
+
+/-- The strict pair: equal supplied datum, different full images. -/
+example : φsplit.image Zigzag.LM = φglue.image Zigzag.LM := image_LM_eq
+
+example : φsplit.image Zigzag.MR = φglue.image Zigzag.MR := image_MR_eq
+
+example : φsplit.image Zigzag.LMR ≠ φglue.image Zigzag.LMR := image_LMR_ne
+
+/-- The named coarse family separating the two candidates. -/
+example : coarse.CompatibleFamily Zigzag.LMR := y₀
+
+example : y₀ ∈ φglue.image Zigzag.LMR := y₀_mem_image_glue
+
+example : y₀ ∉ φsplit.image Zigzag.LMR := y₀_notMem_image_split
+
+/-- All four adjacent binary comparisons are surjective onto the coarse binary families. -/
+example : Function.Surjective (φsplit.observedMapFamily Zigzag.LM) :=
+  surjective_observedMapFamily_LM_split
+
+example : Function.Surjective (φsplit.observedMapFamily Zigzag.MR) :=
+  surjective_observedMapFamily_MR_split
+
+example : Function.Surjective (φglue.observedMapFamily Zigzag.LM) :=
+  surjective_observedMapFamily_LM_glue
+
+example : Function.Surjective (φglue.observedMapFamily Zigzag.MR) :=
+  surjective_observedMapFamily_MR_glue
+
+end MiddleSplitWitness
+
+end InformationBoundary
 
 /-! ## Four comparison behaviors -/
 

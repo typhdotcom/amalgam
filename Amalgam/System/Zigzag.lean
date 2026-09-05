@@ -113,6 +113,11 @@ abbrev MR : Fin 2 → Context := ![M, R]
 /-- The full family `![L, M, R]`. -/
 abbrev LMR : Fin 3 → Context := ![L, M, R]
 
+/-- The family `![L, R]` of the two outer views. -/
+abbrev LR : Fin 2 → Context := ![L, R]
+
+/-! ### The declared forgetful operations -/
+
 /-- The declared restriction operation forgetting the view `R`. -/
 def toLM : FamilyMap LMR LM :=
   ⟨![0, 1], fun k => match k with | 0 => le_rfl | 1 => le_rfl⟩
@@ -120,11 +125,6 @@ def toLM : FamilyMap LMR LM :=
 /-- The declared restriction operation forgetting the view `L`. -/
 def toMR : FamilyMap LMR MR :=
   ⟨![1, 2], fun k => match k with | 0 => le_rfl | 1 => le_rfl⟩
-
-/-- The family `![L, R]` of the two outer views. -/
-abbrev LR : Fin 2 → Context := ![L, R]
-
-/-! ### The declared forgetful operations -/
 
 /-- Forgetting the view `M`. -/
 def toLR : FamilyMap LMR LR :=

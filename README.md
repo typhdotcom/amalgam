@@ -5,8 +5,10 @@ admissible comparisons determine about possible global realizations. It
 currently covers the fibers of an ordinary map, the compatible pairs of a
 binary span, the comparison map that a commuting square induces from its
 global states to those pairs, the reduction of compatible pairs across an
-observed overlap, and restriction systems over a preorder of contexts with
-their compatible families, family comparison, and binary recovery. Everything
+observed overlap, restriction systems over a preorder of contexts with their
+compatible families, family comparison, and binary recovery, and the exact
+classification of the attainable images on the five-context zigzag determined
+by its adjacent binary datum. Everything
 is stated for arbitrary types: carriers
 and fibers may be empty, and no finiteness, decidability, or coverage hypothesis
 appears in any criterion. [PROPOSAL.md](PROPOSAL.md) defines the mathematical
@@ -391,7 +393,8 @@ attained through the intersection criterion
 (`y₀_mem_image_of_inter_nonempty`).
 
 `Amalgam/Models/Zigzag.lean` carries the Section 12 witness on
-`L → B ← M → D ← R`. The five-point preorder has `B ≤ L`, `B ≤ M`, `D ≤ M` and
+`L → B ← M → D ← R`, over the five-point preorder shared from
+`Amalgam/System/Zigzag.lean`, which has `B ≤ L`, `B ≤ M`, `D ≤ M` and
 `D ≤ R` (`B_le_L`, `B_le_M`, `D_le_M`, `D_le_R`), with `B` greatest among the
 common coarser contexts of `L` and `M`, `D` greatest among those of `M` and
 `R`, and no common coarser context of `L` and `R`
@@ -433,6 +436,186 @@ systems have equal full-family images (`image_LMR_eq`) while their `LM` and
 not determine all-family content. No smallest-shape claim is made, and no M3
 datum is refuted.
 
+## The zigzag information boundary
+
+### Shape and admissible datum
+
+`Amalgam/System/Zigzag.lean` fixes the shape and the admissible datum shared by
+the concrete models and by the generic classification. `Zigzag.Context` is the
+five-point preorder with `B ≤ L`, `B ≤ M`, `D ≤ M`, `D ≤ R`, reflexivity and no
+other relation (`B_le_L`, `B_le_M`, `D_le_M`, `D_le_R`); `B` is the greatest
+common coarser context of `L` and `M`, `D` that of `M` and `R`, and `L` and `R`
+have no common coarser context (`le_B_of_le_L_of_le_M`, `le_D_of_le_M_of_le_R`,
+`not_le_L_of_le_R`). The declared admissible families are the eight subfamilies
+of the local views `L`, `M`, `R`, presented on `Fin n` in the order `L, M, R`:
+
+```text
+empty, single L, single M, single R, LM, LR, MR, LMR
+```
+
+Their declared operations are the forgetful restrictions along inclusions, each
+a `FamilyMap` with reflexive context inequalities: `toLM`, `toMR` and `toLR`
+from the full family to a pair, `LMR.toL`, `LMR.toM` and `LMR.toR` from the full
+family to a single view, `LM.toL`, `LM.toM`, `LR.toL`, `LR.toR`, `MR.toM` and
+`MR.toR` from a pair to its two views, and `toEmpty F` from any family to the
+empty one. The overlap contexts `B` and `D` belong to the systems and to the
+compatibility conditions, but they are not local views of this collection and
+carry no reconstruction target of their own.
+
+### Candidates, the supplied datum, and the target
+
+`Amalgam/System/ZigzagTarget.lean` fixes an arbitrary coarse restriction system
+`S'` on that shape. A candidate realization `Candidate S'` is a fine restriction
+system `S` together with a morphism `φ : S.Hom S'` whose observation is
+surjective at every context. No finiteness of the fine carriers, no
+nonemptiness of global families, and no surjectivity of family restrictions is
+imposed, and the fine system may live in any universe.
+
+The supplied datum `Candidate.datum` is the ordered pair `(I_LM, I_MR)` of
+attainable images over the two adjacent binary families, as subsets of the fixed
+coarse compatible-family types. The target `Candidate.target : Target S'`
+collects the attainable image of all eight declared families as subsets of those
+same fixed coarse types. The target equivalence is equality of the eight subsets
+(`Target.ext_iff`, equivalently agreement at every label of `Family` by
+`Target.ext_iff_image`); it is neither a bijection of images nor presentation
+equivalence.
+
+Five of the eight entries are the same for every candidate. `image_empty` is the
+full coarse image on the empty family, since both compatible-family types over
+`Fin 0` are singletons; `image_single` is the full coarse image on a single
+view, since a family over `Fin 1` is a state and is automatically compatible
+(`compatible_single`), so surjectivity of the observation there suffices; and
+`image_LR` is the full coarse image on the two outer views, since `L` and `R`
+have no common coarser context, so every pair of states is compatible
+(`compatible_LR`). On candidates these are `target_empty`, `target_l`,
+`target_m`, `target_r` and `target_lr`, while `target_lm` and `target_mr` are
+exactly the two components of the supplied datum.
+
+Hence the closing equivalence `Candidate.target_eq_iff`: two candidates, whose
+fine systems may live in independent universes, have the same target exactly
+when they have the same supplied datum and the same full image `I_LMR`. That is
+what licenses treating `I_LMR` as the remaining joint question at fixed datum;
+it is not an assumption that the full image projects onto a proper image, for
+which naturality supplies the inclusion `restrict(I_F) ⊆ I_E` and nothing more.
+`image_eq_of_target_eq` reads the resulting agreement off at any label.
+
+The induced maps on attainable images agree too, because both restrict the same
+fixed coarse map `S'.restrict m`. `coe_restrictImage_eq` says that two morphisms
+into `S'` induce the same map on underlying coarse families,
+`restrictImage_setCongr` that the induced maps commute with the identifications
+`Equiv.setCongr` of equal images, and
+`Candidate.restrictImage_setCongr_of_target_eq` states that for candidates with
+equal targets along every `FamilyMap` between declared families. The set-level
+inclusion `S'.restrict m '' I_F ⊆ I_E` is literally the same statement for equal
+targets, so it is not restated.
+
+### The coarse join, the necessary inclusion, and the realization
+
+`Amalgam/System/ZigzagRealization.lean` classifies the possible full images. For
+arbitrary subsets `A` of the coarse `LM`-families and `A'` of the coarse
+`MR`-families, `join A A'` is the coarse join
+
+```text
+J(A_LM, A_MR) =
+  {y in P'_LMR | restrict_toLM(y) in A_LM and restrict_toMR(y) in A_MR}.
+```
+
+with membership `mem_join_iff`.
+
+Necessity is naturality alone. `image_LMR_subset_join` says
+`I_LMR ⊆ J(I_LM, I_MR)` for every morphism, consuming M2's
+`mapsTo_restrict_image`; no surjectivity of the observation is used and the fine
+system may live in any universe. `subset_join_of_images` is the same statement
+for named images.
+
+Sufficiency is an explicit construction of tagged copies. The fine states of
+`realize A A' T` at a context are the `TaggedState` constructors: one `full y`
+for each `y ∈ T` at every context, one `lm a h` for each `a ∈ A` at every context
+below `L` or `M`, one `mr a' h` for each `a' ∈ A'` at every context below `M` or
+`R`, and one `solo p h` for every coarse state at a finer context. A fine state
+is therefore a coarse state carrying the witness it serves: `realizeHom A A' T`
+observes a tagged state as the coarse state its witness dictates there
+(`stateLMR`, `stateLM`, `stateMR`), and a `solo` copy as the restriction of the
+coarse state it copies, which makes the observation surjective at every context
+(`surjective_realizeHom`). Restriction preserves tags, so two fine
+states agree on an overlap exactly when they carry the same tag
+(`TaggedState.res_eq_res_LM_iff`, `TaggedState.res_eq_res_MR_iff`): the
+compatible fine families over `LM` are the constant `full`- and `lm`-tagged
+ones, those over `MR` the constant `full`- and `mr`-tagged ones, and those over
+`LMR` the constant `full`-tagged ones (`eq_full_of_res_eq`). Reading their
+observations gives `image_LM_realize` and `image_MR_realize`, which consume
+`T ⊆ join A A'` because a `full`-tagged binary family is observed as a
+restriction of its `y`, and `image_LMR_realize`, which holds for every `A`, `A'`
+and `T`.
+
+Together these are the exact classification `exists_realization_iff`: a triple
+`(A, A', T)` is realized by a fine system with objectwise surjective
+observations exactly when `T ⊆ join A A'`. It quantifies over an arbitrary
+coarse system and all three subsets, and the converse carries no hypothesis
+beyond that inclusion.
+
+Uniqueness follows. `unique_full_image_iff` says the subsets of `join A A'` are
+all equal exactly when `join A A' = ∅`, and `image_LMR_determined_iff` says any
+two candidates supplying the datum `(A, A')` have the same full image exactly
+when `join A A' = ∅`; otherwise `∅` and `join A A'` are two distinct realizable
+full images of one datum. The gap is a missing agreement of fine middle states:
+the datum records which coarse binary families lift, not whether the fine middle
+state used by an `LM`-lift and the one used by an `MR`-lift of a single coarse
+full family coincide.
+
+### A strict finite witness and the finite sweep
+
+`Amalgam/Models/MiddleSplit.lean` certifies that information loss on a finite
+pair through the production family API. Its coarse system has one state at every
+context, so every coarse compatible-family type is a singleton
+(`uniqueCoarseFamily`) and every attainable image is `∅` or `Set.univ`. The fine
+system `split` is
+
+```text
+Context    L       M        R       B       D
+State      Unit    Bool     Unit    Bool    Bool
+```
+
+with restrictions `L→B : _ ↦ false`, `M→B` and `M→D` the identity,
+`R→D : _ ↦ true`, and the identity on every reflexive arrow; the fine system
+`glue` has one state at every context. Compatibility over `LM` forces the middle
+state to be `false` and over `MR` forces it to be `true`
+(`compatible_LM_split_iff`, `compatible_MR_split_iff`), so both adjacent binary
+lifts exist while no lift of the full family does (`compatible_LMR_split_iff`,
+`isEmpty_LMR_split`).
+
+| Attainable image | `split` | `glue` |
+| --- | --- | --- |
+| `I_LM` | `Set.univ` (`image_LM_split`) | `Set.univ` (`image_LM_glue`) |
+| `I_MR` | `Set.univ` (`image_MR_split`) | `Set.univ` (`image_MR_glue`) |
+| `I_LMR` | `∅` (`image_LMR_split`) | `Set.univ` (`image_LMR_glue`) |
+
+The two candidates therefore supply the same binary images (`image_LM_eq`,
+`image_MR_eq`) and have different full images (`image_LMR_ne`), separated by the
+named coarse family `y₀`, which `glue` attains (`y₀_mem_image_glue`) and `split`
+does not (`y₀_notMem_image_split`). Both observations are surjective at every
+context (`surjective_φsplit`, `surjective_φglue`), and all four adjacent binary
+comparisons are surjective onto the coarse binary families
+(`surjective_observedMapFamily_LM_split`, `surjective_observedMapFamily_MR_split`,
+`surjective_observedMapFamily_LM_glue`, `surjective_observedMapFamily_MR_glue`).
+No minimality is claimed for this pair.
+
+`scripts/zigzag_sweep.py` records the bounded reconnaissance behind that choice.
+It enumerates every fine system on the shape whose five carrier sizes lie
+between one and two, with singleton coarse objects throughout, which is 872
+systems. Under that degeneration each `I_F` is a boolean and the coarse join is
+the conjunction, so the conjecture reads `I_LMR ≤ min(I_LM, I_MR)`. Five triples
+`(I_LM, I_MR, I_LMR)` occur: `(1,1,1)`, `(1,1,0)`, `(1,0,0)`, `(0,1,0)` and
+`(0,0,0)`. The necessary condition holds on all 872 systems, and all 5 of the 5
+triples the conjecture allows are realized within the bound. The strict triple
+`(1,1,0)` needs at least two fine middle states: with a single middle state `m`,
+a left state with `r_LB l = r_MB m` and a right state with `r_MD m = r_RD r`
+assemble into a compatible triple, forcing `I_LMR = 1`. Size shapes with an
+empty carrier are excluded, since no map out of an empty set is onto a singleton
+coarse state. The sweep covers only bounded carrier sizes and singleton coarse
+objects, so no coarse family type in it has two elements; it can refute the
+conjecture or guide the proof, and it cannot prove the universal law.
+
 ## Four comparison behaviors
 
 `Amalgam/Models/Overlap.lean` gives four explicit finite commuting squares over
@@ -463,9 +646,11 @@ construction rather than an unrelated finite function.
 Every mathematical claim above is mirrored by a typed `example` in
 `Amalgam/Status.lean`, at the generality claimed: arbitrary types, arbitrary
 preorders of contexts, and arbitrary index types in arbitrary independent
-universes for the generic statements, and the concrete finite models
-for the four comparison behaviors, the surjective reduction, and the two
-calibration cases. The root
+universes for the generic statements, an arbitrary coarse system on the fixed
+zigzag shape with candidates at explicit independent fine universes for the
+information boundary, and the concrete finite models
+for the four comparison behaviors, the surjective reduction, the two
+calibration cases, and the strict middle-split witness. The root
 `Amalgam` aggregator imports the manifest, so a full build checks it; no library
 module imports it.
 
