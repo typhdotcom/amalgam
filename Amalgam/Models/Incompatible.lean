@@ -1,8 +1,13 @@
 import Amalgam.Models.MiddleSplit
+import Amalgam.System.Comparison
+import Amalgam.System.Restriction
+import Amalgam.System.Zigzag
 import Amalgam.System.ZigzagClassification
+import Amalgam.System.ZigzagRealization
+import Amalgam.System.ZigzagTarget
 
 /-!
-# M4.1: strict incompatible targets on the zigzag
+# Strict incompatible targets on the zigzag
 
 Six explicit abstract targets over the all-singleton coarse system `coarse` of
 `Amalgam/Models/MiddleSplit.lean`, one for each condition of `Zigzag.realizable_target_iff`. Each
@@ -10,7 +15,7 @@ violates exactly its own condition and satisfies the other five, so every condit
 criterion is necessary and none is implied by the rest.
 
 Over `coarse` every coarse compatible-family type is a singleton (`uniqueCoarseFamily`), so each
-`Target coarse` entry is `∅` or `Set.univ` and the six controls are as small as the shape allows.
+`Target coarse` entry is `∅` or `Set.univ`.
 
 | Target | Violated condition | Certificate |
 | --- | --- | --- |
@@ -208,8 +213,9 @@ def noJoin : Target coarse where
   mr := Set.univ
   lmr := Set.univ
 
-/-- `noJoin` violates the join inclusion: the coarse family `y₀` lies in its `LMR` entry, and its
-restriction along `toLM` lies in the empty `LM` entry. -/
+/-- `noJoin` violates the join inclusion: the coarse family `y₀` lies in its `LMR` entry, but its
+restriction along `toLM` is not in the empty `LM` entry, whereas the inclusion would force it
+there. -/
 theorem noJoin_lmr_not_subset_join : ¬ noJoin.lmr ⊆ join noJoin.lm noJoin.mr := fun h =>
   Set.notMem_empty _ ((mem_join_iff y₀).1 (h (Set.mem_univ y₀))).1
 

@@ -1931,6 +1931,18 @@ example (S : RestrictionSystem.{0, uV} Context) [Subsingleton (S.State Context.M
     Nonempty (S.CompatibleFamily Zigzag.LMR) :=
   Zigzag.nonempty_LMR_of_subsingleton_middle S hLM hMR
 
+/-- The tagged realization of `(univ, univ, univ)` has the same target as `glueCandidate`, while
+its fine middle carrier is not a subsingleton. -/
+example :
+    (Zigzag.realizeCandidate (S' := coarse) Set.univ Set.univ Set.univ).target =
+      glueCandidate.target :=
+  target_realizeCandidate_eq_target_glue
+
+example :
+    ¬Subsingleton ((Zigzag.realizeCandidate (S' := coarse) Set.univ Set.univ Set.univ).S.State
+      Context.M) :=
+  not_subsingleton_realize_state_M
+
 /-- Targets do not recover fine presentations: two candidates of `coarse` with equal targets
 whose fine middle carriers are not equivalent as types. -/
 example :

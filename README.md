@@ -613,16 +613,18 @@ The two candidates therefore supply the same binary images (`image_LM_eq`,
 named coarse family `y₀`, which `glue` attains (`y₀_mem_image_glue`) and `split`
 does not (`y₀_notMem_image_split`). Packaged as candidates of `coarse`
 (`splitCandidate`, `glueCandidate`), they have equal supplied datum
-(`datum_eq`) and different targets (`target_ne`). Targets do not recover fine
-presentations: `exists_target_eq_not_nonempty_equiv` gives two candidates of
-`coarse` with equal targets whose fine middle carriers are not even equivalent
-as types (`glueCandidate` and the tagged realization of `(univ, univ, univ)`).
-Both observations are surjective at every
-context (`surjective_φsplit`, `surjective_φglue`), and all four adjacent binary
-comparisons are surjective onto the coarse binary families
+(`datum_eq`) and different targets (`target_ne`). Both observations are
+surjective at every context (`surjective_φsplit`, `surjective_φglue`), and all
+four adjacent binary comparisons are surjective onto the coarse binary families
 (`surjective_observedMapFamily_LM_split`, `surjective_observedMapFamily_MR_split`,
 `surjective_observedMapFamily_LM_glue`, `surjective_observedMapFamily_MR_glue`).
 No minimality is claimed for this pair.
+
+A second pair shows that targets do not recover fine presentations:
+`exists_target_eq_not_nonempty_equiv` gives two candidates of `coarse` with
+equal targets whose fine middle carriers are not even equivalent as types,
+namely `glueCandidate` and the tagged realization of `(univ, univ, univ)`
+(`target_realizeCandidate_eq_target_glue`, `not_subsingleton_realize_state_M`).
 
 `scripts/zigzag_sweep.py` records the bounded reconnaissance behind that choice.
 It enumerates every fine system on the shape whose five carrier sizes lie
@@ -727,8 +729,7 @@ tagged realization, whose fine states are built from the coarse ones, so
 `Amalgam/Models/Incompatible.lean` certifies that no condition of
 `realizable_target_iff` is redundant. It reuses the all-singleton coarse system
 `coarse`, where every coarse compatible-family type is a singleton, so every
-entry of a `Target coarse` is `∅` or `Set.univ` and the controls are as small as
-the shape allows.
+entry of a `Target coarse` is `∅` or `Set.univ`.
 
 | Target | Violated condition | Certificate |
 | --- | --- | --- |
