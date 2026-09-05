@@ -15,14 +15,17 @@ images are `φ.image LM = A`, `φ.image MR = A'`, `φ.image LMR = T`.
 * `image_LMR_subset_join`: for every morphism, `φ.image LMR ⊆ join (φ.image LM) (φ.image MR)`,
   by naturality of the family comparison (`mapsTo_restrict_image`). No surjectivity is used and
   the fine system may live in any universe (`subset_join_of_images`).
-* `realize A A' T`, `realizeHom A A' T`: for `T ⊆ join A A'`, a realization of `(A, A', T)`
-  (`surjective_realizeHom`, `image_LM_realize`, `image_MR_realize`, `image_LMR_realize`). A fine
+* `realize A A' T`, `realizeHom A A' T`: the tagged fine system with its observation. For every
+  `A`, `A'`, `T` the observation is objectwise surjective (`surjective_realizeHom`) and has full
+  image `T` (`image_LMR_realize`); under `T ⊆ join A A'` it also has binary images `A`, `A'`
+  (`image_LM_realize`, `image_MR_realize`), so it is then a realization of `(A, A', T)`. A fine
   state is a tag with the coarse state it dictates: one `full` state per element of `T` at every
   context, one `lm` state per element of `A` at every context below `L` or `M`, one `mr` state
   per element of `A'` at every context below `M` or `R`, and a `solo` copy of every coarse state
-  restricted to every coarser context, which makes the observation surjective. Restriction
-  preserves tags, so fine states agree on an overlap exactly when they carry the same tag
-  (`TaggedState.res_eq_res_LM_iff`, `TaggedState.res_eq_res_MR_iff`): the compatible fine
+  restricted to every coarser context, tagged by its origin, which makes the observation
+  surjective. Restriction preserves tags, so fine states agree on an overlap exactly when they
+  carry the same tag (`TaggedState.res_eq_res_LM_iff`, `TaggedState.res_eq_res_MR_iff`): the
+  compatible fine
   families over `LM`, `MR`, `LMR` are the constant `full`- or `lm`-tagged, `full`- or `mr`-tagged,
   and `full`-tagged families, observed as `S'.restrict toLM y`, `a`, `S'.restrict toMR y`, `a'`,
   and `y`.
@@ -172,7 +175,10 @@ theorem res_stateMR (a' : S'.CompatibleFamily MR) {c d : Context} (h : c ≤ d)
 /-! ### Tagged fine states -/
 
 /-- The fine states at `c` of the realization of `(A, A', T)`: a tag naming the coarse family it
-serves, or an untagged copy of a coarse state at a finer context. -/
+serves, or a `solo` copy of a coarse state tagged by its origin `p : Σ d, S'.State d` and
+restricted to `c`. Restriction retains the origin, so two `solo` copies agree on an overlap only
+when they copy the same coarse state at the same context; since no context is finer than both
+`L` and `M`, or both `M` and `R`, this prevents unwanted compatible pairs. -/
 inductive TaggedState (A : Set (S'.CompatibleFamily LM)) (A' : Set (S'.CompatibleFamily MR))
     (T : Set (S'.CompatibleFamily LMR)) (c : Context) : Type w
   /-- The state serving the full family `y`. -/
@@ -260,7 +266,12 @@ end TaggedState
 
 /-! ### The realization -/
 
-/-- The fine system realizing `(A, A', T)`: tagged states with tag-preserving restriction. -/
+/-- The tagged fine system of `(A, A', T)`: tagged states with tag-preserving restriction. For
+every `A`, `A'`, `T`, its observation `realizeHom A A' T` is objectwise surjective
+(`surjective_realizeHom`) and has full image `T` (`image_LMR_realize`); it has binary images `A`
+and `A'` only under `T ⊆ join A A'` (`image_LM_realize`, `image_MR_realize`). Over the
+all-singleton coarse system with `A = A' = ∅` and `T = Set.univ`, the datum of the packaged
+candidate is not `(A, A')`, since a full family in `T` restricts into the actual binary images. -/
 def realize (A : Set (S'.CompatibleFamily LM)) (A' : Set (S'.CompatibleFamily MR))
     (T : Set (S'.CompatibleFamily LMR)) : RestrictionSystem.{0, w} Context where
   State := TaggedState A A' T

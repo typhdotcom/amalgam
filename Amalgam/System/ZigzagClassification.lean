@@ -15,8 +15,8 @@ This module combines M3.2 (`Amalgam/System/ZigzagTarget.lean`) with M3.3
 
 * `Candidate.image_LMR_subset_join`, `subset_join_of_candidate`: for a candidate in any fine
   universe, `I_LMR ⊆ join I_LM I_MR`, by naturality of the family comparison.
-* `realizeCandidate A A' T`: the realization of `(A, A', T)` packaged as a candidate, with datum
-  `(A, A')` when `T ⊆ join A A'` and full image `T`.
+* `realizeCandidate A A' T`: the tagged fine system of `(A, A', T)` packaged as a candidate, with
+  full image `T` for every `A`, `A'`, `T` and datum `(A, A')` only when `T ⊆ join A A'`.
 * `exists_candidate_iff`: a candidate with datum `(A, A')` and full image `T` exists exactly when
   `T ⊆ join A A'`.
 * `Target.ofDatum A A' T`: the target with full coarse content on the empty family, on each
@@ -41,8 +41,10 @@ This module combines M3.2 (`Amalgam/System/ZigzagTarget.lean`) with M3.3
 The coarse system lives in `RestrictionSystem.{0, w}`. Statements with a candidate as hypothesis
 (`Candidate.image_LMR_subset_join`, `subset_join_of_candidate`, `Candidate.target_eq_ofDatum`,
 `Candidate.target_realizable`, `target_eq_of_join_eq_empty`) hold for a fine system in any
-universe `v`. The realization `realize A A' T` has fine states in the coarse universe `w`, so the
-existential statements and the iff's quantify over `Candidate.{w, w}`.
+universe `v`. The first two consume naturality only; the others also consume the fixed-image
+lemmas of M3.2 and the candidate's objectwise surjectivity. The realization `realize A A' T` has
+fine states in the coarse universe `w`, so the existential statements and the iff's quantify over
+`Candidate.{w, w}`.
 -/
 
 universe v v₁ v₂ w
@@ -70,8 +72,10 @@ theorem subset_join_of_candidate {A : Set (S'.CompatibleFamily LM)}
 
 /-! ### The realization as a candidate -/
 
-/-- The realization of `(A, A', T)` packaged as a candidate: the tagged fine system
-`realize A A' T` with its objectwise surjective observation `realizeHom A A' T`. -/
+/-- The tagged fine system `realize A A' T` with its objectwise surjective observation
+`realizeHom A A' T`, packaged as a candidate. Its full image is `T` for every `A`, `A'`, `T`
+(`realizeCandidate_image_LMR`); its datum is `(A, A')` only under `T ⊆ join A A'`
+(`realizeCandidate_datum`). -/
 def realizeCandidate (A : Set (S'.CompatibleFamily LM)) (A' : Set (S'.CompatibleFamily MR))
     (T : Set (S'.CompatibleFamily LMR)) : Candidate.{w, w} S' where
   S := realize A A' T
@@ -179,8 +183,8 @@ theorem datum_determines_target_iff (A : Set (S'.CompatibleFamily LM))
         (congrArg Prod.snd h₂)⟩
 
 /-- Candidates with fine systems in any universes and the same datum `(A, A')` have the same
-target when `join A A' = ∅`: the forward half of `datum_determines_target_iff` at arbitrary fine
-universes. -/
+target when `join A A' = ∅`: the sufficiency direction of `datum_determines_target_iff`, from
+empty join to determination, at arbitrary fine universes. -/
 theorem target_eq_of_join_eq_empty {A : Set (S'.CompatibleFamily LM)}
     {A' : Set (S'.CompatibleFamily MR)} {c₁ : Candidate.{v₁, w} S'} {c₂ : Candidate.{v₂, w} S'}
     (h : join A A' = ∅) (h₁ : c₁.datum = (A, A')) (h₂ : c₂.datum = (A, A')) :

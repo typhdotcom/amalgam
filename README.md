@@ -8,10 +8,13 @@ global states to those pairs, the reduction of compatible pairs across an
 observed overlap, restriction systems over a preorder of contexts with their
 compatible families, family comparison, and binary recovery, and the exact
 classification of the attainable images on the five-context zigzag determined
-by its adjacent binary datum. Everything
-is stated for arbitrary types: carriers
-and fibers may be empty, and no finiteness, decidability, or coverage hypothesis
-appears in any criterion. [PROPOSAL.md](PROPOSAL.md) defines the mathematical
+by its adjacent binary datum. Everything is stated for arbitrary types, and
+carriers and fibers may be empty. The criteria on fibers, compatible pairs,
+reduction, restriction systems, family comparison, and binary recovery carry no
+finiteness, decidability, or coverage hypothesis. The zigzag classification's
+candidate class requires objectwise surjective observations, which fixes the
+images on the empty family, the three singletons, and `LR`; it imposes no
+finiteness or decidability. [PROPOSAL.md](PROPOSAL.md) defines the mathematical
 scope, roadmap, and completion criteria.
 
 ## Fibers
@@ -509,6 +512,12 @@ equal targets along every `FamilyMap` between declared families. The set-level
 inclusion `S'.restrict m '' I_F ⊆ I_E` is literally the same statement for equal
 targets, so it is not restated.
 
+The same file records the collapse at a single fine middle state,
+`nonempty_LMR_iff_of_subsingleton_middle`: for any fine system on the shape
+whose middle carrier is a subsingleton, the full family has a compatible lift
+exactly when both adjacent pairs do. The strict witness section below relies on
+it.
+
 ### The coarse join, the necessary inclusion, and the realization
 
 `Amalgam/System/ZigzagRealization.lean` classifies the possible full images. For
@@ -532,12 +541,14 @@ Sufficiency is an explicit construction of tagged copies. The fine states of
 `realize A A' T` at a context are the `TaggedState` constructors: one `full y`
 for each `y ∈ T` at every context, one `lm a h` for each `a ∈ A` at every context
 below `L` or `M`, one `mr a' h` for each `a' ∈ A'` at every context below `M` or
-`R`, and one `solo p h` for every coarse state at a finer context. A fine state
+`R`, and one `solo p h` for every coarse state `p` at a finer context, tagged
+by that origin. A fine state
 is therefore a coarse state carrying the witness it serves: `realizeHom A A' T`
 observes a tagged state as the coarse state its witness dictates there
 (`stateLMR`, `stateLM`, `stateMR`), and a `solo` copy as the restriction of the
 coarse state it copies, which makes the observation surjective at every context
-(`surjective_realizeHom`). Restriction preserves tags, so two fine
+(`surjective_realizeHom`). Restriction preserves tags, including the origin of
+a `solo` copy, so two fine
 states agree on an overlap exactly when they carry the same tag
 (`TaggedState.res_eq_res_LM_iff`, `TaggedState.res_eq_res_MR_iff`): the
 compatible fine families over `LM` are the constant `full`- and `lm`-tagged
@@ -546,7 +557,10 @@ ones, those over `MR` the constant `full`- and `mr`-tagged ones, and those over
 observations gives `image_LM_realize` and `image_MR_realize`, which consume
 `T ⊆ join A A'` because a `full`-tagged binary family is observed as a
 restriction of its `y`, and `image_LMR_realize`, which holds for every `A`, `A'`
-and `T`.
+and `T`. The construction is usable without the inclusion: its observation is
+always surjective with full image `T`, but its binary images are then not `A`
+and `A'`. Over the all-singleton coarse system with `A = A' = ∅` and
+`T = Set.univ`, the packaged candidate's datum is not `(∅, ∅)`.
 
 Together these are the exact classification `exists_realization_iff`: a triple
 `(A, A', T)` is realized by a fine system with objectwise surjective
@@ -609,10 +623,19 @@ systems. Under that degeneration each `I_F` is a boolean and the coarse join is
 the conjunction, so the conjecture reads `I_LMR ≤ min(I_LM, I_MR)`. Five triples
 `(I_LM, I_MR, I_LMR)` occur: `(1,1,1)`, `(1,1,0)`, `(1,0,0)`, `(0,1,0)` and
 `(0,0,0)`. The necessary condition holds on all 872 systems, and all 5 of the 5
-triples the conjecture allows are realized within the bound. The strict triple
-`(1,1,0)` needs at least two fine middle states: with a single middle state `m`,
-a left state with `r_LB l = r_MB m` and a right state with `r_MD m = r_RD r`
-assemble into a compatible triple, forcing `I_LMR = 1`. Size shapes with an
+triples the conjecture allows are realized within the bound. The numeric minima
+the sweep reports are bounded-search observations. The explanation of why the
+strict triple `(1,1,0)` needs at least two fine middle states is the certified
+lemma `nonempty_LMR_iff_of_subsingleton_middle`: for any fine system on the
+shape whose middle carrier is a subsingleton, the full family has a compatible
+lift exactly when both adjacent pairs do, with no finiteness, decidability,
+nonemptiness, or surjectivity hypothesis. Its forward direction restricts along
+`toLM` and `toMR` (`nonempty_LM_and_MR_of_nonempty_LMR`); its reverse direction
+combines the two supplied lifts at their common middle state
+(`exists_LMR_of_subsingleton_middle`, `nonempty_LMR_of_subsingleton_middle`):
+with a single middle state `m`, a left state with `r_LB l = r_MB m` and a right
+state with `r_MD m = r_RD r` assemble into a compatible triple by
+`compatible_triple_iff`, forcing `I_LMR = 1`. Size shapes with an
 empty carrier are excluded, since no map out of an empty set is onto a singleton
 coarse state. The sweep covers only bounded carrier sizes and singleton coarse
 objects, so no coarse family type in it has two elements; it can refute the
@@ -632,12 +655,13 @@ says `I_LMR ⊆ join I_LM I_MR` for a candidate in any fine universe, and
 `subset_join_of_candidate` is the same statement for a candidate with named
 datum `(A, A')` and named full image `T`.
 
-Sufficiency is the realization packaged as a candidate. `realizeCandidate A A' T`
-is the fine system `realize A A' T` with its objectwise surjective observation;
-`realizeCandidate_datum` gives it datum `(A, A')` under the hypothesis
-`T ⊆ join A A'`, and `realizeCandidate_image_LMR` gives it full image `T` for
-every `A`, `A'` and `T`. Hence `exists_candidate_iff`: a candidate with datum
-`(A, A')` and full image `T` exists exactly when `T ⊆ join A A'`.
+Sufficiency is the tagged construction packaged as a candidate.
+`realizeCandidate A A' T` is the fine system `realize A A' T` with its
+objectwise surjective observation; `realizeCandidate_image_LMR` gives it full
+image `T` for every `A`, `A'` and `T`, and `realizeCandidate_datum` gives it
+datum `(A, A')` only under the hypothesis `T ⊆ join A A'`. Hence
+`exists_candidate_iff`: a candidate with datum `(A, A')` and full image `T`
+exists exactly when `T ⊆ join A A'`.
 
 Every target that occurs has one shape. `Target.ofDatum A A' T` is the target
 with full coarse content on the empty family, on each singleton and on `LR`,
@@ -657,8 +681,9 @@ its `LM`-entry is `A`, its `MR`-entry is `A'`, and its `LMR`-entry lies in
 
 Uniqueness at the level of the target is `datum_determines_target_iff`: the
 datum `(A, A')` determines the target exactly when `join A A' = ∅`; the
-forward direction, `target_eq_of_join_eq_empty`, holds for two candidates in
-any fine universes. When the
+sufficiency direction, from empty join to determination, is
+`target_eq_of_join_eq_empty` and holds for two candidates in any fine
+universes. When the
 join is nonempty, `Target.ofDatum A A' ∅` and `Target.ofDatum A A' (join A A')`
 are two distinct targets of candidates with this datum. The missing information
 is the same one the previous subsection names: the datum records which coarse
@@ -674,12 +699,14 @@ collections arise from any candidate on this shape, with no further hypothesis;
 it records rather than closes M4's obligation, which decides what closure
 requirements remain.
 
-The universe convention is the one the earlier subsections use. Forward
-directions hold for candidates at any fine universe, since they consume
-naturality alone: `Candidate.image_LMR_subset_join`, `subset_join_of_candidate`,
-`Candidate.target_eq_ofDatum` and `Candidate.target_realizable` are stated at an
-independent fine universe. The existential directions produce the tagged
-realization, whose fine states are built from the coarse ones, so
+The universe convention is the one the earlier subsections use. Statements
+with a candidate as hypothesis hold at any fine universe:
+`Candidate.image_LMR_subset_join` and `subset_join_of_candidate` consume
+naturality only, while `Candidate.target_eq_ofDatum`,
+`Candidate.target_realizable` and `target_eq_of_join_eq_empty` also consume the
+fixed-image lemmas and the candidate's objectwise surjectivity. All five are
+stated at an independent fine universe. The existential directions produce the
+tagged realization, whose fine states are built from the coarse ones, so
 `exists_candidate_iff`, `exists_candidate_target_iff`,
 `exists_candidate_target_iff'`, `datum_determines_target_iff` and
 `realizable_target_iff` quantify over candidates at the coarse universe.

@@ -1644,7 +1644,9 @@ example {S : RestrictionSystem.{0, uV} Context} (φ : S.Hom S')
     (hLMR : φ.image Zigzag.LMR = T) : T ⊆ Zigzag.join A A' :=
   Zigzag.subset_join_of_images φ hLM hMR hLMR
 
-/-- The realization of `(A, A', T)`: tagged fine states with tag-preserving restriction. -/
+/-- The tagged fine system of `(A, A', T)`: tagged fine states with tag-preserving restriction.
+For every `A`, `A'` and `T` its observation is objectwise surjective and has full image `T`; it
+has binary images `A` and `A'` only under `T ⊆ join A A'`. -/
 example : RestrictionSystem.{0, uW} Context := Zigzag.realize A A' T
 
 example (c : Context) : (Zigzag.realize A A' T).State c = Zigzag.TaggedState A A' T c := rfl
@@ -1880,6 +1882,35 @@ example : Function.Surjective (φglue.observedMapFamily Zigzag.LM) :=
 example : Function.Surjective (φglue.observedMapFamily Zigzag.MR) :=
   surjective_observedMapFamily_MR_glue
 
+/-- The collapse at a single fine middle state, for any fine system on the shape: when the middle
+carrier is a subsingleton, the full family has a compatible lift exactly when both adjacent pairs
+do. No finiteness, decidability, nonemptiness, or surjectivity hypothesis is used. This is the
+certified explanation of why the strict triple needs two fine middle states; the sweep's numeric
+minima remain bounded-search observations. -/
+example (S : RestrictionSystem.{0, uV} Context) [Subsingleton (S.State Context.M)] :
+    Nonempty (S.CompatibleFamily Zigzag.LMR) ↔
+      Nonempty (S.CompatibleFamily Zigzag.LM) ∧ Nonempty (S.CompatibleFamily Zigzag.MR) :=
+  Zigzag.nonempty_LMR_iff_of_subsingleton_middle S
+
+/-- The forward direction restricts along `toLM` and `toMR` and needs no hypothesis. -/
+example (S : RestrictionSystem.{0, uV} Context) (h : Nonempty (S.CompatibleFamily Zigzag.LMR)) :
+    Nonempty (S.CompatibleFamily Zigzag.LM) ∧ Nonempty (S.CompatibleFamily Zigzag.MR) :=
+  Zigzag.nonempty_LM_and_MR_of_nonempty_LMR S h
+
+/-- The reverse direction combines the two supplied lifts at their common middle state into a
+full lift restricting to both. -/
+example (S : RestrictionSystem.{0, uV} Context) [Subsingleton (S.State Context.M)]
+    (a : S.CompatibleFamily Zigzag.LM) (a' : S.CompatibleFamily Zigzag.MR) :
+    ∃ x : S.CompatibleFamily Zigzag.LMR,
+      S.restrict Zigzag.toLM x = a ∧ S.restrict Zigzag.toMR x = a' :=
+  Zigzag.exists_LMR_of_subsingleton_middle S a a'
+
+example (S : RestrictionSystem.{0, uV} Context) [Subsingleton (S.State Context.M)]
+    (hLM : Nonempty (S.CompatibleFamily Zigzag.LM))
+    (hMR : Nonempty (S.CompatibleFamily Zigzag.MR)) :
+    Nonempty (S.CompatibleFamily Zigzag.LMR) :=
+  Zigzag.nonempty_LMR_of_subsingleton_middle S hLM hMR
+
 end MiddleSplitWitness
 
 /-! ### Classification at fixed datum -/
@@ -1899,7 +1930,9 @@ example {c : Zigzag.Candidate.{uV, uW} S'} (h₁ : c.datum = (A, A'))
     (h₂ : c.φ.image Zigzag.LMR = T) : T ⊆ Zigzag.join A A' :=
   Zigzag.subset_join_of_candidate h₁ h₂
 
-/-- The realization of `(A, A', T)` packaged as a candidate, at the coarse universe. -/
+/-- The tagged fine system of `(A, A', T)` with its observation, packaged as a candidate at the
+coarse universe. Its full image is `T` for every `A`, `A'` and `T`; its datum is `(A, A')` only
+under `T ⊆ join A A'`. -/
 example : Zigzag.Candidate.{uW, uW} S' := Zigzag.realizeCandidate A A' T
 
 /-- Its datum is `(A, A')`, under `T ⊆ join A A'`. -/

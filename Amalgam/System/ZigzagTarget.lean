@@ -1,4 +1,5 @@
 import Amalgam.System.Zigzag
+import Amalgam.System.Binary
 import Amalgam.System.Comparison
 import Amalgam.System.Presentation
 
@@ -30,6 +31,12 @@ subsets (`Target.ext_iff`): not bijection of images, not presentation equivalenc
   either side; a singleton family is a state, so surjectivity of the observation suffices; over
   `LR` every pair of states is compatible because `L` and `R` have no common coarser context
   (`compatible_LR`, from `Context.not_le_L_of_le_R`).
+* `nonempty_LMR_iff_of_subsingleton_middle`: for a fine system whose middle carrier is a
+  subsingleton, the full family has a compatible lift exactly when both adjacent pairs do. The
+  forward direction restricts along `toLM`, `toMR` (`nonempty_LM_and_MR_of_nonempty_LMR`); the
+  reverse combines the two supplied lifts at their common middle state
+  (`exists_LMR_of_subsingleton_middle`, `nonempty_LMR_of_subsingleton_middle`). No finiteness,
+  decidability, nonemptiness, or surjectivity is used.
 * `Candidate.target_lm`, `Candidate.target_mr`: the remaining proper images are the supplied
   datum.
 * `Candidate.target_eq_iff`: two candidates have the same target exactly when they have the same
@@ -67,6 +74,54 @@ context, so there is no cross condition. -/
 theorem compatible_LR (S : RestrictionSystem.{0, v} Context) (x : ∀ i, S.State (LR i)) :
     S.Compatible LR x :=
   (S.compatible_fin_two_iff LR x).2 fun _ hl hr => (not_le_L_of_le_R hl hr).elim
+
+/-! ### Collapse of the full family at a single fine middle state -/
+
+/-- A compatible full family restricts to compatible families over both adjacent pairs, along
+`toLM` and `toMR`. No hypothesis on the fine system is used. -/
+theorem nonempty_LM_and_MR_of_nonempty_LMR (S : RestrictionSystem.{0, v} Context)
+    (h : Nonempty (S.CompatibleFamily LMR)) :
+    Nonempty (S.CompatibleFamily LM) ∧ Nonempty (S.CompatibleFamily MR) :=
+  ⟨h.map (S.restrict toLM), h.map (S.restrict toMR)⟩
+
+/-- With a single fine middle state, a compatible `LM`-family and a compatible `MR`-family
+combine into a compatible full family restricting to both: their middle states agree by
+`Subsingleton.elim`, so the two overlap equations of `compatible_triple_iff` are those of the two
+pairs (`compatible_pair_iff`). -/
+theorem exists_LMR_of_subsingleton_middle (S : RestrictionSystem.{0, v} Context)
+    [Subsingleton (S.State M)] (a : S.CompatibleFamily LM) (a' : S.CompatibleFamily MR) :
+    ∃ x : S.CompatibleFamily LMR, S.restrict toLM x = a ∧ S.restrict toMR x = a' := by
+  have e : (a.1 1 : S.State M) = a'.1 0 := @Subsingleton.elim (S.State M) _ _ _
+  refine ⟨⟨Fin.cons (a.1 0) (Fin.cons (a.1 1) (Fin.cons (a'.1 1) finZeroElim)),
+    (S.compatible_triple_iff B_le_L B_le_M D_le_M D_le_R le_B_of_le_L_of_le_M
+      le_D_of_le_M_of_le_R le_M_of_le_L_of_le_R _).2
+      ⟨(S.compatible_pair_iff B_le_L B_le_M le_B_of_le_L_of_le_M a.1).1 a.2,
+        (congrArg (S.res D_le_M) e).trans
+          ((S.compatible_pair_iff D_le_M D_le_R le_D_of_le_M_of_le_R a'.1).1 a'.2)⟩⟩,
+    Subtype.ext (funext fun i => match i with | 0 => S.res_refl _ _ | 1 => S.res_refl _ _),
+    Subtype.ext (funext fun i => match i with
+      | 0 => (S.res_refl _ _).trans e
+      | 1 => S.res_refl _ _)⟩
+
+/-- With a single fine middle state, the full family has a compatible lift as soon as both
+adjacent pairs do. -/
+theorem nonempty_LMR_of_subsingleton_middle (S : RestrictionSystem.{0, v} Context)
+    [Subsingleton (S.State M)] (hLM : Nonempty (S.CompatibleFamily LM))
+    (hMR : Nonempty (S.CompatibleFamily MR)) : Nonempty (S.CompatibleFamily LMR) :=
+  let ⟨a⟩ := hLM
+  let ⟨a'⟩ := hMR
+  let ⟨x, _⟩ := exists_LMR_of_subsingleton_middle S a a'
+  ⟨x⟩
+
+/-- The collapse at a single fine middle state: for any fine system on the shape whose middle
+carrier is a subsingleton, the full family has a compatible lift exactly when both adjacent pairs
+do. No finiteness, decidability, nonemptiness, or surjectivity hypothesis is used. -/
+theorem nonempty_LMR_iff_of_subsingleton_middle (S : RestrictionSystem.{0, v} Context)
+    [Subsingleton (S.State M)] :
+    Nonempty (S.CompatibleFamily LMR) ↔
+      Nonempty (S.CompatibleFamily LM) ∧ Nonempty (S.CompatibleFamily MR) :=
+  ⟨nonempty_LM_and_MR_of_nonempty_LMR S,
+    fun h => nonempty_LMR_of_subsingleton_middle S h.1 h.2⟩
 
 variable (φ : S.Hom S')
 
