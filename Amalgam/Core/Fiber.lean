@@ -2,8 +2,8 @@ import Mathlib.Data.Set.Operations
 import Mathlib.Logic.Equiv.Basic
 import Mathlib.Logic.Equiv.Sum
 import Mathlib.Logic.Function.Basic
-import Mathlib.Logic.IsEmpty.Basic
-import Mathlib.Logic.Unique
+import Mathlib.Basic.IsEmpty.Basic
+import Mathlib.Basic.Unique
 
 /-!
 # Fibers of a map

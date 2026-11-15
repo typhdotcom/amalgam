@@ -509,7 +509,7 @@ The induced maps on attainable images agree too, because both restrict the same
 fixed coarse map `S'.restrict m`. `coe_restrictImage_eq` says that two morphisms
 into `S'` induce the same map on underlying coarse families,
 `restrictImage_setCongr` that the induced maps commute with the identifications
-`Equiv.setCongr` of equal images, and
+`Set.equivOfEq` of equal images, and
 `Candidate.restrictImage_setCongr_of_target_eq` states that for candidates with
 equal targets along every `FamilyMap` between declared families. The set-level
 inclusion `S'.restrict m '' I_F ⊆ I_E` is literally the same statement for equal

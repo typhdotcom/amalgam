@@ -329,11 +329,11 @@ theorem coe_restrictImage_eq {S₁ : RestrictionSystem.{0, v₁} Context}
   rfl
 
 /-- Under equal attainable images over `F` and over `E`, the induced image restriction maps of two
-morphisms into `S'` commute with the identifications `Equiv.setCongr` of the equal images. -/
+morphisms into `S'` commute with the identifications `Set.equivOfEq` of the equal images. -/
 theorem restrictImage_setCongr {S₁ : RestrictionSystem.{0, v₁} Context}
     {S₂ : RestrictionSystem.{0, v₂} Context} {φ₁ : S₁.Hom S'} {φ₂ : S₂.Hom S'}
     (hF : φ₁.image F = φ₂.image F) (hE : φ₁.image E = φ₂.image E) (y : φ₁.image F) :
-    Equiv.setCongr hE (φ₁.restrictImage m y) = φ₂.restrictImage m (Equiv.setCongr hF y) :=
+    Set.equivOfEq hE (φ₁.restrictImage m y) = φ₂.restrictImage m (Set.equivOfEq hF y) :=
   Subtype.ext rfl
 
 /-- For candidates with equal targets, the induced image restriction maps along every declared
@@ -342,8 +342,8 @@ the identifications of the equal images. -/
 theorem Candidate.restrictImage_setCongr_of_target_eq {c₁ : Candidate.{v₁, w} S'}
     {c₂ : Candidate.{v₂, w} S'} (h : c₁.target = c₂.target) {f e : Family}
     (m : FamilyMap f.fam e.fam) (y : c₁.φ.image f.fam) :
-    Equiv.setCongr (c₁.image_eq_of_target_eq h e) (c₁.φ.restrictImage m y) =
-      c₂.φ.restrictImage m (Equiv.setCongr (c₁.image_eq_of_target_eq h f) y) :=
+    Set.equivOfEq (c₁.image_eq_of_target_eq h e) (c₁.φ.restrictImage m y) =
+      c₂.φ.restrictImage m (Set.equivOfEq (c₁.image_eq_of_target_eq h f) y) :=
   restrictImage_setCongr m _ _ y
 
 end RestrictImage

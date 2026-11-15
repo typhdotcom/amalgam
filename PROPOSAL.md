@@ -1278,7 +1278,7 @@ span through `bijective_compare₁`, `injective_compare₂`,
 `not_injective_compare₄`, and `not_surjective_compare₄`, with explicit
 unreached pairs and distinct-state witnesses. `Amalgam/Status.lean` mirrors
 the README's mathematical claims and is imported by the root library. The
-Apache-2.0 Lake package `amalgam` pins Lean and mathlib to `v4.33.1` and provides
+Apache-2.0 Lake package `amalgam` pins Lean and mathlib to `v4.34.1` and provides
 build and cache tasks. M1 consumes this API to characterize when observing
 local descriptions preserves their joint compatibility.
 
