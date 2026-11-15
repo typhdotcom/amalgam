@@ -4,7 +4,7 @@ import Amalgam.Core.Reduction
 /-!
 # A surjective reduction that loses compatibility
 
-The witness prescribed in PROPOSAL §10 for failure of the exact lifting criterion of
+A witness for failure of the exact lifting criterion of
 `Amalgam.Core.Reduction` under observation maps that are surjective on every object.
 
 The fine span is `Unit ─p→ Bool ←q─ Unit` with `p _ = false` and `q _ = true`: the two local

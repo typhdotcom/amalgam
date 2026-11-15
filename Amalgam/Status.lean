@@ -1609,7 +1609,7 @@ example {ι : Type uI} {κ : Type uK} {F : ι → Context} {E : κ → Context} 
     {φ₁ : S₁.Hom S'} {φ₂ : S₂.Hom S'} (hF : φ₁.image F = φ₂.image F)
     (hE : φ₁.image E = φ₂.image E) (y : φ₁.image F) :
     Set.equivOfEq hE (φ₁.restrictImage m y) = φ₂.restrictImage m (Set.equivOfEq hF y) :=
-  Zigzag.restrictImage_setCongr m hF hE y
+  Zigzag.restrictImage_equivOfEq m hF hE y
 
 /-- For candidates with equal targets, along every declared operation between declared
 families. -/
@@ -1619,7 +1619,7 @@ example {c₁ : Zigzag.Candidate.{uV₁, uW} S'} {c₂ : Zigzag.Candidate.{uV₂
     Set.equivOfEq (Zigzag.Candidate.image_eq_of_target_eq h e) (c₁.φ.restrictImage m y) =
       c₂.φ.restrictImage m
         (Set.equivOfEq (Zigzag.Candidate.image_eq_of_target_eq h f) y) :=
-  Zigzag.Candidate.restrictImage_setCongr_of_target_eq h m y
+  Zigzag.Candidate.restrictImage_equivOfEq_of_target_eq h m y
 
 end TargetSection
 

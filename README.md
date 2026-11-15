@@ -16,8 +16,12 @@ reduction, restriction systems, family comparison, and binary recovery carry no
 finiteness, decidability, or coverage hypothesis. The zigzag classification's
 candidate class requires objectwise surjective observations, which fixes the
 images on the empty family, the three singletons, and `LR`; it imposes no
-finiteness or decidability. [PROPOSAL.md](PROPOSAL.md) defines the mathematical
-scope, roadmap, and completion criteria.
+finiteness or decidability.
+
+Compatible families and amalgamations are those of sheaf theory, where at most
+one amalgamation is separatedness and unique amalgamation is the sheaf
+condition. Amalgam keeps the whole extension fiber, not only its existence or
+uniqueness, and does not import sites or sheaves.
 
 ## Fibers
 
@@ -397,7 +401,7 @@ of `x₀` and `x₁` to one coarse pair (`map_binaryEquiv_x₀_eq`), and `y₀` 
 attained through the intersection criterion
 (`y₀_mem_image_of_inter_nonempty`).
 
-`Amalgam/Models/Zigzag.lean` carries the Section 12 witness on
+`Amalgam/Models/Zigzag.lean` carries the finite witness on
 `L → B ← M → D ← R`, over the five-point preorder shared from
 `Amalgam/System/Zigzag.lean`, which has `B ≤ L`, `B ≤ M`, `D ≤ M` and
 `D ≤ R` (`B_le_L`, `B_le_M`, `D_le_M`, `D_le_R`), with `B` greatest among the
@@ -508,9 +512,9 @@ which naturality supplies the inclusion `restrict(I_F) ⊆ I_E` and nothing more
 The induced maps on attainable images agree too, because both restrict the same
 fixed coarse map `S'.restrict m`. `coe_restrictImage_eq` says that two morphisms
 into `S'` induce the same map on underlying coarse families,
-`restrictImage_setCongr` that the induced maps commute with the identifications
+`restrictImage_equivOfEq` that the induced maps commute with the identifications
 `Set.equivOfEq` of equal images, and
-`Candidate.restrictImage_setCongr_of_target_eq` states that for candidates with
+`Candidate.restrictImage_equivOfEq_of_target_eq` states that for candidates with
 equal targets along every `FamilyMap` between declared families. The set-level
 inclusion `S'.restrict m '' I_F ⊆ I_E` is literally the same statement for equal
 targets, so it is not restated.
@@ -747,7 +751,7 @@ witnesses the failed inclusion. Each target satisfies the five conditions it
 does not violate: `noEmpty_satisfies_others`, `noL_satisfies_others`,
 `noM_satisfies_others`, `noR_satisfies_others`, `noLR_satisfies_others` and
 `noJoin_satisfies_others`, where the full entries meet the join inclusion
-through `univ_subset_join_univ_univ`. Nonrealizability goes through the accepted
+through `univ_subset_join_univ_univ`. Nonrealizability goes through the
 criterion: `noEmpty_not_realizable`, `noL_not_realizable`, `noM_not_realizable`,
 `noR_not_realizable`, `noLR_not_realizable` and `noJoin_not_realizable` each say
 that no candidate of `coarse` has that target, by `realizable_target_iff`

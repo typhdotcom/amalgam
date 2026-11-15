@@ -2,7 +2,7 @@
 # requires-python = ">=3.14"
 # dependencies = []
 # ///
-"""Bounded finite reconnaissance for the zigzag M3 conjecture.
+"""Bounded finite reconnaissance for the zigzag information-boundary conjecture.
 
 Shape: the five-point preorder ``B <= L``, ``B <= M``, ``D <= M``, ``D <= R``,
 drawn as ``L -> B <- M -> D <- R`` (arrows are the restriction maps).
@@ -147,7 +147,7 @@ def report(max_size: int) -> None:
     result = sweep(max_size)
     realized = sorted(result.witness, reverse=True)
 
-    print("zigzag M3 finite sweep")
+    print("zigzag finite sweep")
     print("  shape L -> B <- M -> D <- R; coarse objects all singletons, so every")
     print("  coarse family type is a singleton and observations are surjective")
     print(f"  size bound: 1 <= |S_X| <= {max_size} for X in L, B, M, D, R")

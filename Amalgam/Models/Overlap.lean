@@ -4,7 +4,7 @@ import Mathlib.Data.Fintype.Prod
 /-!
 # Four certified comparison behaviors
 
-Explicit finite commuting squares realizing the four cases of PROPOSAL §4: a comparison map that
+Explicit finite commuting squares realizing the four comparison behaviors: a comparison map that
 is bijective, one that is injective but not surjective, one that is surjective but not injective,
 and one that is neither.
 

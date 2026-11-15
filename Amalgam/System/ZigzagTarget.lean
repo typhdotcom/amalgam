@@ -45,7 +45,7 @@ subsets (`Target.ext_iff`): not bijection of images, not presentation equivalenc
   joint question at fixed datum. It is not an assumption that the full image projects onto any
   proper image; the naturality inclusion `restrict(I_F) ⊆ I_E` (`Hom.image_restrict_subset`) is
   all that relates the entries.
-* `coe_restrictImage_eq`, `restrictImage_setCongr`, `Candidate.restrictImage_setCongr_of_target_eq`:
+* `coe_restrictImage_eq`, `restrictImage_equivOfEq`, `Candidate.restrictImage_equivOfEq_of_target_eq`:
   the induced image restriction maps of two candidates agree on underlying coarse families, and
   commute with the identifications of equal images, because both restrict the fixed coarse map
   `S'.restrict m`. The set-level inclusion `S'.restrict m '' I_F ⊆ I_E` is literally the same
@@ -330,7 +330,7 @@ theorem coe_restrictImage_eq {S₁ : RestrictionSystem.{0, v₁} Context}
 
 /-- Under equal attainable images over `F` and over `E`, the induced image restriction maps of two
 morphisms into `S'` commute with the identifications `Set.equivOfEq` of the equal images. -/
-theorem restrictImage_setCongr {S₁ : RestrictionSystem.{0, v₁} Context}
+theorem restrictImage_equivOfEq {S₁ : RestrictionSystem.{0, v₁} Context}
     {S₂ : RestrictionSystem.{0, v₂} Context} {φ₁ : S₁.Hom S'} {φ₂ : S₂.Hom S'}
     (hF : φ₁.image F = φ₂.image F) (hE : φ₁.image E = φ₂.image E) (y : φ₁.image F) :
     Set.equivOfEq hE (φ₁.restrictImage m y) = φ₂.restrictImage m (Set.equivOfEq hF y) :=
@@ -339,12 +339,12 @@ theorem restrictImage_setCongr {S₁ : RestrictionSystem.{0, v₁} Context}
 /-- For candidates with equal targets, the induced image restriction maps along every declared
 operation between declared families (and along any other `FamilyMap` between them) commute with
 the identifications of the equal images. -/
-theorem Candidate.restrictImage_setCongr_of_target_eq {c₁ : Candidate.{v₁, w} S'}
+theorem Candidate.restrictImage_equivOfEq_of_target_eq {c₁ : Candidate.{v₁, w} S'}
     {c₂ : Candidate.{v₂, w} S'} (h : c₁.target = c₂.target) {f e : Family}
     (m : FamilyMap f.fam e.fam) (y : c₁.φ.image f.fam) :
     Set.equivOfEq (c₁.image_eq_of_target_eq h e) (c₁.φ.restrictImage m y) =
       c₂.φ.restrictImage m (Set.equivOfEq (c₁.image_eq_of_target_eq h f) y) :=
-  restrictImage_setCongr m _ _ y
+  restrictImage_equivOfEq m _ _ y
 
 end RestrictImage
 

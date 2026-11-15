@@ -1,5 +1,5 @@
 name = "amalgam"
-version = "0.1.0"
+version = "0.2.0"
 keywords = ["math", "order-theory", "sheaf-theory", "combinatorics"]
 homepage = "https://github.com/typhdotcom/amalgam"
 description = "A formal theory of restriction, compatibility, and global extension"

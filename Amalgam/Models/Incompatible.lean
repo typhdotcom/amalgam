@@ -27,7 +27,7 @@ Over `coarse` every coarse compatible-family type is a singleton (`uniqueCoarseF
 | `noJoin` | `lmr ⊆ join lm mr` | `noJoin_lmr_not_subset_join` |
 
 The five satisfied conditions of each target are certified by `noEmpty_satisfies_others` and its
-four analogues, and by `noJoin_satisfies_others`. Nonrealizability goes through the accepted
+four analogues, and by `noJoin_satisfies_others`. Nonrealizability goes through the
 criterion `Zigzag.realizable_target_iff`: `noEmpty_not_realizable` and its five analogues.
 `ofDatum_univ_univ_empty_realizable` is the positive control, so the six conditions are jointly
 satisfiable and no control is vacuous.

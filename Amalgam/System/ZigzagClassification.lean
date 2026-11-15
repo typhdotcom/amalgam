@@ -39,7 +39,7 @@ of `Amalgam/System/ZigzagRealization.lean`.
 * `realizable_target_iff`: an abstract target arises from some candidate exactly when its five
   fixed entries are full and its `LMR`-entry lies in the join of its `LM`- and `MR`-entries.
   This is `exists_realization_iff` read at the level of targets, recorded as the realizability
-  consequence (PROPOSAL Section 14) for this shape and datum.
+  consequence for this shape and datum.
 
 ## Universe convention
 
